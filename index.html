@@ -60,6 +60,24 @@
         </div>
     </div>
     
+    <!-- Modal de Adicionar Pagamento -->
+    <div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Adicionar Pagamento</h2>
+            <form id="payment-form">
+                <input type="hidden" id="payment-doc-id">
+                <div class="mb-4">
+                    <label for="payment-amount" class="block text-sm font-medium text-gray-700 mb-1">Valor do Pagamento (R$)</label>
+                    <input type="number" step="0.01" id="payment-amount" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="flex justify-end gap-4">
+                    <button type="button" id="cancel-payment-button" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition-colors">Cancelar</button>
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors">Salvar Pagamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Estrutura Principal da Aplicação -->
     <div id="app-container" class="hidden h-screen w-full md:flex">
         <!-- Sidebar de Navegação -->
@@ -225,7 +243,7 @@
                 <div id="section-financeiro" class="content-section hidden">
                     <h1 class="text-3xl font-bold text-gray-800 mb-6">Controle Financeiro</h1>
                     <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-                        <h2 class="text-xl font-bold text-gray-800 mb-4">Adicionar Lançamento</h2>
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">Adicionar Lançamento Inicial</h2>
                         <form id="form-financeiro">
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                <select id="financeiro-aluno" class="w-full p-2 border rounded" required>
@@ -233,7 +251,7 @@
                                    <!-- Opções de alunos preenchidas via JS -->
                                </select>
                                 <input type="number" step="0.01" id="financeiro-valor-total" placeholder="Valor Total (R$)" class="w-full p-2 border rounded" required>
-                                <input type="number" step="0.01" id="financeiro-valor-pago" placeholder="Valor Pago (R$)" class="w-full p-2 border rounded" required>
+                                <input type="number" step="0.01" id="financeiro-valor-pago" placeholder="1º Pagamento (R$)" class="w-full p-2 border rounded" required>
                                 <select id="financeiro-status" class="w-full p-2 border rounded" required>
                                    <option value="Pendente">Pendente</option>
                                    <option value="Pago Parcialmente">Pago Parcialmente</option>
@@ -250,6 +268,7 @@
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Aluno</th>
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Valor Total</th>
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Valor Pago</th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-600">Valor Restante</th>
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Status</th>
                                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Ações</th>
                                 </tr>
@@ -269,7 +288,7 @@
         // Importações do Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         document.addEventListener('DOMContentLoaded', async function() {
             // --- CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE ---
@@ -310,10 +329,8 @@
                     appContainer.classList.add('hidden');
                     appContainer.classList.remove('flex');
                     document.getElementById('auth-status').innerText = "Desconectado";
-                    // Limpa listeners antigos para não acumular
                     unsubscribeListeners.forEach(unsub => unsub());
                     unsubscribeListeners = [];
-                    // Limpa a tela
                     clearAllData();
                     renderAll();
                 }
@@ -328,11 +345,9 @@
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
                 loginError.classList.add('hidden');
-
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
                 } catch (error) {
-                    console.error("Erro de login:", error.code);
                     loginError.textContent = "Email ou senha incorretos.";
                     loginError.classList.remove('hidden');
                 }
@@ -343,17 +358,14 @@
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
                 loginError.classList.add('hidden');
-
                 if (password.length < 6) {
                     loginError.textContent = "A senha deve ter no mínimo 6 caracteres.";
                     loginError.classList.remove('hidden');
                     return;
                 }
-
                 try {
                     await createUserWithEmailAndPassword(auth, email, password);
                 } catch (error) {
-                    console.error("Erro de registro:", error.code);
                     if (error.code === 'auth/email-already-in-use') {
                         loginError.textContent = "Este email já está em uso.";
                     } else {
@@ -367,23 +379,63 @@
                 await signOut(auth);
             });
 
+            // --- Lógica do Modal de Pagamento ---
+            const paymentModal = document.getElementById('payment-modal');
+            const paymentForm = document.getElementById('payment-form');
+            const cancelPaymentButton = document.getElementById('cancel-payment-button');
+
+            cancelPaymentButton.addEventListener('click', () => {
+                paymentModal.classList.add('hidden');
+                paymentModal.classList.remove('flex');
+            });
+
+            paymentForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const docId = document.getElementById('payment-doc-id').value;
+                const amount = parseFloat(document.getElementById('payment-amount').value);
+                
+                if (!docId || isNaN(amount) || amount <= 0) return;
+
+                const financialDoc = dbState.financeiro.find(item => item.id === docId);
+                if (!financialDoc) return;
+
+                const currentPaid = parseFloat(financialDoc.pago || 0);
+                const total = parseFloat(financialDoc.total || 0);
+                const newPaid = currentPaid + amount;
+
+                let newStatus = 'Pago Parcialmente';
+                if (newPaid >= total) {
+                    newStatus = 'Pago';
+                }
+
+                try {
+                    const docRef = doc(db, `users/${userId}/financeiro/${docId}`);
+                    await updateDoc(docRef, {
+                        pago: newPaid,
+                        status: newStatus
+                    });
+                    paymentModal.classList.add('hidden');
+                    paymentModal.classList.remove('flex');
+                    paymentForm.reset();
+                } catch (error) {
+                    console.error("Erro ao atualizar pagamento:", error);
+                }
+            });
+
+
             // --- LISTENERS EM TEMPO REAL (ONSNAPSHOT) ---
             function setupRealtimeListeners() {
                 if (!userId) return;
-                
-                // Limpa listeners antigos antes de criar novos
                 unsubscribeListeners.forEach(unsub => unsub());
                 unsubscribeListeners = [];
-                
                 const collections = ['eventos', 'alunos', 'fotografos', 'financeiro'];
                 collections.forEach(col => {
-                    const collectionPath = `users/${userId}/${col}`; // Caminho simplificado
+                    const collectionPath = `users/${userId}/${col}`;
                     const unsub = onSnapshot(collection(db, collectionPath), (querySnapshot) => {
                         dbState[col] = [];
                         querySnapshot.forEach((doc) => {
                             dbState[col].push({ id: doc.id, ...doc.data() });
                         });
-                        // Ordena os alunos por nome para consistência
                         if(col === 'alunos') {
                             dbState.alunos.sort((a,b) => a.nome.localeCompare(b.nome));
                         }
@@ -397,7 +449,6 @@
                 dbState = { eventos: [], alunos: [], fotografos: [], financeiro: [] };
             }
 
-            // --- RENDERIZAÇÃO GERAL ---
             function renderAll() {
                 renderEventos();
                 renderAlunos();
@@ -408,7 +459,7 @@
                 lucide.createIcons();
             }
 
-            // --- RENDERIZAÇÃO DAS SEÇÕES (funções idênticas à versão anterior, sem alterações) ---
+            // --- RENDERIZAÇÃO DAS SEÇÕES ---
             function updateDashboard() {
                 document.getElementById('total-eventos').innerText = dbState.eventos.length;
                 document.getElementById('total-alunos').innerText = dbState.alunos.length;
@@ -496,21 +547,27 @@
                 const lista = document.getElementById('lista-financeiro');
                 lista.innerHTML = '';
                 if (dbState.financeiro.length === 0) {
-                     lista.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Nenhum lançamento financeiro.</td></tr>';
+                     lista.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhum lançamento financeiro.</td></tr>';
                     return;
                 }
                 dbState.financeiro.forEach(item => {
                     const aluno = dbState.alunos.find(a => a.id === item.alunoId);
                     const statusClass = item.status === 'Pago' ? 'bg-green-100 text-green-800' : (item.status === 'Pendente' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800');
+                    const total = parseFloat(item.total || 0);
+                    const pago = parseFloat(item.pago || 0);
+                    const restante = total - pago;
+                    
                     const row = document.createElement('tr');
                     row.className = 'border-b hover:bg-gray-50';
                     row.innerHTML = `
                         <td class="p-4">${aluno ? aluno.nome : 'Aluno não encontrado'}</td>
-                        <td class="p-4">R$ ${parseFloat(item.total).toFixed(2).replace('.', ',')}</td>
-                        <td class="p-4">R$ ${parseFloat(item.pago).toFixed(2).replace('.', ',')}</td>
+                        <td class="p-4">R$ ${total.toFixed(2).replace('.', ',')}</td>
+                        <td class="p-4">R$ ${pago.toFixed(2).replace('.', ',')}</td>
+                        <td class="p-4 font-medium ${restante > 0 ? 'text-red-600' : 'text-green-600'}">R$ ${restante.toFixed(2).replace('.', ',')}</td>
                         <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${item.status}</span></td>
-                        <td class="p-4">
-                            <button onclick="window.app.deleteItem('financeiro', '${item.id}')" class="text-red-500 hover:text-red-700"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                        <td class="p-4 flex items-center gap-2">
+                            <button onclick="window.app.openPaymentModal('${item.id}')" class="text-green-500 hover:text-green-700" title="Adicionar Pagamento"><i data-lucide="plus-circle" class="w-5 h-5"></i></button>
+                            <button onclick="window.app.deleteItem('financeiro', '${item.id}')" class="text-red-500 hover:text-red-700" title="Excluir Lançamento"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
                         </td>
                     `;
                     lista.appendChild(row);
@@ -546,6 +603,12 @@
             
             // --- FUNÇÕES GLOBAIS ---
             window.app = {
+                openPaymentModal: function(docId) {
+                    document.getElementById('payment-doc-id').value = docId;
+                    paymentModal.classList.remove('hidden');
+                    paymentModal.classList.add('flex');
+                    document.getElementById('payment-amount').focus();
+                },
                 deleteItem: async function(collectionName, id) {
                     if (!userId) { console.error("Usuário não autenticado."); return; }
                     if (confirm(`Tem certeza que deseja excluir este item?`)) {

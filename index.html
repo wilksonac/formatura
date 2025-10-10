@@ -619,6 +619,14 @@
                     }
                 },
                 showSection: function(sectionId) {
+                    // --- CORREÇÃO PARA O MENU MÓVEL ---
+                    // Fecha o menu lateral em dispositivos móveis após um clique
+                    const sidebar = document.getElementById('sidebar');
+                    if (window.innerWidth < 768) { // 768px é o breakpoint 'md' do Tailwind
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                    // --- FIM DA CORREÇÃO ---
+
                     document.querySelectorAll('.content-section').forEach(section => section.classList.add('hidden'));
                     document.getElementById(`section-${sectionId}`).classList.remove('hidden');
                     document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('bg-gray-700'));
@@ -639,4 +647,17 @@
     </script>
 </body>
 </html>
+```
+
+**O que foi alterado?**
+
+A única mudança foi na função `showSection`, que é chamada toda vez que você clica em um item do menu. Adicionei este pequeno trecho de código no início dela:
+
+```javascript
+// --- CORREÇÃO PARA O MENU MÓVEL ---
+const sidebar = document.getElementById('sidebar');
+if (window.innerWidth < 768) { // 768px é o breakpoint 'md' do Tailwind
+    sidebar.classList.add('-translate-x-full');
+}
+// --- FIM DA CORREÇÃO ---
 

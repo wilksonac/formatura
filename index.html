@@ -123,7 +123,7 @@
                 <!-- Seção Dashboard -->
                 <div id="section-dashboard" class="content-section">
                     <h1 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-gray-500">Próximos Eventos</p>
@@ -140,6 +140,15 @@
                             </div>
                              <div class="bg-green-100 p-3 rounded-full">
                                 <i data-lucide="users" class="h-6 w-6 text-green-500"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Total Pago</p>
+                                <p id="total-pago" class="text-3xl font-bold text-gray-800">R$ 0,00</p>
+                            </div>
+                             <div class="bg-emerald-100 p-3 rounded-full">
+                                <i data-lucide="check-circle" class="h-6 w-6 text-emerald-500"></i>
                             </div>
                         </div>
                         <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
@@ -463,8 +472,13 @@
             function updateDashboard() {
                 document.getElementById('total-eventos').innerText = dbState.eventos.length;
                 document.getElementById('total-alunos').innerText = dbState.alunos.length;
+                
+                const totalPago = dbState.financeiro.reduce((acc, item) => acc + parseFloat(item.pago || 0), 0);
+                document.getElementById('total-pago').innerText = `R$ ${totalPago.toFixed(2).replace('.', ',')}`;
+
                 const totalPendente = dbState.financeiro.reduce((acc, item) => acc + (parseFloat(item.total || 0) - parseFloat(item.pago || 0)), 0);
                 document.getElementById('total-pendente').innerText = `R$ ${totalPendente.toFixed(2).replace('.', ',')}`;
+                
                 const dashboardEventosContainer = document.getElementById('dashboard-eventos-recentes');
                 dashboardEventosContainer.innerHTML = '';
                 if(dbState.eventos.length === 0) {
@@ -647,6 +661,4 @@
     </script>
 </body>
 </html>
-```
-
 

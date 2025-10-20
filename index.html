@@ -53,7 +53,7 @@
                 </div>
                 <div id="login-error" class="text-red-500 text-sm mb-4 text-center hidden"></div>
                 <div class="flex items-center justify-between gap-4">
-                    <button type="button" id="login-button" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">Entrar</button>
+                    <button type="submit" id="login-button" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">Entrar</button>
                     <button type="button" id="register-button" class="w-full bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 transition-colors">Registrar</button>
                 </div>
             </form>
@@ -425,7 +425,8 @@
             });
 
             // --- Lógica de Login e Registro ---
-            document.getElementById('login-button').addEventListener('click', async (e) => {
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault(); // Impede o recarregamento da página
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
                 document.getElementById('login-error').classList.add('hidden');
@@ -438,7 +439,8 @@
             });
 
             document.getElementById('register-button').addEventListener('click', async (e) => {
-                e.preventDefault();
                 const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const loginError = document.getElementById('login-error');
 // ... existing code ... -->
 

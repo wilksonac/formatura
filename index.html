@@ -621,16 +621,13 @@
                 head.innerHTML = `<tr>
                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Aluno</th>
                     <th class="p-4 text-left text-sm font-semibold text-gray-600">Contrato</th>
-                    ${cenarios.map(c => `<th class="p-4 text-left text-sm font-semibold text-gray-600">${c}</th>`).join('')}
+                    ${cenarios.map(c => `<th class="p-4 text-center text-sm font-semibold text-gray-600">${c}</th>`).join('')}
+                    <th class="p-4 text-center text-sm font-semibold text-gray-600">Ações</th>
                 </tr>`;
 
                 // Agrupa todos os alunos
                 const alunosComContratoIds = dbState.financeiro.map(f => f.alunoId);
-                const alunosComContrato = dbState.alunos.filter(a => alunosComContratoIds.includes(a.id)).map(a => ({...a, temContrato: true }));
-                const alunosSemContrato = sessionData.alunos.filter(a => !a.alunoId).map(a => ({...a, temContrato: false }));
-                const todosAlunos = [...alunosComContrato, ...alunosSemContrato].sort((a,b) => a.nome.localeCompare(b.nome));
-
-                // Renderiza o corpo da tabela
+// ... existing code ... -->
                 const body = document.getElementById('fotos-table-body');
                 body.innerHTML = todosAlunos.map(aluno => {
                     const alunoId = aluno.id || aluno.nome; // Usa o nome como ID para os sem contrato
@@ -640,72 +637,41 @@
                         <td class="p-4">${aluno.nome}</td>
                         <td class="p-4">${aluno.temContrato ? '<span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Sim</span>' : '<span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">Não</span>'}</td>
                         ${cenarios.map(c => `<td class="p-4 text-center"><input type="checkbox" onchange="window.app.toggleFoto('${eventoId}', '${alunoId}', '${c}', ${aluno.temContrato}, '${aluno.nome}')" ${fotosTiradas[c] ? 'checked' : ''} class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"></td>`).join('')}
+                         <td class="p-4 text-center">
+                            ${!aluno.temContrato ? `<button onclick="window.app.deleteAlunoFoto('${eventoId}', '${aluno.nome}')" class="text-red-500 hover:text-red-700" title="Excluir Aluno"><i data-lucide="trash-2" class="w-5 h-5"></i></button>` : ''}
+                        </td>
                     </tr>`;
                 }).join('');
             }
 
             document.getElementById('fotos-evento-select').addEventListener('change', (e) => {
-                const cenariosInput = document.getElementById('fotos-cenarios-input');
-                const saveBtn = document.getElementById('fotos-salvar-cenarios');
-                const eventoId = e.target.value;
-                const sessionData = dbState.fotos.find(f => f.id === eventoId);
-                
-                cenariosInput.disabled = !eventoId;
-                saveBtn.disabled = !eventoId;
-                cenariosInput.value = sessionData?.cenarios?.join(', ') || '';
-                renderFotosChecklist();
-            });
-            
-            document.getElementById('fotos-salvar-cenarios').addEventListener('click', async () => {
-                const eventoId = document.getElementById('fotos-evento-select').value;
-                if (!eventoId) return;
-                const cenarios = document.getElementById('fotos-cenarios-input').value.split(',').map(s => s.trim()).filter(Boolean);
-                try {
-                    await setDoc(doc(db, `users/${userId}/fotos/${eventoId}`), { cenarios }, { merge: true });
-                } catch (error) { console.error("Erro ao salvar cenários:", error); }
-            });
-            
+// ... existing code ... -->
             document.getElementById('form-add-aluno-sem-contrato').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const eventoId = document.getElementById('fotos-evento-select').value;
-                const nomeAluno = document.getElementById('fotos-novo-aluno-nome').value;
+                const nomeAluno = document.getElementById('fotos-novo-aluno-nome').value.trim();
                 if (!eventoId || !nomeAluno) return;
 
                 const sessionDocRef = doc(db, `users/${userId}/fotos/${eventoId}`);
                 const sessionData = dbState.fotos.find(f => f.id === eventoId) || { alunos: [] };
+
+                // Verifica se o aluno já existe na lista (com ou sem contrato)
+                const alunosComContratoIds = dbState.financeiro.map(f => f.alunoId);
+                const todosOsNomesNaSessao = [
+                    ...dbState.alunos.filter(a => alunosComContratoIds.includes(a.id)).map(a => a.nome),
+                    ...sessionData.alunos.filter(a => !a.alunoId).map(a => a.nome)
+                ];
+
+                if (todosOsNomesNaSessao.includes(nomeAluno)) {
+                    console.warn(`Aluno "${nomeAluno}" já existe na lista para este evento.`);
+                    // Idealmente, mostrar um feedback visual para o usuário aqui.
+                    return;
+                }
                 
                 const novosAlunos = [...sessionData.alunos, { nome: nomeAluno, fotosTiradas: {} }];
                 try {
                     await setDoc(sessionDocRef, { alunos: novosAlunos }, { merge: true });
-                    e.target.reset();
-                } catch (error) { console.error("Erro ao adicionar aluno:", error); }
-            });
-
-            // --- MANIPULADORES DE EVENTOS (SUBMIT FORMS) ---
-            async function handleFormSubmit(collectionName, data, formElement) {
-                if (!userId) { console.error("Usuário não autenticado."); return; }
-                try {
-                    await addDoc(collection(db, `users/${userId}/${collectionName}`), data);
-                    formElement.reset();
-                } catch (error) { console.error("Erro ao adicionar documento: ", error); }
-            }
-            
-            document.getElementById('form-evento').addEventListener('submit', function(e) { e.preventDefault(); handleFormSubmit('eventos', { nome: this.elements['evento-nome'].value, data: this.elements['evento-data'].value, programacao: this.elements['evento-programacao'].value }, this); });
-            document.getElementById('form-aluno').addEventListener('submit', function(e) { e.preventDefault(); handleFormSubmit('alunos', { nome: this.elements['aluno-nome'].value, pai: this.elements['aluno-pai'].value, contato: this.elements['aluno-contato'].value }, this); });
-            document.getElementById('form-fotografo').addEventListener('submit', function(e) { e.preventDefault(); handleFormSubmit('fotografos', { nome: this.elements['fotografo-nome'].value, contato: this.elements['fotografo-contato'].value }, this); });
-            document.getElementById('form-financeiro').addEventListener('submit', function(e) { e.preventDefault(); handleFormSubmit('financeiro', { alunoId: this.elements['financeiro-aluno'].value, total: parseFloat(this.elements['financeiro-valor-total'].value), pago: parseFloat(this.elements['financeiro-valor-pago'].value), status: this.elements['financeiro-status'].value }, this); });
-            document.getElementById('form-custo').addEventListener('submit', function(e) { e.preventDefault(); handleFormSubmit('custos', { descricao: this.elements['custo-descricao'].value, valor: parseFloat(this.elements['custo-valor'].value), eventoId: this.elements['custo-evento'].value }, this); });
-            
-            // --- FUNÇÕES GLOBAIS ---
-            window.app = {
-                openPaymentModal: (docId) => {
-                    document.getElementById('payment-doc-id').value = docId;
-                    paymentModal.classList.remove('hidden');
-                    paymentModal.classList.add('flex');
-                    document.getElementById('payment-amount').focus();
-                },
-                deleteItem: async (collectionName, id) => {
-                    if (!userId) return;
+// ... existing code ... -->
                     if (confirm(`Tem certeza que deseja excluir este item?`)) {
                         try {
                             await deleteDoc(doc(db, `users/${userId}/${collectionName}/${id}`));
@@ -714,49 +680,25 @@
                 },
                 showSection: (sectionId) => {
                     if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full');
-                    document.querySelectorAll('.content-section').forEach(section => section.classList.add('hidden'));
-                    document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+// ... existing code ... -->
                     document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('bg-gray-700'));
                     event.currentTarget.classList.add('bg-gray-700');
+                },
+                deleteAlunoFoto: async (eventoId, nomeAluno) => {
+                    if (!userId) return;
+                    const sessionDocRef = doc(db, `users/${userId}/fotos/${eventoId}`);
+                    const sessionData = dbState.fotos.find(f => f.id === eventoId);
+                    if (!sessionData) return;
+                    // Filtra para remover apenas o aluno sem contrato (identificado pelo nome)
+                    const novosAlunos = sessionData.alunos.filter(a => !(a.nome === nomeAluno && !a.alunoId));
+                    try {
+                        await setDoc(sessionDocRef, { alunos: novosAlunos }, { merge: true });
+                    } catch (error) {
+                        console.error("Erro ao deletar aluno da sessão de fotos:", error);
+                    }
                 },
                 toggleFoto: async (eventoId, alunoIdentifier, cenario, temContrato, nomeAluno) => {
                     const sessionDocRef = doc(db, `users/${userId}/fotos/${eventoId}`);
                     const sessionData = dbState.fotos.find(f => f.id === eventoId) || { alunos: [] };
-                    
-                    const alunoIndex = sessionData.alunos.findIndex(a => (a.alunoId || a.nome) === alunoIdentifier);
-                    let alunoData;
-
-                    if (alunoIndex !== -1) {
-                        alunoData = { ...sessionData.alunos[alunoIndex] };
-                    } else {
-                        alunoData = temContrato 
-                            ? { alunoId: alunoIdentifier, nome: nomeAluno, fotosTiradas: {} } 
-                            : { nome: nomeAluno, fotosTiradas: {} };
-                    }
-
-                    alunoData.fotosTiradas[cenario] = !alunoData.fotosTiradas[cenario];
-
-                    const novosAlunos = [...sessionData.alunos];
-                    if (alunoIndex !== -1) {
-                        novosAlunos[alunoIndex] = alunoData;
-                    } else {
-                        novosAlunos.push(alunoData);
-                    }
-
-                    try {
-                        await setDoc(sessionDocRef, { alunos: novosAlunos }, { merge: true });
-                    } catch (error) { console.error("Erro ao marcar foto:", error); }
-                }
-            };
-
-            // --- UI/Mobile ---
-            document.getElementById('mobile-menu-button').addEventListener('click', () => {
-                document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            });
-
-            lucide.createIcons();
-        });
-    </script>
-</body>
-</html>
+// ... existing code ... -->
 

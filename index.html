@@ -87,7 +87,7 @@
                 <a href="#" onclick="window.app.showSection('dashboard')" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 nav-link bg-gray-700">
                     <i data-lucide="layout-dashboard" class="inline-block w-5 h-5 mr-2"></i> Dashboard
                 </a>
-                <a href="#" onclick="window.app.showSection('eventos')" class="block py-2.5 px-4 rounded transition duration-2ASs-200 hover:bg-gray-700 nav-link">
+                <a href="#" onclick="window.app.showSection('eventos')" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 nav-link">
                     <i data-lucide="calendar-days" class="inline-block w-5 h-5 mr-2"></i> Eventos
                 </a>
                 <a href="#" onclick="window.app.showSection('alunos')" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 nav-link">
@@ -397,7 +397,6 @@
                 custos: [], 
                 cenarios: [], 
                 checklist: {} 
-                // alunosAvulsos removido do estado
             };
             let unsubscribeListeners = [];
             let unsubscribeChecklistListeners = [];
@@ -532,8 +531,6 @@
                     renderCenariosAndChecklist();
                 });
 
-                // Listener para Alunos Avulsos REMOVIDO
-
                 // Listener para Checklist
                 const checklistPath = `users/${userId}/eventos/${eventId}/checklist`;
                 const unsubChecklist = onSnapshot(collection(db, checklistPath), (snapshot) => {
@@ -570,12 +567,25 @@
             }
 
             // --- RENDERIZAÇÃO DAS SEÇÕES ---
+
+            /**
+             * CORREÇÃO: Função auxiliar para checar o contrato.
+             * Trata `undefined` (alunos antigos) como `true` (com contrato).
+             * Só retorna `false` se o campo for explicitamente `false`.
+             */
+            function hasContract(aluno) {
+                return aluno.temContrato === false ? false : true;
+            }
+
             function updateDashboard() {
                 document.getElementById('total-eventos').innerText = dbState.eventos.length;
                 document.getElementById('total-alunos').innerText = dbState.alunos.length;
                 
-                // Filtra lançamentos financeiros para alunos que ainda existem
-                const alunosComContratoIds = dbState.alunos.filter(a => a.temContrato).map(a => a.id);
+                // CORREÇÃO: Usar a função hasContract para filtrar
+                const alunosComContratoIds = dbState.alunos
+                    .filter(hasContract) // Filtra alunos com contrato (true ou undefined)
+                    .map(a => a.id);
+                    
                 const financeiroFiltrado = dbState.financeiro.filter(f => alunosComContratoIds.includes(f.alunoId));
 
                 const totalPago = financeiroFiltrado.reduce((acc, item) => acc + (parseFloat(item.pago) || 0), 0);
@@ -620,9 +630,10 @@
                 lista.innerHTML = dbState.alunos.length === 0 
                     ? '<tr><td colspan="5" class="p-4 text-center text-gray-500">Nenhum aluno cadastrado.</td></tr>'
                     : dbState.alunos.map(aluno => {
-                        // Lógica para o status do contrato
-                        const statusClass = aluno.temContrato ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
-                        const statusText = aluno.temContrato ? 'Sim' : 'Não';
+                        // CORREÇÃO: Usar a função hasContract
+                        const temContrato = hasContract(aluno);
+                        const statusClass = temContrato ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+                        const statusText = temContrato ? 'Sim' : 'Não';
                         
                         return `
                         <tr class="border-b hover:bg-gray-50">
@@ -648,11 +659,15 @@
 
             function renderFinanceiro() {
                 const lista = document.getElementById('lista-financeiro');
-                lista.innerHTML = dbState.financeiro.length === 0 
+                // CORREÇÃO: Filtrar lançamentos de alunos que podem ter sido deletados
+                const alunosComContratoIds = dbState.alunos.filter(hasContract).map(a => a.id);
+                const financeiroFiltrado = dbState.financeiro.filter(f => alunosComContratoIds.includes(f.alunoId));
+
+                lista.innerHTML = financeiroFiltrado.length === 0 
                     ? '<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhum lançamento financeiro.</td></tr>'
-                    : dbState.financeiro.map(item => {
+                    : financeiroFiltrado.map(item => {
                         const aluno = dbState.alunos.find(a => a.id === item.alunoId);
-                        // Se o aluno foi deletado, não renderiza o lançamento
+                        // Esta verificação agora é mais segura, mas o filtro acima já deve ter feito o trabalho
                         if (!aluno) return ''; 
 
                         const statusClass = item.status === 'Pago' ? 'bg-green-100 text-green-800' : (item.status === 'Pendente' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800');
@@ -741,8 +756,6 @@
 
             function renderChecklist() {
                 const container = document.getElementById('checklist-container');
-                
-                // Agora usa apenas a lista principal de alunos
                 const todosAlunos = [...dbState.alunos]; // Já vem ordenada
 
                 if (todosAlunos.length === 0 || dbState.cenarios.length === 0) {
@@ -757,8 +770,9 @@
                 headHTML += '</tr>';
 
                 let bodyHTML = todosAlunos.map(aluno => {
-                    // Adiciona a etiqueta se 'temContrato' for false
-                    const badge = !aluno.temContrato 
+                    // CORREÇÃO: Usar a função hasContract
+                    const temContrato = hasContract(aluno);
+                    const badge = !temContrato
                         ? ' <span class="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">Sem Contrato</span>' 
                         : '';
                     
@@ -789,19 +803,22 @@
                 try {
                     await addDoc(collection(db, `users/${userId}/${collectionName}`), data);
                     formElement.reset();
+                    // Garante que o checkbox volte ao padrão
+                    if (formElement.id === 'form-aluno') {
+                        formElement.elements['aluno-tem-contrato'].checked = true;
+                    }
                 } catch (error) { console.error("Erro ao adicionar documento: ", error); }
             }
             
             document.getElementById('form-evento').addEventListener('submit', function(e) { e.preventDefault(); handleFormSubmit('eventos', { nome: this.elements['evento-nome'].value, data: this.elements['evento-data'].value, programacao: this.elements['evento-programacao'].value }, this); });
             
-            // FORMULÁRIO DE ALUNO ATUALIZADO
             document.getElementById('form-aluno').addEventListener('submit', function(e) { 
                 e.preventDefault(); 
                 handleFormSubmit('alunos', { 
                     nome: this.elements['aluno-nome'].value, 
                     pai: this.elements['aluno-pai'].value, 
                     contato: this.elements['aluno-contato'].value,
-                    temContrato: this.elements['aluno-tem-contrato'].checked // Novo campo
+                    temContrato: this.elements['aluno-tem-contrato'].checked 
                 }, this); 
             });
 
@@ -821,8 +838,6 @@
                 } catch (error) { console.error("Erro ao adicionar cenário:", error); }
             });
 
-            // Formulário de Aluno Avulso REMOVIDO
-
             function populateSelectWithOptions(selectId, options) {
                 const select = document.getElementById(selectId);
                 const selectedValue = select.value;
@@ -836,9 +851,9 @@
                 select.value = selectedValue;
             }
 
-            // ATUALIZADO: Popula financeiro apenas com alunos com contrato
+            // CORREÇÃO: Usar a função hasContract para filtrar
             function populateAlunoSelect() {
-                const alunosComContrato = dbState.alunos.filter(aluno => aluno.temContrato);
+                const alunosComContrato = dbState.alunos.filter(hasContract);
                 populateSelectWithOptions('financeiro-aluno', { 
                     header: '<option value="">Selecione o Aluno (Com Contrato)</option>', 
                     data: alunosComContrato 
@@ -883,7 +898,6 @@
                         } catch (error) { console.error("Erro ao deletar cenário: ", error); }
                     }
                 },
-                // deleteAlunoAvulso REMOVIDO
                 updateChecklist: async (alunoId, cenarioId, isChecked) => {
                     if (!userId || !selectedEventIdForFotos) return;
                     const path = `users/${userId}/eventos/${selectedEventIdForFotos}/checklist/${alunoId}`;

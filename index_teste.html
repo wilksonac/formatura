@@ -105,6 +105,9 @@
                 <a href="#" onclick="window.app.showSection('custos')" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 nav-link">
                     <i data-lucide="shopping-cart" class="inline-block w-5 h-5 mr-2"></i> Custos
                 </a>
+                <a href="#" onclick="window.app.showSection('entregas')" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 nav-link">
+                    <i data-lucide="package-check" class="inline-block w-5 h-5 mr-2"></i> Entrega de Material
+                </a>
             </nav>
         </aside>
 
@@ -261,7 +264,7 @@
                                 </div>
                         </div>
 
-                        <div id="checklist-container" class="bg-white rounded-lg shadow-md overflow-x-auto">
+                        <div id="checklist-container" class="bg-white rounded-lg shadow-md overflow-auto max-h-[70vh]">
                            </div>
                     </div>
                 </div>
@@ -362,6 +365,28 @@
                     </div>
                 </div>
 
+                <div id="section-entregas" class="content-section hidden">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Entrega de Material</h1>
+                    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                        <p class="text-gray-600 mb-4">Gerencie a entrega de Mídias e Álbuns. Marque a caixa para confirmar a entrega e a data será salva automaticamente.</p>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-max">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="p-4 text-left text-sm font-semibold text-gray-600">Aluno</th>
+                                        <th class="p-4 text-center text-sm font-semibold text-gray-600">Mídia Digital</th>
+                                        <th class="p-4 text-center text-sm font-semibold text-gray-600">Álbum Impresso</th>
+                                        <th class="p-4 text-left text-sm font-semibold text-gray-600">Histórico</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lista-entregas">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
@@ -396,7 +421,8 @@
                 financeiro: [], 
                 custos: [], 
                 cenarios: [], 
-                checklist: {} 
+                checklist: {},
+                entregas: [] // Estado para entregas
             };
             let unsubscribeListeners = [];
             let unsubscribeChecklistListeners = [];
@@ -501,7 +527,8 @@
                 if (!userId) return;
                 unsubscribeListeners.forEach(unsub => unsub());
                 unsubscribeListeners = [];
-                const collections = ['eventos', 'alunos', 'fotografos', 'financeiro', 'custos'];
+                // Adicionada a coleção 'entregas'
+                const collections = ['eventos', 'alunos', 'fotografos', 'financeiro', 'custos', 'entregas'];
                 collections.forEach(col => {
                     const collectionPath = `users/${userId}/${col}`;
                     const unsub = onSnapshot(collection(db, collectionPath), (querySnapshot) => {
@@ -547,7 +574,7 @@
             function clearAllData() {
                 dbState = { 
                     eventos: [], alunos: [], fotografos: [], financeiro: [], custos: [], 
-                    cenarios: [], checklist: {} 
+                    cenarios: [], checklist: {}, entregas: []
                 };
                 selectedEventIdForFotos = null;
                 document.getElementById('fotos-management-area').classList.add('hidden');
@@ -559,6 +586,7 @@
                 renderFotografos();
                 renderFinanceiro();
                 renderCustos();
+                renderEntregas(); // Renderiza nova seção
                 updateDashboard();
                 populateAlunoSelect();
                 populateEventoSelect();
@@ -568,22 +596,16 @@
 
             // --- RENDERIZAÇÃO DAS SEÇÕES ---
 
-            /**
-             * CORREÇÃO: Função auxiliar para checar o contrato.
-             * Trata `undefined` (alunos antigos) como `true` (com contrato).
-             * Só retorna `false` se o campo for explicitamente `false`.
-             */
             function hasContract(aluno) {
-                return aluno.temContrato === false ? false : true;
+                return aluno.temContrato !== false;
             }
 
             function updateDashboard() {
                 document.getElementById('total-eventos').innerText = dbState.eventos.length;
                 document.getElementById('total-alunos').innerText = dbState.alunos.length;
                 
-                // CORREÇÃO: Usar a função hasContract para filtrar
                 const alunosComContratoIds = dbState.alunos
-                    .filter(hasContract) // Filtra alunos com contrato (true ou undefined)
+                    .filter(hasContract) 
                     .map(a => a.id);
                     
                 const financeiroFiltrado = dbState.financeiro.filter(f => alunosComContratoIds.includes(f.alunoId));
@@ -630,7 +652,6 @@
                 lista.innerHTML = dbState.alunos.length === 0 
                     ? '<tr><td colspan="5" class="p-4 text-center text-gray-500">Nenhum aluno cadastrado.</td></tr>'
                     : dbState.alunos.map(aluno => {
-                        // CORREÇÃO: Usar a função hasContract
                         const temContrato = hasContract(aluno);
                         const statusClass = temContrato ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
                         const statusText = temContrato ? 'Sim' : 'Não';
@@ -638,8 +659,8 @@
                         return `
                         <tr class="border-b hover:bg-gray-50">
                             <td class="p-4">${aluno.nome}</td>
-                            <td class="p-4">${aluno.pai}</td>
-                            <td class="p-4">${aluno.contato}</td>
+                            <td class="p-4">${aluno.pai || '---'}</td>
+                            <td class="p-4">${aluno.contato || '---'}</td>
                             <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${statusText}</span></td>
                             <td class="p-4"><button onclick="window.app.deleteItem('alunos', '${aluno.id}')" class="text-red-500 hover:text-red-700"><i data-lucide="trash-2" class="w-5 h-5"></i></button></td>
                         </tr>`;
@@ -659,7 +680,6 @@
 
             function renderFinanceiro() {
                 const lista = document.getElementById('lista-financeiro');
-                // CORREÇÃO: Filtrar lançamentos de alunos que podem ter sido deletados
                 const alunosComContratoIds = dbState.alunos.filter(hasContract).map(a => a.id);
                 const financeiroFiltrado = dbState.financeiro.filter(f => alunosComContratoIds.includes(f.alunoId));
 
@@ -667,7 +687,6 @@
                     ? '<tr><td colspan="6" class="p-4 text-center text-gray-500">Nenhum lançamento financeiro.</td></tr>'
                     : financeiroFiltrado.map(item => {
                         const aluno = dbState.alunos.find(a => a.id === item.alunoId);
-                        // Esta verificação agora é mais segura, mas o filtro acima já deve ter feito o trabalho
                         if (!aluno) return ''; 
 
                         const statusClass = item.status === 'Pago' ? 'bg-green-100 text-green-800' : (item.status === 'Pendente' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800');
@@ -701,6 +720,50 @@
                             <td class="p-4"><button onclick="window.app.deleteItem('custos', '${item.id}')" class="text-red-500 hover:text-red-700" title="Excluir Custo"><i data-lucide="trash-2" class="w-5 h-5"></i></button></td>
                         </tr>`;
                     }).join('');
+            }
+
+            // --- NOVA FUNÇÃO RENDERIZAÇÃO ENTREGAS ---
+            function renderEntregas() {
+                const lista = document.getElementById('lista-entregas');
+                const alunosOrdenados = [...dbState.alunos].sort((a, b) => a.nome.localeCompare(b.nome));
+
+                if (alunosOrdenados.length === 0) {
+                    lista.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum aluno cadastrado.</td></tr>';
+                    return;
+                }
+
+                lista.innerHTML = alunosOrdenados.map(aluno => {
+                    const entrega = dbState.entregas.find(e => e.id === aluno.id) || {};
+                    const dataMidia = entrega.dataMidia ? new Date(entrega.dataMidia).toLocaleDateString('pt-BR') : '-';
+                    const dataAlbum = entrega.dataAlbum ? new Date(entrega.dataAlbum).toLocaleDateString('pt-BR') : '-';
+
+                    return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-4 font-medium text-gray-700">${aluno.nome}</td>
+                        <td class="p-4 text-center">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" 
+                                    onchange="window.app.updateEntrega('${aluno.id}', 'midia', this.checked)"
+                                    class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
+                                    ${entrega.entregueMidia ? 'checked' : ''}>
+                                <span class="ml-2 text-sm text-gray-600">${entrega.entregueMidia ? 'Entregue' : 'Pendente'}</span>
+                            </label>
+                        </td>
+                        <td class="p-4 text-center">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" 
+                                    onchange="window.app.updateEntrega('${aluno.id}', 'album', this.checked)"
+                                    class="form-checkbox h-5 w-5 text-purple-600 rounded focus:ring-purple-500 border-gray-300"
+                                    ${entrega.entregueAlbum ? 'checked' : ''}>
+                                <span class="ml-2 text-sm text-gray-600">${entrega.entregueAlbum ? 'Entregue' : 'Pendente'}</span>
+                            </label>
+                        </td>
+                        <td class="p-4 text-sm text-gray-500">
+                            ${entrega.entregueMidia ? `<div><i data-lucide="disc" class="inline w-3 h-3 mr-1"></i>Mídia: ${dataMidia}</div>` : ''}
+                            ${entrega.entregueAlbum ? `<div><i data-lucide="book" class="inline w-3 h-3 mr-1"></i>Álbum: ${dataAlbum}</div>` : ''}
+                        </td>
+                    </tr>`;
+                }).join('');
             }
             
             // --- LÓGICA DA SEÇÃO DE FOTOS ---
@@ -763,21 +826,20 @@
                     return;
                 }
 
-                let headHTML = '<tr><th class="p-4 text-left text-sm font-semibold text-gray-600 sticky left-0 bg-gray-50 z-10">Aluno</th>';
+                let headHTML = '<tr><th class="p-4 text-left text-sm font-semibold text-gray-600 sticky left-0 z-30 bg-gray-50">Aluno</th>';
                 dbState.cenarios.forEach(cenario => {
                     headHTML += `<th class="p-4 text-center text-sm font-semibold text-gray-600">${cenario.nome}</th>`;
                 });
                 headHTML += '</tr>';
 
                 let bodyHTML = todosAlunos.map(aluno => {
-                    // CORREÇÃO: Usar a função hasContract
                     const temContrato = hasContract(aluno);
                     const badge = !temContrato
                         ? ' <span class="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">Sem Contrato</span>' 
                         : '';
                     
                     let rowHTML = `<tr class="border-b hover:bg-gray-50">
-                                    <td class="p-4 font-medium sticky left-0 bg-white md:bg-transparent whitespace-nowrap">${aluno.nome}${badge}</td>`;
+                                    <td class="p-4 font-medium sticky left-0 bg-white z-10 whitespace-nowrap">${aluno.nome}${badge}</td>`;
                     
                     dbState.cenarios.forEach(cenario => {
                         const isChecked = dbState.checklist[aluno.id] && dbState.checklist[aluno.id][cenario.id];
@@ -792,7 +854,7 @@
 
                 container.innerHTML = `
                     <table class="w-full min-w-max">
-                        <thead class="bg-gray-50">${headHTML}</thead>
+                        <thead class="bg-gray-50 sticky top-0 z-20">${headHTML}</thead>
                         <tbody>${bodyHTML}</tbody>
                     </table>`;
             }
@@ -803,7 +865,6 @@
                 try {
                     await addDoc(collection(db, `users/${userId}/${collectionName}`), data);
                     formElement.reset();
-                    // Garante que o checkbox volte ao padrão
                     if (formElement.id === 'form-aluno') {
                         formElement.elements['aluno-tem-contrato'].checked = true;
                     }
@@ -851,7 +912,6 @@
                 select.value = selectedValue;
             }
 
-            // CORREÇÃO: Usar a função hasContract para filtrar
             function populateAlunoSelect() {
                 const alunosComContrato = dbState.alunos.filter(hasContract);
                 populateSelectWithOptions('financeiro-aluno', { 
@@ -904,6 +964,25 @@
                     try {
                         await setDoc(doc(db, path), { [cenarioId]: isChecked }, { merge: true });
                     } catch (error) { console.error("Erro ao atualizar checklist:", error); }
+                },
+                // NOVA FUNÇÃO DE UPDATE DE ENTREGA
+                updateEntrega: async (alunoId, tipo, isChecked) => {
+                    if (!userId) return;
+                    
+                    const path = `users/${userId}/entregas/${alunoId}`;
+                    const timestamp = isChecked ? new Date().toISOString() : null;
+                    
+                    const updateData = {
+                        [`entregue${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`]: isChecked,
+                        [`data${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`]: timestamp
+                    };
+
+                    try {
+                        await setDoc(doc(db, path), updateData, { merge: true });
+                    } catch (error) {
+                        console.error("Erro ao atualizar entrega:", error);
+                        alert("Erro ao salvar status de entrega.");
+                    }
                 }
             };
 

@@ -125,9 +125,9 @@
         </div>
     </div>
 
-    <!-- MODAL GENÉRICO DE EDIÇÃO (ALUNO, EVENTO, TURMA, CUSTO, FOTÓGRAFO) -->
+    <!-- MODAL GENÉRICO DE EDIÇÃO -->
     <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg">
             <div class="flex justify-between items-center mb-4">
                 <h2 id="edit-modal-title" class="text-xl font-bold text-gray-800">Editar Item</h2>
                 <button type="button" onclick="window.app.closeEditModal()" class="text-gray-400 hover:text-gray-600">
@@ -414,12 +414,12 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="lista-turmas"></div>
                 </div>
 
-                <!-- SECTION: EVENTOS (SUPORTE A MULTI-DIAS) -->
+                <!-- SECTION: EVENTOS (SUPORTE A MULTI-DIAS, FREELANCERS, HORA E LOCAL) -->
                 <div id="section-eventos" class="content-section hidden">
                     <div class="flex justify-between items-center mb-6">
                         <div>
                             <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Gerenciar Eventos</h1>
-                            <p class="text-sm text-gray-500">Sessões de fotos (1 ou vários dias), colações e eventos comemorativos</p>
+                            <p class="text-sm text-gray-500">Sessões de fotos (1 ou vários dias), datas, horários, locais e equipe de freelancers escalada</p>
                         </div>
                     </div>
 
@@ -428,7 +428,7 @@
                             <i data-lucide="calendar-plus" class="w-5 h-5 text-emerald-600"></i> Adicionar Novo Evento
                         </h2>
                         <form id="form-evento">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <div class="lg:col-span-1">
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Evento</label>
                                     <input type="text" id="evento-nome" placeholder="Ex: Fotos de Beca (3 dias)" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
@@ -438,17 +438,41 @@
                                     <input type="date" id="evento-data-inicio" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Data de Término <span class="text-gray-400 font-normal">(Opcional)</span></label>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Data de Término <span class="text-gray-400 font-normal">(Opcional se for 1 dia)</span></label>
                                     <input type="date" id="evento-data-fim" title="Preencha apenas se o evento durar mais de 1 dia" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Horário (Início e Término)</label>
+                                    <input type="text" id="evento-horario" placeholder="Ex: 08:00 às 17:00 / 14:00" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Local do Evento</label>
+                                    <input type="text" id="evento-local" placeholder="Ex: Auditório Colégio São José / Quadra" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Vincular à Turma</label>
                                     <select id="evento-turma-select" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></select>
                                 </div>
                             </div>
+
+                            <!-- Equipe / Freelancers Multi-select Checkboxes -->
+                            <div class="mt-4">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-semibold text-gray-600">
+                                        <i data-lucide="user-check" class="inline w-3.5 h-3.5 text-pink-600 mr-1"></i> Equipe / Freelancers Escalados (Selecione 1 ou mais):
+                                    </label>
+                                    <button type="button" onclick="window.app.showSection('fotografos')" class="text-pink-600 hover:text-pink-700 text-xs font-medium hover:underline flex items-center gap-1">
+                                        + Cadastrar novo fotógrafo
+                                    </button>
+                                </div>
+                                <div id="evento-freelancers-checkboxes" class="p-3 bg-gray-50 border border-gray-200 rounded-lg flex flex-wrap gap-2.5 min-h-[44px]">
+                                    <span class="text-xs text-gray-400 italic">Carregando fotógrafos...</span>
+                                </div>
+                            </div>
+
                             <div class="mt-4">
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">Programação / Observações dos Dias</label>
-                                <textarea id="evento-programacao" placeholder="Ex: Dia 1 - Turma A / Dia 2 - Turma B / Dia 3 - Fotos individuais e família..." class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" rows="2"></textarea>
+                                <textarea id="evento-programacao" placeholder="Ex: Dia 1 - Turma A / Dia 2 - Turma B / Dia 3 - Fotos individuais e família. Roteiro e adereços..." class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" rows="2"></textarea>
                             </div>
                             <div class="mt-4 flex justify-end">
                                 <button type="submit" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition shadow flex items-center gap-2">
@@ -575,23 +599,23 @@
                 <div id="section-fotografos" class="content-section hidden">
                     <div class="flex justify-between items-center mb-6">
                         <div>
-                            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Equipe de Fotógrafos</h1>
-                            <p class="text-sm text-gray-500">Cadastro de profissionais e assistentes</p>
+                            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Equipe de Fotógrafos & Freelancers</h1>
+                            <p class="text-sm text-gray-500">Cadastro de profissionais e assistentes para escalar nos eventos</p>
                         </div>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
                         <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <i data-lucide="user-check" class="w-5 h-5 text-pink-600"></i> Adicionar Fotógrafo
+                            <i data-lucide="user-check" class="w-5 h-5 text-pink-600"></i> Adicionar Fotógrafo / Freelancer
                         </h2>
                         <form id="form-fotografo">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Fotógrafo</label>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Fotógrafo / Freelancer</label>
                                     <input type="text" id="fotografo-nome" placeholder="Nome do Profissional" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500" required>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Contato / Telefone</label>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Contato / Telefone (WhatsApp)</label>
                                     <input type="text" id="fotografo-contato" placeholder="(DD) 99999-9999" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500" required>
                                 </div>
                             </div>
@@ -608,7 +632,7 @@
                             <thead class="bg-gray-50 border-b">
                                 <tr>
                                     <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Nome</th>
-                                    <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Contato</th>
+                                    <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Contato / WhatsApp</th>
                                     <th class="p-4 text-right text-xs font-bold text-gray-600 uppercase">Ações</th>
                                 </tr>
                             </thead>
@@ -947,6 +971,9 @@
                         if (col === 'eventos') {
                             dbState.eventos.sort((a, b) => new Date(((b.dataInicio || b.data || '1970-01-01')) + 'T00:00:00') - new Date(((a.dataInicio || a.data || '1970-01-01')) + 'T00:00:00'));
                         }
+                        if (col === 'fotografos') {
+                            dbState.fotografos.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+                        }
                         renderAll();
                     });
                     unsubscribeListeners.push(unsub);
@@ -989,7 +1016,7 @@
             // --- HELPER DE FILTRAGEM POR TURMA ---
             function getTurmaDoItem(item) {
                 if (item.turmaId) return item.turmaId;
-                return DEFAULT_LEGACY_TURMA.id; // Se não tem turmaId salvo, pertence à turma legado de 2025
+                return DEFAULT_LEGACY_TURMA.id;
             }
 
             function pertenceATurmaAtiva(item) {
@@ -1086,11 +1113,13 @@
                     ? '<p class="text-gray-400 text-sm italic">Nenhum evento registrado nesta turma.</p>'
                     : eventosFiltrados.slice(0, 4).map(evento => {
                         const dataFormatada = formatarDataEvento(evento);
+                        const localInfo = evento.local ? ` • <i data-lucide="map-pin" class="inline w-3 h-3 text-red-500"></i> ${evento.local}` : '';
+                        const horaInfo = evento.horario ? ` • <i data-lucide="clock" class="inline w-3 h-3 text-blue-500"></i> ${evento.horario}` : '';
                         return `
                         <div class="border-b border-gray-100 py-2.5 flex justify-between items-center">
                             <div>
                                 <p class="text-sm font-semibold text-gray-800">${evento.nome}</p>
-                                <span class="text-xs text-gray-500">${getNomeTurma(evento.turmaId)}</span>
+                                <span class="text-xs text-gray-500">${getNomeTurma(evento.turmaId)}${localInfo}${horaInfo}</span>
                             </div>
                             <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">${dataFormatada}</span>
                         </div>`;
@@ -1184,6 +1213,13 @@
                         const nomeTurma = getNomeTurma(evento.turmaId);
                         const isMultiDay = evento.dataFim && evento.dataFim !== (evento.dataInicio || evento.data);
 
+                        // Freelancers escalados
+                        const freelancerIds = Array.isArray(evento.freelancers) ? evento.freelancers : [];
+                        const fotografoNomes = freelancerIds.map(fId => {
+                            const f = dbState.fotografos.find(item => item.id === fId);
+                            return f ? f.nome : null;
+                        }).filter(Boolean);
+
                         return `
                         <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-l-blue-600 border border-gray-200 flex flex-col justify-between">
                             <div>
@@ -1195,7 +1231,23 @@
                                     </div>
                                 </div>
                                 <h3 class="text-lg font-bold text-gray-800">${evento.nome}</h3>
-                                <p class="text-gray-600 mt-2 text-sm whitespace-pre-line">${evento.programacao || 'Sem programação definida.'}</p>
+                                
+                                <!-- Detalhes: Horário e Local -->
+                                <div class="mt-2 space-y-1 text-xs text-gray-600">
+                                    ${evento.horario ? `<div class="flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 text-blue-500 flex-shrink-0"></i> <span>${evento.horario}</span></div>` : ''}
+                                    ${evento.local ? `<div class="flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-red-500 flex-shrink-0"></i> <span>${evento.local}</span></div>` : ''}
+                                </div>
+
+                                <!-- Equipe de Freelancers -->
+                                ${fotografoNomes.length > 0 ? `
+                                <div class="mt-3 pt-2.5 border-t border-gray-100">
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Equipe Escalada (${fotografoNomes.length}):</span>
+                                    <div class="flex flex-wrap gap-1">
+                                        ${fotografoNomes.map(n => `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-pink-50 text-pink-700 text-xs rounded font-medium border border-pink-100"><i data-lucide="user-check" class="w-3 h-3"></i> ${n}</span>`).join('')}
+                                    </div>
+                                </div>` : ''}
+
+                                <p class="text-gray-600 mt-2.5 text-sm whitespace-pre-line">${evento.programacao || 'Sem programação definida.'}</p>
                             </div>
                             <div class="mt-5 pt-3 border-t border-gray-100 flex justify-between items-center">
                                 <button onclick="window.app.selectEventForFotos('${evento.id}')" class="text-xs font-bold text-purple-600 hover:text-purple-800 flex items-center gap-1">
@@ -1227,7 +1279,6 @@
                         const statusText = temContrato ? 'Sim' : 'Não';
                         const nomeTurma = getNomeTurma(aluno.turmaId);
                         
-                        // WhatsApp link direto
                         const cleanPhone = (aluno.contato || '').replace(/\D/g, '');
                         const whatsAppLink = cleanPhone.length >= 10 
                             ? `<a href="https://wa.me/55${cleanPhone}" target="_blank" class="text-emerald-600 hover:text-emerald-800 font-medium inline-flex items-center gap-1 ml-1" title="Conversar no WhatsApp"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i></a>`
@@ -1261,10 +1312,15 @@
                 const lista = document.getElementById('lista-fotografos');
                 lista.innerHTML = dbState.fotografos.length === 0 
                     ? '<tr><td colspan="3" class="p-6 text-center text-gray-500">Nenhum fotógrafo cadastrado.</td></tr>'
-                    : dbState.fotografos.map(fotografo => `
+                    : dbState.fotografos.map(fotografo => {
+                        const cleanPhone = (fotografo.contato || '').replace(/\D/g, '');
+                        const whatsAppLink = cleanPhone.length >= 10 
+                            ? `<a href="https://wa.me/55${cleanPhone}" target="_blank" class="text-emerald-600 hover:text-emerald-800 font-medium inline-flex items-center gap-1 ml-1" title="Conversar no WhatsApp"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i></a>`
+                            : '';
+                        return `
                         <tr class="hover:bg-gray-50 transition border-b border-gray-100">
                             <td class="p-4 font-semibold text-gray-800">${fotografo.nome}</td>
-                            <td class="p-4 text-gray-600 text-sm">${fotografo.contato || '---'}</td>
+                            <td class="p-4 text-gray-600 text-sm flex items-center">${fotografo.contato || '---'} ${whatsAppLink}</td>
                             <td class="p-4 text-right">
                                 <div class="inline-flex gap-1">
                                     <button onclick="window.app.openEditModal('fotografos', '${fotografo.id}')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Editar">
@@ -1275,7 +1331,8 @@
                                     </button>
                                 </div>
                             </td>
-                        </tr>`).join('');
+                        </tr>`;
+                    }).join('');
             }
 
             // --- SEÇÃO: FINANCEIRO ---
@@ -1301,7 +1358,6 @@
                         const restante = Math.max(0, total - pago);
                         const nomeTurma = getNomeTurma(aluno.turmaId);
 
-                        // Botão de Cobrança WhatsApp
                         const cleanPhone = (aluno.contato || '').replace(/\D/g, '');
                         let whatsAppButton = '';
                         if (cleanPhone.length >= 10) {
@@ -1427,7 +1483,7 @@
                 }).join('');
             }
             
-            // --- SEÇÃO DE FOTOS ---
+            // --- DROPDOWNS & CHECKBOXES ---
             function populateDropdowns() {
                 // Fotos Select
                 const fotosSelect = document.getElementById('fotos-evento-select');
@@ -1442,6 +1498,22 @@
                     fotosSelect.appendChild(opt);
                 });
                 fotosSelect.value = selectedEventIdForFotos;
+
+                // Freelancers checkboxes no formulário de eventos
+                const fCheckboxesContainer = document.getElementById('evento-freelancers-checkboxes');
+                if (fCheckboxesContainer) {
+                    if (dbState.fotografos.length === 0) {
+                        fCheckboxesContainer.innerHTML = '<span class="text-xs text-gray-400 italic">Nenhum fotógrafo cadastrado ainda. Clique em "+ Cadastrar novo fotógrafo" para adicionar sua equipe.</span>';
+                    } else {
+                        fCheckboxesContainer.innerHTML = dbState.fotografos.map(f => `
+                            <label class="inline-flex items-center bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm text-xs font-medium text-gray-700 cursor-pointer hover:bg-pink-50 hover:border-pink-300 transition select-none">
+                                <input type="checkbox" name="evento-freelancer-check" value="${f.id}" class="rounded border-gray-300 text-pink-600 focus:ring-pink-500 mr-2 h-4 w-4">
+                                <span>${f.nome}</span>
+                                ${f.contato ? `<span class="text-[10px] text-gray-400 ml-1.5">(${f.contato})</span>` : ''}
+                            </label>
+                        `).join('');
+                    }
+                }
 
                 // Turma Selects nos Formulários
                 const alunoTurmaSelect = document.getElementById('aluno-turma-select');
@@ -1507,7 +1579,6 @@
                 const container = document.getElementById('checklist-container');
                 const eventoAtual = dbState.eventos.find(e => e.id === selectedEventIdForFotos);
                 
-                // Alunos vinculados à turma deste evento (ou todos da turma ativa)
                 const turmaDoEvento = eventoAtual ? getTurmaDoItem(eventoAtual) : activeTurmaId;
                 let alunosDoEvento = dbState.alunos;
                 if (turmaDoEvento && turmaDoEvento !== 'ALL') {
@@ -1556,7 +1627,6 @@
             async function handleFormSubmit(collectionName, data, formElement) {
                 if (!userId) return;
                 try {
-                    // Vincula turma atual se aplicável
                     if (!data.turmaId && activeTurmaId !== 'ALL' && ['eventos', 'alunos', 'custos'].includes(collectionName)) {
                         data.turmaId = activeTurmaId;
                     }
@@ -1565,6 +1635,7 @@
                     if (formElement.id === 'form-aluno') {
                         formElement.elements['aluno-tem-contrato'].checked = true;
                     }
+                    populateDropdowns();
                 } catch (error) { 
                     console.error("Erro ao adicionar:", error); 
                     alert("Erro ao salvar. Verifique sua conexão.");
@@ -1581,17 +1652,26 @@
                 }, this);
             });
 
-            // Submit de Evento com Suporte a Multi-Dias
+            // Submit de Evento com Multi-Dias, Freelancers, Hora e Local
             document.getElementById('form-evento').addEventListener('submit', function(e) {
                 e.preventDefault();
                 const dataInicio = this.elements['evento-data-inicio'].value;
                 const dataFim = this.elements['evento-data-fim'].value || null;
+                const horario = this.elements['evento-horario'].value.trim();
+                const local = this.elements['evento-local'].value.trim();
+
+                const selectedFreelancers = Array.from(
+                    this.querySelectorAll('input[name="evento-freelancer-check"]:checked')
+                ).map(cb => cb.value);
 
                 handleFormSubmit('eventos', {
                     nome: this.elements['evento-nome'].value.trim(),
                     data: dataInicio,
                     dataInicio: dataInicio,
                     dataFim: dataFim,
+                    horario: horario,
+                    local: local,
+                    freelancers: selectedFreelancers,
                     turmaId: this.elements['evento-turma-select'].value || (activeTurmaId !== 'ALL' ? activeTurmaId : DEFAULT_LEGACY_TURMA.id),
                     programacao: this.elements['evento-programacao'].value.trim()
                 }, this);
@@ -1761,10 +1841,17 @@
                 } else if (col === 'eventos') {
                     const dataInicio = document.getElementById('edit-field-data-inicio').value;
                     const dataFim = document.getElementById('edit-field-data-fim').value || null;
+                    const selectedFreelancers = Array.from(
+                        document.querySelectorAll('input[name="edit-evento-freelancer-check"]:checked')
+                    ).map(cb => cb.value);
+
                     updatePayload.nome = document.getElementById('edit-field-nome').value.trim();
                     updatePayload.data = dataInicio;
                     updatePayload.dataInicio = dataInicio;
                     updatePayload.dataFim = dataFim;
+                    updatePayload.horario = document.getElementById('edit-field-horario').value.trim();
+                    updatePayload.local = document.getElementById('edit-field-local').value.trim();
+                    updatePayload.freelancers = selectedFreelancers;
                     updatePayload.turmaId = document.getElementById('edit-field-turmaId').value;
                     updatePayload.programacao = document.getElementById('edit-field-programacao').value.trim();
                 } else if (col === 'fotografos') {
@@ -1985,6 +2072,19 @@
                         title.innerText = 'Editar Evento';
                         const dataInicio = docItem.dataInicio || docItem.data || '';
                         const dataFim = docItem.dataFim || '';
+                        const currentFreelancers = Array.isArray(docItem.freelancers) ? docItem.freelancers : [];
+
+                        const freelancersCheckboxes = dbState.fotografos.length === 0 
+                            ? '<span class="text-xs text-gray-400 italic">Nenhum fotógrafo cadastrado. Vá em "Fotógrafos" para cadastrar sua equipe.</span>'
+                            : dbState.fotografos.map(f => {
+                                const isChecked = currentFreelancers.includes(f.id) ? 'checked' : '';
+                                return `
+                                <label class="inline-flex items-center bg-white px-2.5 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-700 cursor-pointer hover:bg-pink-50 hover:border-pink-300 transition select-none">
+                                    <input type="checkbox" name="edit-evento-freelancer-check" value="${f.id}" ${isChecked} class="rounded border-gray-300 text-pink-600 focus:ring-pink-500 mr-2 h-4 w-4">
+                                    <span>${f.nome}</span>
+                                </label>`;
+                            }).join('');
+
                         fields.innerHTML = `
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Evento</label>
@@ -2000,9 +2100,27 @@
                                     <input type="date" id="edit-field-data-fim" value="${dataFim}" class="w-full p-2.5 border rounded-lg">
                                 </div>
                             </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Horário</label>
+                                    <input type="text" id="edit-field-horario" value="${docItem.horario || ''}" placeholder="Ex: 08:00 às 17:00" class="w-full p-2.5 border rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Local</label>
+                                    <input type="text" id="edit-field-local" value="${docItem.local || ''}" placeholder="Ex: Colégio São José" class="w-full p-2.5 border rounded-lg">
+                                </div>
+                            </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">Turma</label>
                                 <select id="edit-field-turmaId" class="w-full p-2.5 border rounded-lg">${turmasOptions}</select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1.5 flex items-center gap-1">
+                                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-pink-600"></i> Equipe / Freelancers Escalados:
+                                </label>
+                                <div class="p-2.5 bg-gray-50 border rounded-lg flex flex-wrap gap-2 max-h-36 overflow-y-auto">
+                                    ${freelancersCheckboxes}
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">Programação / Observações</label>

@@ -101,7 +101,7 @@
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" onclick="window.app.closePaymentModal()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">Cancelar</button>
-                    <button type="submit" class="bg-green-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-green-700 transition shadow">Salvar Pagamento</button>
+                    <button type="submit" class="bg-green-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-green-700 transition shadow">Salvar Pagamento</button>
                 </div>
             </form>
         </div>
@@ -140,7 +140,7 @@
                 <div id="edit-form-fields" class="space-y-4"></div>
                 <div class="mt-6 flex justify-end gap-3">
                     <button type="button" onclick="window.app.closeEditModal()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">Cancelar</button>
-                    <button type="submit" class="bg-blue-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow">Salvar Alterações</button>
+                    <button type="submit" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition shadow">Salvar Alterações</button>
                 </div>
             </form>
         </div>
@@ -169,7 +169,7 @@
                 </div>
                 <div class="mt-4 flex justify-end gap-3">
                     <button type="button" onclick="window.app.closeBatchImportModal()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">Cancelar</button>
-                    <button type="submit" class="bg-green-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-green-700 transition shadow">Importar Alunos</button>
+                    <button type="submit" class="bg-green-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-green-700 transition shadow">Importar Alunos</button>
                 </div>
             </form>
         </div>
@@ -220,13 +220,13 @@
                         <i data-lucide="image" class="w-5 h-5 mr-3 text-purple-400"></i> Fotos & Checklist
                     </a>
                     <a href="#" onclick="window.app.showSection('fotografos')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
-                        <i data-lucide="user-square" class="w-5 h-5 mr-3 text-pink-400"></i> Fotógrafos
+                        <i data-lucide="user-square" class="w-5 h-5 mr-3 text-pink-400"></i> Fotógrafos & Freelas
                     </a>
                     <a href="#" onclick="window.app.showSection('financeiro')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
                         <i data-lucide="dollar-sign" class="w-5 h-5 mr-3 text-yellow-400"></i> Financeiro
                     </a>
                     <a href="#" onclick="window.app.showSection('custos')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
-                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-3 text-orange-400"></i> Custos
+                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-3 text-orange-400"></i> Custos & Despesas
                     </a>
                     <a href="#" onclick="window.app.showSection('entregas')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
                         <i data-lucide="package-check" class="w-5 h-5 mr-3 text-teal-400"></i> Entrega de Material
@@ -600,7 +600,7 @@
                     <div class="flex justify-between items-center mb-6">
                         <div>
                             <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Equipe de Fotógrafos & Freelancers</h1>
-                            <p class="text-sm text-gray-500">Cadastro de profissionais e assistentes para escalar nos eventos</p>
+                            <p class="text-sm text-gray-500">Cadastro de profissionais e assistentes para escalar nos eventos e registrar custos</p>
                         </div>
                     </div>
 
@@ -709,33 +709,52 @@
                     </div>
                 </div>
                 
-                <!-- SECTION: CUSTOS -->
+                <!-- SECTION: CUSTOS & DESPESAS (DETALHADO: SERVIÇO, MATERIAL, FREELANCER) -->
                 <div id="section-custos" class="content-section hidden">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
                         <div>
                             <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Controle de Custos & Despesas</h1>
-                            <p class="text-sm text-gray-500">Gastos com becas, freelancers, impressão, transporte e adereços</p>
+                            <p class="text-sm text-gray-500">Categorize detalhadamente entre Serviços, Freelancers e Materiais</p>
                         </div>
                     </div>
 
+                    <!-- Resumo Rápido de Custos por Categoria -->
+                    <div id="custos-resumo-cards" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6"></div>
+
+                    <!-- Form de Cadastro Detalhado de Custo -->
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
                         <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                             <i data-lucide="receipt" class="w-5 h-5 text-orange-600"></i> Registrar Novo Custo
                         </h2>
                         <form id="form-custo">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Tipo de Despesa</label>
+                                    <select id="custo-tipo" onchange="window.app.toggleCustoTipo(this.value)" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 font-medium" required>
+                                        <option value="Serviço">💼 Serviço Geral</option>
+                                        <option value="Freelancer">📸 Freelancer / Fotógrafo</option>
+                                        <option value="Material">📦 Material / Insumo</option>
+                                        <option value="Outro">📄 Outro</option>
+                                    </select>
+                                </div>
+                                <div id="custo-fotografo-wrapper" class="hidden">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Selecionar Freelancer / Profissional</label>
+                                    <select id="custo-fotografo" onchange="window.app.onCustoFotografoChange(this)" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 font-medium">
+                                        <option value="">Selecione o Fotógrafo</option>
+                                    </select>
+                                </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Descrição da Despesa</label>
-                                    <input type="text" id="custo-descricao" placeholder="Ex: Impressão dos Álbuns / Diária Fotógrafo" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" required>
+                                    <input type="text" id="custo-descricao" placeholder="Ex: Diária de Fotos / Impressão dos Álbuns" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" required>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Valor (R$)</label>
-                                    <input type="number" step="0.01" id="custo-valor" placeholder="Ex: 250.00" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" required>
+                                    <input type="number" step="0.01" id="custo-valor" placeholder="Ex: 350.00" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 font-semibold" required>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Evento Associado</label>
-                                    <select id="custo-evento" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" required>
-                                        <option value="">Selecione o Evento</option>
+                                    <select id="custo-evento" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+                                        <option value="">Despesa Geral (Sem evento específico)</option>
                                     </select>
                                 </div>
                             </div>
@@ -747,18 +766,23 @@
                         </form>
                     </div>
 
+                    <!-- Tabela de Custos -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <table class="w-full min-w-max">
-                            <thead class="bg-gray-50 border-b">
-                                <tr>
-                                    <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Descrição</th>
-                                    <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Evento Associado</th>
-                                    <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Valor</th>
-                                    <th class="p-4 text-right text-xs font-bold text-gray-600 uppercase">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="lista-custos" class="divide-y divide-gray-100"></tbody>
-                        </table>
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-max">
+                                <thead class="bg-gray-50 border-b">
+                                    <tr>
+                                        <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Tipo</th>
+                                        <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Descrição & Profissional</th>
+                                        <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Evento Associado</th>
+                                        <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Turma</th>
+                                        <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Valor</th>
+                                        <th class="p-4 text-right text-xs font-bold text-gray-600 uppercase">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lista-custos" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -1403,20 +1427,67 @@
                     }).join('');
             }
             
-            // --- SEÇÃO: CUSTOS ---
+            // --- SEÇÃO: CUSTOS DETALHADOS ---
             function renderCustos() {
                 const lista = document.getElementById('lista-custos');
                 const filtrados = dbState.custos.filter(pertenceATurmaAtiva);
 
+                // Cálculo dos subtotais para os cards de resumo
+                const totalGeral = filtrados.reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0);
+                const totalFreela = filtrados.filter(c => (c.tipo || '').toLowerCase() === 'freelancer').reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0);
+                const totalServico = filtrados.filter(c => (c.tipo || '').toLowerCase() === 'serviço' || (c.tipo || '').toLowerCase() === 'servico' || !c.tipo).reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0);
+                const totalMaterial = filtrados.filter(c => (c.tipo || '').toLowerCase() === 'material').reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0);
+
+                const resumoEl = document.getElementById('custos-resumo-cards');
+                if (resumoEl) {
+                    resumoEl.innerHTML = `
+                        <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm">
+                            <span class="text-xs text-gray-500 block uppercase font-semibold">Total Geral</span>
+                            <span class="font-bold text-lg text-orange-600 mt-0.5 block">R$ ${totalGeral.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        <div class="bg-pink-50 p-3.5 rounded-xl border border-pink-100">
+                            <span class="text-xs text-pink-700 block uppercase font-bold flex items-center gap-1"><i data-lucide="user-check" class="w-3 h-3"></i> Freelancers</span>
+                            <span class="font-bold text-lg text-pink-800 mt-0.5 block">R$ ${totalFreela.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        <div class="bg-blue-50 p-3.5 rounded-xl border border-blue-100">
+                            <span class="text-xs text-blue-700 block uppercase font-bold flex items-center gap-1"><i data-lucide="briefcase" class="w-3 h-3"></i> Serviços</span>
+                            <span class="font-bold text-lg text-blue-800 mt-0.5 block">R$ ${totalServico.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        <div class="bg-amber-50 p-3.5 rounded-xl border border-amber-100">
+                            <span class="text-xs text-amber-800 block uppercase font-bold flex items-center gap-1"><i data-lucide="package" class="w-3 h-3"></i> Materiais</span>
+                            <span class="font-bold text-lg text-amber-900 mt-0.5 block">R$ ${totalMaterial.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                    `;
+                }
+
                 lista.innerHTML = filtrados.length === 0
-                    ? '<tr><td colspan="4" class="p-6 text-center text-gray-500">Nenhum custo cadastrado para esta turma.</td></tr>'
+                    ? '<tr><td colspan="6" class="p-6 text-center text-gray-500">Nenhum custo cadastrado para esta turma.</td></tr>'
                     : filtrados.map(item => {
                         const evento = dbState.eventos.find(e => e.id === item.eventoId);
                         const valor = parseFloat(item.valor) || 0;
+                        const tipo = item.tipo || 'Serviço';
+                        const fotografo = item.fotografoId ? dbState.fotografos.find(f => f.id === item.fotografoId) : null;
+                        const nomeProfissional = item.fotografoNome || (fotografo ? fotografo.nome : null);
+                        const nomeTurma = getNomeTurma(item.turmaId);
+
+                        let tipoBadge = '<span class="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-200 inline-flex items-center gap-1"><i data-lucide="briefcase" class="w-3 h-3"></i> Serviço</span>';
+                        if (tipo === 'Freelancer') {
+                            tipoBadge = '<span class="px-2.5 py-1 bg-pink-50 text-pink-700 text-xs font-bold rounded-full border border-pink-200 inline-flex items-center gap-1"><i data-lucide="user-check" class="w-3 h-3"></i> Freelancer</span>';
+                        } else if (tipo === 'Material') {
+                            tipoBadge = '<span class="px-2.5 py-1 bg-amber-50 text-amber-800 text-xs font-bold rounded-full border border-amber-200 inline-flex items-center gap-1"><i data-lucide="package" class="w-3 h-3"></i> Material</span>';
+                        } else if (tipo === 'Outro') {
+                            tipoBadge = '<span class="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded-full border border-gray-200 inline-flex items-center gap-1"><i data-lucide="file-text" class="w-3 h-3"></i> Outro</span>';
+                        }
+
                         return `
                         <tr class="hover:bg-gray-50 transition border-b border-gray-100">
-                            <td class="p-4 font-semibold text-gray-800">${item.descricao}</td>
-                            <td class="p-4 text-gray-600 text-sm">${evento ? evento.nome : 'Geral'}</td>
+                            <td class="p-4">${tipoBadge}</td>
+                            <td class="p-4">
+                                <p class="font-semibold text-gray-800 text-sm">${item.descricao}</p>
+                                ${nomeProfissional ? `<span class="text-xs text-pink-700 font-medium inline-flex items-center gap-1 mt-0.5"><i data-lucide="camera" class="w-3 h-3"></i> Profissional: ${nomeProfissional}</span>` : ''}
+                            </td>
+                            <td class="p-4 text-gray-600 text-sm">${evento ? evento.nome : '<span class="text-gray-400 italic">Despesa Geral</span>'}</td>
+                            <td class="p-4 text-gray-500 text-xs">${nomeTurma}</td>
                             <td class="p-4 font-bold text-orange-600">R$ ${valor.toFixed(2).replace('.', ',')}</td>
                             <td class="p-4 text-right">
                                 <div class="inline-flex gap-1">
@@ -1515,6 +1586,15 @@
                     }
                 }
 
+                // Fotógrafo select no formulário de Custos
+                const custoFotografoSelect = document.getElementById('custo-fotografo');
+                if (custoFotografoSelect) {
+                    const currentVal = custoFotografoSelect.value;
+                    custoFotografoSelect.innerHTML = '<option value="">Selecione o Fotógrafo / Freelancer</option>' + 
+                        dbState.fotografos.map(f => `<option value="${f.id}">${f.nome} ${f.contato ? `(${f.contato})` : ''}</option>`).join('');
+                    custoFotografoSelect.value = currentVal;
+                }
+
                 // Turma Selects nos Formulários
                 const alunoTurmaSelect = document.getElementById('aluno-turma-select');
                 const eventoTurmaSelect = document.getElementById('evento-turma-select');
@@ -1543,7 +1623,7 @@
                 const custoEventoSelect = document.getElementById('custo-evento');
                 if (custoEventoSelect) {
                     const selVal = custoEventoSelect.value;
-                    custoEventoSelect.innerHTML = '<option value="">Selecione o Evento</option>' +
+                    custoEventoSelect.innerHTML = '<option value="">Despesa Geral (Sem evento específico)</option>' +
                         eventosFiltrados.map(e => `<option value="${e.id}">${e.nome}</option>`).join('');
                     custoEventoSelect.value = selVal;
                 }
@@ -1635,6 +1715,9 @@
                     if (formElement.id === 'form-aluno') {
                         formElement.elements['aluno-tem-contrato'].checked = true;
                     }
+                    if (formElement.id === 'form-custo') {
+                        window.app.toggleCustoTipo('Serviço');
+                    }
                     populateDropdowns();
                 } catch (error) { 
                     console.error("Erro ao adicionar:", error); 
@@ -1722,11 +1805,19 @@
                 }, this); 
             });
 
+            // Submit de Custo com Tipo e Freelancer
             document.getElementById('form-custo').addEventListener('submit', function(e) { 
                 e.preventDefault(); 
-                const eventoId = this.elements['custo-evento'].value;
-                const evento = dbState.eventos.find(ev => ev.id === eventoId);
+                const tipo = this.elements['custo-tipo'].value;
+                const fotografoId = this.elements['custo-fotografo']?.value || null;
+                const fotografo = fotografoId ? dbState.fotografos.find(f => f.id === fotografoId) : null;
+                const eventoId = this.elements['custo-evento'].value || null;
+                const evento = eventoId ? dbState.eventos.find(ev => ev.id === eventoId) : null;
+
                 handleFormSubmit('custos', { 
+                    tipo: tipo,
+                    fotografoId: fotografoId,
+                    fotografoNome: fotografo ? fotografo.nome : null,
                     descricao: this.elements['custo-descricao'].value.trim(), 
                     valor: parseFloat(this.elements['custo-valor'].value) || 0, 
                     eventoId: eventoId,
@@ -1858,9 +1949,17 @@
                     updatePayload.nome = document.getElementById('edit-field-nome').value.trim();
                     updatePayload.contato = document.getElementById('edit-field-contato').value.trim();
                 } else if (col === 'custos') {
+                    const tipo = document.getElementById('edit-field-tipo').value;
+                    const fotografoId = document.getElementById('edit-field-fotografoId') ? document.getElementById('edit-field-fotografoId').value : null;
+                    const fotografo = fotografoId ? dbState.fotografos.find(f => f.id === fotografoId) : null;
+
+                    updatePayload.tipo = tipo;
+                    updatePayload.fotografoId = fotografoId || null;
+                    updatePayload.fotografoNome = fotografo ? fotografo.nome : null;
                     updatePayload.descricao = document.getElementById('edit-field-descricao').value.trim();
                     updatePayload.valor = parseFloat(document.getElementById('edit-field-valor').value) || 0;
-                    updatePayload.eventoId = document.getElementById('edit-field-eventoId').value;
+                    updatePayload.eventoId = document.getElementById('edit-field-eventoId').value || null;
+                    updatePayload.turmaId = document.getElementById('edit-field-turmaId').value;
                 } else if (col === 'financeiro') {
                     updatePayload.total = parseFloat(document.getElementById('edit-field-total').value) || 0;
                     updatePayload.pago = parseFloat(document.getElementById('edit-field-pago').value) || 0;
@@ -1896,6 +1995,36 @@
                     event.currentTarget.classList.add('bg-slate-800', 'text-white');
                     event.currentTarget.classList.remove('text-slate-300');
                     lucide.createIcons();
+                },
+                toggleCustoTipo: (tipo) => {
+                    const wrapper = document.getElementById('custo-fotografo-wrapper');
+                    if (wrapper) {
+                        if (tipo === 'Freelancer') {
+                            wrapper.classList.remove('hidden');
+                        } else {
+                            wrapper.classList.add('hidden');
+                        }
+                    }
+                },
+                onCustoFotografoChange: (selectEl) => {
+                    const fotografoId = selectEl.value;
+                    const descInput = document.getElementById('custo-descricao');
+                    if (fotografoId) {
+                        const f = dbState.fotografos.find(item => item.id === fotografoId);
+                        if (f && (!descInput.value || descInput.value.startsWith('Diária Freelancer'))) {
+                            descInput.value = `Diária Freelancer - ${f.nome}`;
+                        }
+                    }
+                },
+                toggleEditCustoTipo: (tipo) => {
+                    const wrapper = document.getElementById('edit-custo-fotografo-wrapper');
+                    if (wrapper) {
+                        if (tipo === 'Freelancer') {
+                            wrapper.classList.remove('hidden');
+                        } else {
+                            wrapper.classList.add('hidden');
+                        }
+                    }
                 },
                 selectEventForFotos: (eventId) => {
                     selectedEventIdForFotos = eventId;
@@ -2139,19 +2268,43 @@
                             </div>`;
                     } else if (collectionName === 'custos') {
                         title.innerText = 'Editar Custo';
-                        const eventosOpts = dbState.eventos.map(e => `<option value="${e.id}" ${e.id === docItem.eventoId ? 'selected' : ''}>${e.nome}</option>`).join('');
+                        const eventosOpts = '<option value="">Despesa Geral (Sem evento)</option>' + 
+                            dbState.eventos.map(e => `<option value="${e.id}" ${e.id === docItem.eventoId ? 'selected' : ''}>${e.nome}</option>`).join('');
+                        
+                        const fotografosOpts = '<option value="">Nenhum / Não aplicável</option>' + 
+                            dbState.fotografos.map(f => `<option value="${f.id}" ${f.id === docItem.fotografoId ? 'selected' : ''}>${f.nome}</option>`).join('');
+
+                        const tipoAtual = docItem.tipo || 'Serviço';
+
                         fields.innerHTML = `
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Tipo de Custo / Categoria</label>
+                                <select id="edit-field-tipo" onchange="window.app.toggleEditCustoTipo(this.value)" class="w-full p-2.5 border rounded-lg font-medium" required>
+                                    <option value="Serviço" ${tipoAtual === 'Serviço' ? 'selected' : ''}>💼 Serviço Geral</option>
+                                    <option value="Freelancer" ${tipoAtual === 'Freelancer' ? 'selected' : ''}>📸 Freelancer / Fotógrafo</option>
+                                    <option value="Material" ${tipoAtual === 'Material' ? 'selected' : ''}>📦 Material / Insumo</option>
+                                    <option value="Outro" ${tipoAtual === 'Outro' ? 'selected' : ''}>📄 Outro</option>
+                                </select>
+                            </div>
+                            <div id="edit-custo-fotografo-wrapper" class="${tipoAtual === 'Freelancer' ? '' : 'hidden'}">
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Freelancer / Profissional</label>
+                                <select id="edit-field-fotografoId" class="w-full p-2.5 border rounded-lg">${fotografosOpts}</select>
+                            </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">Descrição</label>
                                 <input type="text" id="edit-field-descricao" value="${docItem.descricao || ''}" class="w-full p-2.5 border rounded-lg" required>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">Valor (R$)</label>
-                                <input type="number" step="0.01" id="edit-field-valor" value="${docItem.valor || 0}" class="w-full p-2.5 border rounded-lg" required>
+                                <input type="number" step="0.01" id="edit-field-valor" value="${docItem.valor || 0}" class="w-full p-2.5 border rounded-lg font-semibold" required>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Evento</label>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Evento Associado</label>
                                 <select id="edit-field-eventoId" class="w-full p-2.5 border rounded-lg">${eventosOpts}</select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Turma</label>
+                                <select id="edit-field-turmaId" class="w-full p-2.5 border rounded-lg">${turmasOptions}</select>
                             </div>`;
                     } else if (collectionName === 'financeiro') {
                         title.innerText = 'Editar Lançamento Financeiro';

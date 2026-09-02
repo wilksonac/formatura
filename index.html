@@ -1046,6 +1046,23 @@
                                 
                                 <!-- FORMULÁRIO DE GERAÇÃO -->
                                 <div class="lg:col-span-5 space-y-5">
+                                    
+                                    <!-- Banner de Edição de Contrato Existente -->
+                                    <div id="contrato-edit-banner" class="hidden bg-indigo-50 border-2 border-indigo-200 p-3.5 rounded-xl flex items-center justify-between gap-3 shadow-xs">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="bg-indigo-600 text-white p-2 rounded-lg">
+                                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                            </div>
+                                            <div>
+                                                <span class="text-xs font-bold text-indigo-900 block">Modo de Edição de Contrato</span>
+                                                <span id="contrato-edit-info" class="text-[11px] text-indigo-700 block">Alterando dados do contrato emitido</span>
+                                            </div>
+                                        </div>
+                                        <button type="button" onclick="window.app.cancelContractEditing()" class="text-xs bg-white hover:bg-gray-100 text-gray-700 font-semibold px-2.5 py-1.5 rounded-lg border border-gray-300 shadow-xs transition whitespace-nowrap">
+                                            Cancelar Edição
+                                        </button>
+                                    </div>
+
                                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
                                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                                             <i data-lucide="user-check" class="w-4 h-4 text-blue-600"></i> Selecionar Aluno Cadastrado (Opcional):
@@ -1151,7 +1168,7 @@
                                         </div>
 
                                         <div class="pt-3">
-                                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                            <button type="submit" id="btn-submit-contrato" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2">
                                                 <i data-lucide="refresh-cw" class="w-4 h-4"></i> Atualizar Pré-Visualização do Contrato
                                             </button>
                                         </div>
@@ -2752,6 +2769,12 @@
                                 <button onclick="window.app.openSignatureForHistoryContract('${c.id}')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded text-xs font-semibold inline-flex items-center gap-1" title="Assinar Digitalmente este Contrato">
                                     <i data-lucide="pen-tool" class="w-4 h-4"></i>
                                 </button>
+                                <button onclick="window.app.editContractFromHistory('${c.id}')" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded text-xs font-semibold inline-flex items-center gap-1" title="Editar Dados deste Contrato">
+                                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="window.app.deleteContract('${c.id}')" class="p-1.5 text-red-500 hover:bg-red-50 rounded text-xs font-semibold inline-flex items-center gap-1" title="Excluir este Contrato Emitido">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>`;
@@ -3946,6 +3969,7 @@
                 // Atalho a partir da tabela de alunos
                 generateContractForAluno: (alunoId) => {
                     window.app.showSection('contratos');
+                    window.app.cancelContractEditing();
                     window.app.switchContratosTab('gerar');
                     const select = document.getElementById('contrato-select-aluno');
                     if (select) {
@@ -4339,13 +4363,33 @@ _Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
                         prompt('Copie o texto abaixo:', text);
                     });
                 },
-                // Recarregar contrato emitido
+                // Visualizar Contrato Emitido
                 reloadContractPreview: (contratoId) => {
+                    const c = dbState.contratosGerados.find(item => item.id === contratoId);
+                    if (!c) return;
+
+                    window.app.switchContratosTab('gerar');
+                    window.app.editContractFromHistory(contratoId);
+                },
+                // Editar Contrato Emitido
+                editContractFromHistory: (contratoId) => {
                     const c = dbState.contratosGerados.find(item => item.id === contratoId);
                     if (!c) return;
 
                     activeEditingContractId = contratoId;
                     window.app.switchContratosTab('gerar');
+
+                    // Banner de Edição
+                    const banner = document.getElementById('contrato-edit-banner');
+                    const info = document.getElementById('contrato-edit-info');
+                    if (banner) banner.classList.remove('hidden');
+                    if (info) info.innerText = `Editando contrato de: ${c.alunoNome || 'Formando'} (Responsável: ${c.responsavelNome || 'Não informado'})`;
+
+                    const btnSubmit = document.getElementById('btn-submit-contrato');
+                    if (btnSubmit) {
+                        btnSubmit.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> Salvar Alterações no Contrato`;
+                    }
+
                     if (c.alunoId) {
                         document.getElementById('contrato-select-aluno').value = c.alunoId;
                     }
@@ -4384,6 +4428,51 @@ _Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
                     };
 
                     window.app.onGenerateContractSubmit();
+                    lucide.createIcons();
+                },
+                // Cancelar Edição do Contrato
+                cancelContractEditing: () => {
+                    activeEditingContractId = null;
+                    const banner = document.getElementById('contrato-edit-banner');
+                    if (banner) banner.classList.add('hidden');
+                    
+                    const btnSubmit = document.getElementById('btn-submit-contrato');
+                    if (btnSubmit) {
+                        btnSubmit.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4"></i> Atualizar Pré-Visualização do Contrato`;
+                    }
+
+                    const form = document.getElementById('form-gerar-contrato');
+                    if (form) form.reset();
+                    const selectAluno = document.getElementById('contrato-select-aluno');
+                    if (selectAluno) selectAluno.value = '';
+                    
+                    contractSignatures = {
+                        contratante: { assinado: false, imagem: null, hash: null, dataHora: null, nome: '', doc: '' },
+                        contratado: { assinado: false, imagem: null, hash: null, dataHora: null, nome: '', doc: '' }
+                    };
+                    
+                    const outputEl = document.getElementById('contractOutput');
+                    if (outputEl) {
+                        outputEl.innerHTML = '<p class="text-gray-400 text-center py-12 italic">Preencha os campos ao lado e clique em "Atualizar Pré-Visualização" para gerar o documento completo.</p>';
+                    }
+                    lucide.createIcons();
+                },
+                // Excluir Contrato Emitido
+                deleteContract: async (contratoId) => {
+                    if (!userId || !contratoId) return;
+                    const c = dbState.contratosGerados.find(item => item.id === contratoId);
+                    const alunoNome = c ? (c.alunoNome || 'deste aluno') : 'deste aluno';
+                    if (confirm(`⚠️ Tem certeza que deseja excluir o contrato emitido para "${alunoNome}"?\n\nEsta ação não poderá ser desfeita.`)) {
+                        try {
+                            await deleteDoc(doc(db, `users/${userId}/contratos_gerados/${contratoId}`));
+                            if (activeEditingContractId === contratoId) {
+                                window.app.cancelContractEditing();
+                            }
+                        } catch (error) {
+                            console.error("Erro ao excluir contrato:", error);
+                            alert("Erro ao excluir contrato.");
+                        }
+                    }
                 },
                 // Modal de Adicionar Novo Pacote
                 openAddPacoteModal: () => {
@@ -4748,6 +4837,9 @@ WhatsApp: (81) 98845-6625`;
                 },
                 deleteItem: async (collectionName, id) => {
                     if (!userId) return;
+                    if (collectionName === 'contratos_gerados') {
+                        return window.app.deleteContract(id);
+                    }
                     if (confirm(`Tem certeza que deseja excluir este item?`)) {
                         try {
                             await deleteDoc(doc(db, `users/${userId}/${collectionName}/${id}`));

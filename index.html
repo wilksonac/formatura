@@ -142,6 +142,54 @@
                 gap: 2.5rem;
             }
         }
+
+        /* Otimizações Específicas para Celular / Smartphones (Desktop Intacto) */
+        @media (max-width: 768px) {
+            /* Previne zoom automático e indesejado no iOS Safari ao focar inputs */
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+            
+            /* Rolagem suave nativa */
+            .overflow-x-auto, .overflow-y-auto, main {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Alvos de toque acessíveis e sem highlight cinza */
+            button, a, select, input[type="checkbox"], input[type="radio"] {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            /* Espaçamento seguro na parte inferior para a barra de navegação móvel */
+            .mobile-safe-bottom {
+                padding-bottom: 5.5rem !important;
+            }
+
+            /* Header e Título mais compactos no mobile */
+            h1 {
+                font-size: 1.35rem !important;
+                line-height: 1.25 !important;
+            }
+
+            /* Modais no Mobile: limite de altura e scroll interno */
+            .fixed.inset-0 > div {
+                max-height: 92vh !important;
+                margin: auto 0.5rem !important;
+                padding: 1.25rem !important;
+            }
+
+            /* Tabelas responsivas com scroll suave */
+            .overflow-x-auto {
+                scrollbar-width: thin;
+                border-radius: 0.75rem;
+            }
+
+            /* Botões de ação em tabelas */
+            td button {
+                padding: 0.45rem !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -538,11 +586,24 @@
     </div>
 
     <!-- MAIN APP CONTAINER -->
-    <div id="app-container" class="hidden h-screen w-full md:flex overflow-hidden">
+    <div id="app-container" class="hidden h-screen w-full flex-col md:flex-row md:flex overflow-hidden relative">
         
+        <!-- BACKDROP PARA SIDEBAR NO CELULAR -->
+        <div id="sidebar-backdrop" onclick="window.app.toggleMobileMenu(false)" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden transition-opacity"></div>
+
         <!-- SIDEBAR -->
-        <aside id="sidebar" class="sidebar bg-slate-900 text-white w-64 flex flex-col justify-between py-6 px-3 absolute inset-y-0 left-0 z-40 transform -translate-x-full md:relative md:translate-x-0 shadow-xl">
+        <aside id="sidebar" class="sidebar bg-slate-900 text-white w-72 md:w-64 flex flex-col justify-between py-5 px-3 fixed md:relative inset-y-0 left-0 z-50 transform -translate-x-full md:translate-x-0 shadow-2xl transition-transform duration-300 ease-in-out">
             <div>
+                <!-- Botão Fechar no Celular -->
+                <div class="flex justify-between items-center px-2 mb-3 md:hidden border-b border-slate-800 pb-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <i data-lucide="layers" class="w-4 h-4 text-blue-400"></i> Menu Completo
+                    </span>
+                    <button type="button" onclick="window.app.toggleMobileMenu(false)" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
                 <!-- Brand Header -->
                 <a href="#" class="text-white flex items-center space-x-3 px-3 mb-6">
                     <div class="bg-blue-600 p-2 rounded-lg">
@@ -637,7 +698,7 @@
             </header>
             
             <!-- MAIN VIEWPORT -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8">
+            <main class="flex-1 overflow-x-hidden overflow-y-auto p-3 sm:p-5 md:p-8 mobile-safe-bottom">
                 
                 <!-- SECTION: DASHBOARD -->
                 <div id="section-dashboard" class="content-section">
@@ -1598,6 +1659,30 @@
 
             </main>
         </div>
+
+        <!-- BARRA DE NAVEGAÇÃO INFERIOR PARA CELULARES -->
+        <nav id="mobile-bottom-nav" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-30 flex md:hidden items-center justify-around px-1 py-1 shadow-lg">
+            <button type="button" onclick="window.app.showSection('dashboard')" id="bottom-nav-dashboard" class="flex flex-col items-center justify-center py-1.5 px-2 text-blue-600 rounded-xl transition flex-1 font-bold text-[10px]">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 mb-0.5"></i>
+                <span>Início</span>
+            </button>
+            <button type="button" onclick="window.app.showSection('alunos')" id="bottom-nav-alunos" class="flex flex-col items-center justify-center py-1.5 px-2 text-gray-500 hover:text-gray-900 rounded-xl transition flex-1 font-medium text-[10px]">
+                <i data-lucide="users" class="w-5 h-5 mb-0.5"></i>
+                <span>Alunos</span>
+            </button>
+            <button type="button" onclick="window.app.showSection('contratos')" id="bottom-nav-contratos" class="flex flex-col items-center justify-center py-1.5 px-2 text-gray-500 hover:text-gray-900 rounded-xl transition flex-1 font-medium text-[10px]">
+                <i data-lucide="file-signature" class="w-5 h-5 mb-0.5"></i>
+                <span>Contratos</span>
+            </button>
+            <button type="button" onclick="window.app.showSection('financeiro')" id="bottom-nav-financeiro" class="flex flex-col items-center justify-center py-1.5 px-2 text-gray-500 hover:text-gray-900 rounded-xl transition flex-1 font-medium text-[10px]">
+                <i data-lucide="dollar-sign" class="w-5 h-5 mb-0.5"></i>
+                <span>Financeiro</span>
+            </button>
+            <button type="button" onclick="window.app.toggleMobileMenu(true)" class="flex flex-col items-center justify-center py-1.5 px-2 text-gray-500 hover:text-gray-900 rounded-xl transition flex-1 font-medium text-[10px]">
+                <i data-lucide="menu" class="w-5 h-5 mb-0.5"></i>
+                <span>Mais</span>
+            </button>
+        </nav>
     </div>
 
     <!-- FIREBASE & APP SCRIPT -->
@@ -2149,7 +2234,6 @@
 
                 function draw(e) {
                     if (!isDrawingSig) return;
-                    if (e.cancelable) e.preventDefault();
                     const coords = getCoords(e);
                     sigCtx.beginPath();
                     sigCtx.moveTo(lastSigX, lastSigY);
@@ -2167,9 +2251,20 @@
                 sigCanvas.onmousemove = draw;
                 window.addEventListener('mouseup', stopDraw);
 
-                sigCanvas.ontouchstart = startDraw;
-                sigCanvas.ontouchmove = draw;
-                sigCanvas.ontouchend = stopDraw;
+                sigCanvas.addEventListener('touchstart', (e) => {
+                    if (e.cancelable) e.preventDefault();
+                    startDraw(e);
+                }, { passive: false });
+
+                sigCanvas.addEventListener('touchmove', (e) => {
+                    if (e.cancelable) e.preventDefault();
+                    draw(e);
+                }, { passive: false });
+
+                sigCanvas.addEventListener('touchend', (e) => {
+                    if (e.cancelable) e.preventDefault();
+                    stopDraw();
+                }, { passive: false });
             }
 
             function generateSignatureHash(nome, doc, dataHora) {
@@ -3606,21 +3701,58 @@
                     hasAutoSelectedTurma = true;
                     renderAll();
                 },
+                toggleMobileMenu: (forceState = null) => {
+                    const sidebar = document.getElementById('sidebar');
+                    const backdrop = document.getElementById('sidebar-backdrop');
+                    if (!sidebar) return;
+
+                    const isCurrentlyOpen = !sidebar.classList.contains('-translate-x-full');
+                    const shouldOpen = forceState !== null ? forceState : !isCurrentlyOpen;
+
+                    if (shouldOpen) {
+                        sidebar.classList.remove('-translate-x-full');
+                        if (backdrop) backdrop.classList.remove('hidden');
+                    } else {
+                        sidebar.classList.add('-translate-x-full');
+                        if (backdrop) backdrop.classList.add('hidden');
+                    }
+                    lucide.createIcons();
+                },
                 showSection: (sectionId) => {
                     if (window.innerWidth < 768) {
-                        document.getElementById('sidebar').classList.add('-translate-x-full');
+                        window.app.toggleMobileMenu(false);
                     }
                     document.querySelectorAll('.content-section').forEach(section => section.classList.add('hidden'));
-                    document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+                    const targetEl = document.getElementById(`section-${sectionId}`);
+                    if (targetEl) targetEl.classList.remove('hidden');
                     
+                    // Highlight na Sidebar (Desktop e Drawer)
                     document.querySelectorAll('.nav-link').forEach(link => {
                         link.classList.remove('bg-slate-800', 'text-white');
                         link.classList.add('text-slate-300');
                     });
-                    if (event && event.currentTarget && event.currentTarget.classList) {
+                    if (event && event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.contains('nav-link')) {
                         event.currentTarget.classList.add('bg-slate-800', 'text-white');
                         event.currentTarget.classList.remove('text-slate-300');
                     }
+
+                    // Highlight na Barra Inferior do Celular
+                    const bottomNavIds = ['dashboard', 'alunos', 'contratos', 'financeiro'];
+                    bottomNavIds.forEach(id => {
+                        const btn = document.getElementById(`bottom-nav-${id}`);
+                        if (btn) {
+                            if (id === sectionId) {
+                                btn.className = "flex flex-col items-center justify-center py-1.5 px-2 text-blue-600 rounded-xl transition flex-1 font-bold text-[10px]";
+                            } else {
+                                btn.className = "flex flex-col items-center justify-center py-1.5 px-2 text-gray-500 hover:text-gray-900 rounded-xl transition flex-1 font-medium text-[10px]";
+                            }
+                        }
+                    });
+
+                    // Rola o viewport para o topo ao trocar de aba
+                    const mainViewport = document.querySelector('main');
+                    if (mainViewport) mainViewport.scrollTop = 0;
+
                     lucide.createIcons();
                 },
                 // --- FILTROS E BUSCA EM TEMPO REAL ---
@@ -3982,9 +4114,16 @@
                     modal.classList.add('flex');
 
                     setTimeout(() => {
+                        const canvas = document.getElementById('signature-pad-canvas');
+                        if (canvas && canvas.parentElement) {
+                            const containerWidth = canvas.parentElement.clientWidth;
+                            if (containerWidth > 100) {
+                                canvas.width = Math.min(520, containerWidth - 12);
+                            }
+                        }
                         initSignaturePad();
                         window.app.loadPartySignatureToCanvas('contratante');
-                    }, 100);
+                    }, 120);
                     lucide.createIcons();
                 },
                 openSignatureForHistoryContract: (contratoId) => {
@@ -5404,10 +5543,28 @@ _Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
                 }
             };
 
+            // Detecção e Otimizações de Celular
+            function applyMobileOptimizations() {
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+                if (isMobile) {
+                    document.body.classList.add('is-mobile');
+                } else {
+                    document.body.classList.remove('is-mobile');
+                    const backdrop = document.getElementById('sidebar-backdrop');
+                    if (backdrop) backdrop.classList.add('hidden');
+                }
+            }
+
+            window.addEventListener('resize', applyMobileOptimizations);
+            applyMobileOptimizations();
+
             // Mobile menu toggle
-            document.getElementById('mobile-menu-button').addEventListener('click', () => {
-                document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            });
+            const mobileMenuBtn = document.getElementById('mobile-menu-button');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    window.app.toggleMobileMenu();
+                });
+            }
 
             lucide.createIcons();
         });

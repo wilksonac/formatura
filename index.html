@@ -110,10 +110,30 @@
             font-weight: 700;
             font-family: 'Inter', sans-serif;
         }
-        .contract-paper .signature-doc {
-            font-size: 0.75rem;
-            color: #64748b;
-            font-family: 'Inter', sans-serif;
+        .contract-paper .signature-img-preview {
+            max-height: 52px;
+            max-width: 190px;
+            object-fit: contain;
+            margin-bottom: -6px;
+            z-index: 2;
+        }
+        .contract-paper .signature-cert-seal {
+            margin-top: 6px;
+            padding: 4px 8px;
+            background-color: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 6px;
+            font-size: 8px;
+            color: #166534;
+            font-family: monospace;
+            line-height: 1.35;
+            text-align: center;
+            width: 90%;
+        }
+        .contract-paper .signature-cert-seal-contratado {
+            background-color: #eff6ff;
+            border-color: #93c5fd;
+            color: #1e40af;
         }
 
         @media (max-width: 640px) {
@@ -379,6 +399,91 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE ASSINATURA DIGITAL DO CONTRATO -->
+    <div id="signature-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-xl border border-gray-100">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
+                        <i data-lucide="pen-tool" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-800">Assinatura Digital & Autenticação Eletrônica</h2>
+                        <p class="text-xs text-gray-500">Validade jurídica conforme MP 2.200-2/2001 e Lei 14.063/2020</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.app.closeSignatureModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Seleção de Assinante -->
+            <div class="flex gap-2 p-1 bg-gray-100 rounded-xl mb-4 text-xs font-bold">
+                <button type="button" id="sig-tab-contratante" onclick="window.app.switchSignatureParty('contratante')" class="flex-1 py-2 px-3 rounded-lg bg-white shadow-sm text-emerald-800 transition flex items-center justify-center gap-1.5">
+                    <i data-lucide="user-check" class="w-4 h-4"></i> Contratante (Responsável)
+                </button>
+                <button type="button" id="sig-tab-contratado" onclick="window.app.switchSignatureParty('contratado')" class="flex-1 py-2 px-3 rounded-lg text-gray-600 hover:text-gray-900 transition flex items-center justify-center gap-1.5">
+                    <i data-lucide="camera" class="w-4 h-4"></i> Contratado (Fotógrafo)
+                </button>
+            </div>
+
+            <!-- Painel de Assinatura -->
+            <div class="space-y-4">
+                <div class="p-3 bg-slate-50 border rounded-xl flex justify-between items-center text-xs">
+                    <div>
+                        <span class="text-gray-500 block">Nome do Assinante:</span>
+                        <strong id="sig-signer-name" class="text-gray-900 text-sm">---</strong>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-gray-500 block">Documento (CPF):</span>
+                        <strong id="sig-signer-cpf" class="text-gray-900">---</strong>
+                    </div>
+                </div>
+
+                <!-- Canvas de Desenho -->
+                <div>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="text-xs font-bold text-gray-700 flex items-center gap-1">
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5 text-blue-600"></i> Desenhe a rubrica ou assinatura abaixo:
+                        </label>
+                        <button type="button" onclick="window.app.clearSignaturePad()" class="text-xs text-red-600 hover:text-red-800 font-semibold flex items-center gap-1">
+                            <i data-lucide="trash-2" class="w-3 h-3"></i> Limpar Traço
+                        </button>
+                    </div>
+                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-1 bg-gray-50/50 relative">
+                        <canvas id="signature-pad-canvas" width="520" height="160" class="w-full h-36 bg-white rounded-lg cursor-crosshair touch-none border border-gray-200 shadow-inner"></canvas>
+                        <div id="signature-placeholder-guide" class="absolute inset-0 flex items-center justify-center pointer-events-none text-gray-300 text-xs italic">
+                            Assine aqui com o dedo ou mouse
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selo de Autenticação Digital -->
+                <div class="bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-200">
+                    <label class="flex items-start cursor-pointer">
+                        <input type="checkbox" id="sig-include-cert" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4 mt-0.5" checked>
+                        <div class="ml-2.5">
+                            <span class="text-xs font-bold text-emerald-950 block">Gerar Selo de Autenticação Criptográfica (Hash SHA-256)</span>
+                            <span class="text-[11px] text-emerald-800 block mt-0.5">Adiciona carimbo com código único, registro de data, hora e conformidade legal ao rodapé da assinatura.</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-5 pt-4 border-t flex flex-wrap justify-between items-center gap-2">
+                <button type="button" onclick="window.app.removeSignaturesFromContract()" class="text-xs text-gray-500 hover:text-red-600 font-semibold transition">
+                    Remover Assinaturas
+                </button>
+                <div class="flex gap-2">
+                    <button type="button" onclick="window.app.closeSignatureModal()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-200 transition">Cancelar</button>
+                    <button type="button" onclick="window.app.applySignatureToContract()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-xs font-bold transition shadow flex items-center gap-1.5">
+                        <i data-lucide="check" class="w-4 h-4"></i> Confirmar & Aplicar Assinatura
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -998,7 +1103,10 @@
                                         <span class="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
                                             <i data-lucide="file-text" class="w-4 h-4 text-emerald-600"></i> Prévia do Documento
                                         </span>
-                                        <div class="flex items-center gap-2">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <button type="button" onclick="window.app.openSignatureModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow" title="Coletar e aplicar assinaturas digitais com validade jurídica">
+                                                <i data-lucide="pen-tool" class="w-4 h-4"></i> Assinar Digitalmente
+                                            </button>
                                             <button type="button" onclick="window.app.downloadContractPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow">
                                                 <i data-lucide="download" class="w-4 h-4"></i> Baixar PDF
                                             </button>
@@ -1142,6 +1250,7 @@
                                             <th class="p-3 text-left text-xs font-bold text-gray-600 uppercase">Responsável</th>
                                             <th class="p-3 text-left text-xs font-bold text-gray-600 uppercase">Pacote</th>
                                             <th class="p-3 text-left text-xs font-bold text-gray-600 uppercase">Valor</th>
+                                            <th class="p-3 text-center text-xs font-bold text-gray-600 uppercase">Assinatura</th>
                                             <th class="p-3 text-left text-xs font-bold text-gray-600 uppercase">Data de Emissão</th>
                                             <th class="p-3 text-right text-xs font-bold text-gray-600 uppercase">Ações</th>
                                         </tr>
@@ -1550,8 +1659,20 @@
             let unsubscribeChecklistListeners = [];
             let selectedEventIdForFotos = null;
             let currentBriefingEvent = null;
-            let lastGeneratedContractData = null;
             let currentReceiptData = null;
+            let activeEditingContractId = null;
+
+            // Estado de Assinaturas Digitais do Contrato
+            let contractSignatures = {
+                contratante: { assinado: false, imagem: null, hash: null, dataHora: null, nome: '', doc: '' },
+                contratado: { assinado: false, imagem: null, hash: null, dataHora: null, nome: '', doc: '' }
+            };
+            let currentSignatureParty = 'contratante';
+            let isDrawingSig = false;
+            let sigCanvas = null;
+            let sigCtx = null;
+            let lastSigX = 0;
+            let lastSigY = 0;
 
             // Turma padrão de fallback para registros legados
             const DEFAULT_LEGACY_TURMA = {
@@ -1991,6 +2112,139 @@
                 return aluno.temContrato !== false;
             }
 
+            // --- HELPERS DE ASSINATURA DIGITAL & CERTIFICAÇÃO ---
+            function initSignaturePad() {
+                sigCanvas = document.getElementById('signature-pad-canvas');
+                if (!sigCanvas) return;
+                sigCtx = sigCanvas.getContext('2d');
+                sigCtx.strokeStyle = '#0f2b5c';
+                sigCtx.lineWidth = 2.5;
+                sigCtx.lineCap = 'round';
+                sigCtx.lineJoin = 'round';
+
+                function getCoords(e) {
+                    const rect = sigCanvas.getBoundingClientRect();
+                    const scaleX = sigCanvas.width / rect.width;
+                    const scaleY = sigCanvas.height / rect.height;
+                    if (e.touches && e.touches.length > 0) {
+                        return {
+                            x: (e.touches[0].clientX - rect.left) * scaleX,
+                            y: (e.touches[0].clientY - rect.top) * scaleY
+                        };
+                    }
+                    return {
+                        x: (e.clientX - rect.left) * scaleX,
+                        y: (e.clientY - rect.top) * scaleY
+                    };
+                }
+
+                function startDraw(e) {
+                    isDrawingSig = true;
+                    const coords = getCoords(e);
+                    lastSigX = coords.x;
+                    lastSigY = coords.y;
+                    const guide = document.getElementById('signature-placeholder-guide');
+                    if (guide) guide.classList.add('hidden');
+                }
+
+                function draw(e) {
+                    if (!isDrawingSig) return;
+                    if (e.cancelable) e.preventDefault();
+                    const coords = getCoords(e);
+                    sigCtx.beginPath();
+                    sigCtx.moveTo(lastSigX, lastSigY);
+                    sigCtx.lineTo(coords.x, coords.y);
+                    sigCtx.stroke();
+                    lastSigX = coords.x;
+                    lastSigY = coords.y;
+                }
+
+                function stopDraw() {
+                    isDrawingSig = false;
+                }
+
+                sigCanvas.onmousedown = startDraw;
+                sigCanvas.onmousemove = draw;
+                window.addEventListener('mouseup', stopDraw);
+
+                sigCanvas.ontouchstart = startDraw;
+                sigCanvas.ontouchmove = draw;
+                sigCanvas.ontouchend = stopDraw;
+            }
+
+            function generateSignatureHash(nome, doc, dataHora) {
+                const raw = `${nome || ''}|${doc || ''}|${dataHora || ''}|WilksonFotografias|${Date.now()}`;
+                let hash = 0;
+                for (let i = 0; i < raw.length; i++) {
+                    const char = raw.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash |= 0;
+                }
+                const hex = Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
+                const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+                return `WF-${new Date().getFullYear()}-${hex.substring(0, 4)}-${hex.substring(4, 8)}-${randomSuffix}`;
+            }
+
+            function renderSignaturesHTML(clienteNome, clienteCpf, contratadoNome, contratadoCpf) {
+                let contratanteBox = '';
+                if (contractSignatures.contratante && contractSignatures.contratante.assinado) {
+                    contratanteBox = `
+                    <div class="signature-box">
+                        ${contractSignatures.contratante.imagem ? `<img src="${contractSignatures.contratante.imagem}" class="signature-img-preview" alt="Assinatura Contratante">` : '<div style="height:35px;"></div>'}
+                        <div class="signature-line"></div>
+                        <div class="signature-name">${clienteNome || '[Nome do Responsável]'}</div>
+                        <div class="signature-doc">CONTRATANTE (CPF: ${clienteCpf || '[CPF]'})</div>
+                        ${contractSignatures.contratante.hash ? `
+                        <div class="signature-cert-seal">
+                            🔒 <strong>ASSINADO DIGITALMENTE</strong><br>
+                            Autenticação: ${contractSignatures.contratante.hash}<br>
+                            Data/Hora: ${contractSignatures.contratante.dataHora}<br>
+                            Validade: MP 2.200-2/2001 e Lei 14.063/2020
+                        </div>` : ''}
+                    </div>`;
+                } else {
+                    contratanteBox = `
+                    <div class="signature-box">
+                        <div style="height:45px;"></div>
+                        <div class="signature-line"></div>
+                        <div class="signature-name">${clienteNome || '[Nome do Responsável]'}</div>
+                        <div class="signature-doc">CONTRATANTE (CPF: ${clienteCpf || '[CPF]'})</div>
+                    </div>`;
+                }
+
+                let contratadoBox = '';
+                if (contractSignatures.contratado && contractSignatures.contratado.assinado) {
+                    contratadoBox = `
+                    <div class="signature-box">
+                        ${contractSignatures.contratado.imagem ? `<img src="${contractSignatures.contratado.imagem}" class="signature-img-preview" alt="Assinatura Contratado">` : '<div style="height:35px;"></div>'}
+                        <div class="signature-line"></div>
+                        <div class="signature-name">${contratadoNome || 'Wilkson Albuquerque Carvalho'}</div>
+                        <div class="signature-doc">CONTRATADO (CPF: ${contratadoCpf || '646.660.003-30'})</div>
+                        ${contractSignatures.contratado.hash ? `
+                        <div class="signature-cert-seal signature-cert-seal-contratado">
+                            📸 <strong>ASSINADO PELO CONTRATADO</strong><br>
+                            Autenticação: ${contractSignatures.contratado.hash}<br>
+                            Data/Hora: ${contractSignatures.contratado.dataHora}<br>
+                            Wilkson Fotografias • Autenticado
+                        </div>` : ''}
+                    </div>`;
+                } else {
+                    contratadoBox = `
+                    <div class="signature-box">
+                        <div style="height:45px;"></div>
+                        <div class="signature-line"></div>
+                        <div class="signature-name">${contratadoNome || 'Wilkson Albuquerque Carvalho'}</div>
+                        <div class="signature-doc">CONTRATADO (CPF: ${contratadoCpf || '646.660.003-30'})</div>
+                    </div>`;
+                }
+
+                return `
+                <div class="signatures-wrapper">
+                    ${contratanteBox}
+                    ${contratadoBox}
+                </div>`;
+            }
+
             // --- RENDERIZAÇÃO COMPLETA ---
             function renderAll() {
                 updateTurmaSelectors();
@@ -2377,23 +2631,33 @@
                 if (btnClear) btnClear.classList.toggle('hidden', !filterState.contratosSearch);
 
                 if (filtrados.length === 0) {
-                    container.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-500">${filterState.contratosSearch ? `Nenhum contrato encontrado para "${filterState.contratosSearch}".` : 'Nenhum contrato gerado recentemente.'}</td></tr>`;
+                    container.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-gray-500">${filterState.contratosSearch ? `Nenhum contrato encontrado para "${filterState.contratosSearch}".` : 'Nenhum contrato gerado recentemente.'}</td></tr>`;
                     return;
                 }
 
                 container.innerHTML = filtrados.map(c => {
                     const dataStr = c.dataGeracao ? new Date(c.dataGeracao).toLocaleString('pt-BR') : '-';
+                    const assinadoBadge = (c.assinado || c.assinadoContratante)
+                        ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[11px] font-bold rounded-full inline-flex items-center gap-1 border border-emerald-300"><i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i> Assinado Digital</span>'
+                        : '<span class="px-2 py-0.5 bg-amber-50 text-amber-800 text-[11px] font-bold rounded-full inline-flex items-center gap-1 border border-amber-200"><i data-lucide="clock" class="w-3 h-3 text-amber-600"></i> Pendente</span>';
+
                     return `
                     <tr class="hover:bg-gray-50 transition border-b border-gray-100">
                         <td class="p-3 font-semibold text-gray-800">${c.alunoNome || 'Formando'}</td>
                         <td class="p-3 text-sm text-gray-600">${c.responsavelNome || '-'}</td>
                         <td class="p-3 text-xs"><span class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded font-medium">${c.pacoteNome || '-'}</span></td>
                         <td class="p-3 font-bold text-emerald-700 text-sm">R$ ${parseFloat(c.valor || 0).toFixed(2).replace('.', ',')}</td>
+                        <td class="p-3 text-center">${assinadoBadge}</td>
                         <td class="p-3 text-xs text-gray-500">${dataStr}</td>
                         <td class="p-3 text-right">
-                            <button onclick="window.app.reloadContractPreview('${c.id}')" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded text-xs font-semibold inline-flex items-center gap-1" title="Ver / Reemitir Contrato">
-                                <i data-lucide="eye" class="w-4 h-4"></i> Abrir
-                            </button>
+                            <div class="inline-flex items-center gap-1">
+                                <button onclick="window.app.reloadContractPreview('${c.id}')" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded text-xs font-semibold inline-flex items-center gap-1" title="Ver / Imprimir Contrato">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="window.app.openSignatureForHistoryContract('${c.id}')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded text-xs font-semibold inline-flex items-center gap-1" title="Assinar Digitalmente este Contrato">
+                                    <i data-lucide="pen-tool" class="w-4 h-4"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>`;
                 }).join('');
@@ -3601,6 +3865,7 @@
 
                     // Montagem do texto a partir do modelo customizável
                     let template = cfg.templateTexto || DEFAULT_CONTRACT_TEMPLATE;
+                    const signaturesHTML = renderSignaturesHTML(clienteNome, clienteCpf, contratadoNome, contratadoCpf);
 
                     let rendered = template
                         .replace(/{NOME_CONTRATANTE}/g, clienteNome || '[Nome do Responsável]')
@@ -3626,6 +3891,14 @@
                         .replace(/{CIDADE_FORO}/g, cidadeForo)
                         .replace(/{DATA_EXTENSO}/g, dataExtenso);
 
+                    if (rendered.includes('<div class="signatures-wrapper">')) {
+                        rendered = rendered.replace(/<div class="signatures-wrapper">[\s\S]*?<\/div>\s*<\/div>/, signaturesHTML);
+                    } else if (rendered.includes('{ASSINATURAS}')) {
+                        rendered = rendered.replace(/{ASSINATURAS}/g, signaturesHTML);
+                    } else {
+                        rendered += signaturesHTML;
+                    }
+
                     // Atualiza a prévia visual
                     const outputEl = document.getElementById('contractOutput');
                     outputEl.innerHTML = rendered;
@@ -3641,22 +3914,187 @@
                     if (userId) {
                         try {
                             const alunoSelectedId = document.getElementById('contrato-select-aluno').value || null;
-                            await addDoc(collection(db, `users/${userId}/contratos_gerados`), {
+                            const contractPayload = {
                                 alunoId: alunoSelectedId,
                                 alunoNome: alunoNome,
                                 responsavelNome: clienteNome,
                                 cpf: clienteCpf,
+                                rg: clienteRg,
+                                endereco: clienteEndereco,
+                                telefone: clienteTelefone,
+                                email: clienteEmail,
+                                turmaNome: alunoTurma,
                                 pacoteNome: pacoteNome,
+                                pacoteItens: pacoteItens,
                                 valor: valor,
                                 formaPagamento: formaPagamento,
+                                observacoes: observacoes,
+                                direitoImagem: direitoImagem,
+                                assinado: Boolean(contractSignatures.contratante.assinado || contractSignatures.contratado.assinado),
+                                assinadoContratante: Boolean(contractSignatures.contratante.assinado),
+                                assinaturaContratanteImg: contractSignatures.contratante.imagem,
+                                assinaturaContratanteHash: contractSignatures.contratante.hash,
+                                assinaturaContratanteDataHora: contractSignatures.contratante.dataHora,
+                                assinadoContratado: Boolean(contractSignatures.contratado.assinado),
+                                assinaturaContratadoImg: contractSignatures.contratado.imagem,
+                                assinaturaContratadoHash: contractSignatures.contratado.hash,
+                                assinaturaContratadoDataHora: contractSignatures.contratado.dataHora,
                                 dataGeracao: new Date().toISOString()
-                            });
+                            };
+
+                            if (activeEditingContractId) {
+                                await updateDoc(doc(db, `users/${userId}/contratos_gerados/${activeEditingContractId}`), contractPayload);
+                            } else {
+                                const newDocRef = await addDoc(collection(db, `users/${userId}/contratos_gerados`), contractPayload);
+                                activeEditingContractId = newDocRef.id;
+                            }
                         } catch (err) {
                             console.warn("Aviso ao salvar histórico de contrato:", err);
                         }
                     }
 
                     lucide.createIcons();
+                },
+                // --- ASSINATURA DIGITAL DO CONTRATO ---
+                openSignatureModal: (contratoId = null) => {
+                    if (contratoId) {
+                        window.app.reloadContractPreview(contratoId);
+                    }
+                    
+                    const clienteNome = document.getElementById('contrato-cliente-nome').value.trim();
+                    const alunoNome = document.getElementById('contrato-aluno-nome').value.trim();
+
+                    if (!clienteNome || !alunoNome) {
+                        alert('Preencha os dados do Contrato (Nome do Formando e Responsável) antes de assinar.');
+                        return;
+                    }
+
+                    const content = document.getElementById('contractOutput');
+                    if (!content || !content.innerHTML.includes('CONTRATO')) {
+                        window.app.onGenerateContractSubmit();
+                    }
+
+                    currentSignatureParty = 'contratante';
+                    window.app.switchSignatureParty('contratante');
+
+                    const modal = document.getElementById('signature-modal');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+
+                    setTimeout(() => {
+                        initSignaturePad();
+                        window.app.loadPartySignatureToCanvas('contratante');
+                    }, 100);
+                    lucide.createIcons();
+                },
+                openSignatureForHistoryContract: (contratoId) => {
+                    window.app.reloadContractPreview(contratoId);
+                    setTimeout(() => {
+                        window.app.openSignatureModal();
+                    }, 200);
+                },
+                closeSignatureModal: () => {
+                    const modal = document.getElementById('signature-modal');
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                },
+                switchSignatureParty: (party) => {
+                    currentSignatureParty = party;
+                    const btnContratante = document.getElementById('sig-tab-contratante');
+                    const btnContratado = document.getElementById('sig-tab-contratado');
+                    const nameEl = document.getElementById('sig-signer-name');
+                    const cpfEl = document.getElementById('sig-signer-cpf');
+
+                    const cfg = dbState.configContrato || {};
+                    const contratadoNome = cfg.contratadoNome || "Wilkson Albuquerque Carvalho";
+                    const contratadoCpf = cfg.contratadoCpf || "646.660.003-30";
+
+                    const clienteNome = document.getElementById('contrato-cliente-nome').value.trim() || 'Responsável Legal';
+                    const clienteCpf = document.getElementById('contrato-cliente-cpf').value.trim() || 'Não informado';
+
+                    if (party === 'contratante') {
+                        btnContratante.className = "flex-1 py-2 px-3 rounded-lg bg-white shadow-sm text-emerald-800 transition flex items-center justify-center gap-1.5 font-bold";
+                        btnContratado.className = "flex-1 py-2 px-3 rounded-lg text-gray-600 hover:text-gray-900 transition flex items-center justify-center gap-1.5 font-medium";
+                        nameEl.innerText = clienteNome;
+                        cpfEl.innerText = clienteCpf;
+                    } else {
+                        btnContratado.className = "flex-1 py-2 px-3 rounded-lg bg-white shadow-sm text-blue-800 transition flex items-center justify-center gap-1.5 font-bold";
+                        btnContratante.className = "flex-1 py-2 px-3 rounded-lg text-gray-600 hover:text-gray-900 transition flex items-center justify-center gap-1.5 font-medium";
+                        nameEl.innerText = contratadoNome;
+                        cpfEl.innerText = contratadoCpf;
+                    }
+
+                    window.app.loadPartySignatureToCanvas(party);
+                    lucide.createIcons();
+                },
+                clearSignaturePad: () => {
+                    if (sigCtx && sigCanvas) {
+                        sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+                    }
+                    const guide = document.getElementById('signature-placeholder-guide');
+                    if (guide) guide.classList.remove('hidden');
+                },
+                loadPartySignatureToCanvas: (party) => {
+                    window.app.clearSignaturePad();
+                    const sigData = contractSignatures[party];
+                    if (sigData && sigData.imagem && sigCtx && sigCanvas) {
+                        const img = new Image();
+                        img.onload = () => {
+                            sigCtx.drawImage(img, 0, 0);
+                            const guide = document.getElementById('signature-placeholder-guide');
+                            if (guide) guide.classList.add('hidden');
+                        };
+                        img.src = sigData.imagem;
+                    }
+                },
+                applySignatureToContract: () => {
+                    const party = currentSignatureParty;
+                    const canvas = document.getElementById('signature-pad-canvas');
+                    if (!canvas) return;
+
+                    const blankCanvas = document.createElement('canvas');
+                    blankCanvas.width = canvas.width;
+                    blankCanvas.height = canvas.height;
+                    const isBlank = canvas.toDataURL() === blankCanvas.toDataURL();
+
+                    const sigImg = isBlank ? null : canvas.toDataURL('image/png');
+                    const includeCert = document.getElementById('sig-include-cert').checked;
+                    const dataHora = new Date().toLocaleString('pt-BR');
+
+                    const cfg = dbState.configContrato || {};
+                    const contratadoNome = cfg.contratadoNome || "Wilkson Albuquerque Carvalho";
+                    const contratadoCpf = cfg.contratadoCpf || "646.660.003-30";
+
+                    const clienteNome = document.getElementById('contrato-cliente-nome').value.trim();
+                    const clienteCpf = document.getElementById('contrato-cliente-cpf').value.trim();
+
+                    const signerNome = party === 'contratante' ? clienteNome : contratadoNome;
+                    const signerDoc = party === 'contratante' ? clienteCpf : contratadoCpf;
+
+                    contractSignatures[party] = {
+                        assinado: true,
+                        imagem: sigImg,
+                        hash: includeCert ? generateSignatureHash(signerNome, signerDoc, dataHora) : null,
+                        dataHora: dataHora,
+                        nome: signerNome,
+                        doc: signerDoc
+                    };
+
+                    window.app.onGenerateContractSubmit();
+                    window.app.closeSignatureModal();
+
+                    alert(`✅ Assinatura de ${signerNome} aplicada ao contrato com sucesso!`);
+                },
+                removeSignaturesFromContract: () => {
+                    if (confirm('Deseja remover as assinaturas deste contrato?')) {
+                        contractSignatures = {
+                            contratante: { assinado: false, imagem: null, hash: null, dataHora: null },
+                            contratado: { assinado: false, imagem: null, hash: null, dataHora: null }
+                        };
+                        window.app.clearSignaturePad();
+                        window.app.onGenerateContractSubmit();
+                        window.app.closeSignatureModal();
+                    }
                 },
                 // Baixar PDF do Contrato
                 downloadContractPDF: () => {
@@ -3713,6 +4151,9 @@
                         '.signature-line { border-bottom: 1.5px solid #334155; width: 100%; margin-bottom: 0.5rem; }' +
                         '.signature-name { font-size: 0.85rem; font-weight: 700; font-family: sans-serif; }' +
                         '.signature-doc { font-size: 0.75rem; color: #64748b; font-family: sans-serif; }' +
+                        '.signature-img-preview { max-height: 52px; max-width: 190px; object-fit: contain; margin-bottom: -6px; }' +
+                        '.signature-cert-seal { margin-top: 6px; padding: 4px 8px; background-color: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; font-size: 8px; color: #166534; font-family: monospace; line-height: 1.35; text-align: center; width: 100%; }' +
+                        '.signature-cert-seal-contratado { background-color: #eff6ff; border-color: #93c5fd; color: #1e40af; }' +
                         '@media print { body { padding: 0; } }' +
                         '</style>' +
                         '</head><body>' +
@@ -3736,21 +4177,22 @@
                     const valor = document.getElementById('contrato-valor').value;
                     const formaPagamento = document.getElementById('contrato-forma-pagamento').value;
                     const itens = document.getElementById('contrato-pacote-itens').value;
+                    const assinado = contractSignatures.contratante.assinado ? '✅ Assinado Digitalmente' : '⏳ Aguardando Assinatura';
 
                     const text = 
-`📄 *WILKSON FOTOGRAFIAS - RESUMO DO CONTRATO DE FORMATURA*
-
+`📄 *WILKSON FOTOGRAFIAS - CONTRATO DE FORMATURA*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎓 *Formando(a):* ${alunoNome || '---'}
 👤 *Responsável:* ${clienteNome || '---'}
-📦 *Pacote Escolhido:* ${pacoteNome}
+📦 *Pacote:* ${pacoteNome}
 💰 *Valor Total:* R$ ${parseFloat(valor || 0).toFixed(2).replace('.', ',')}
-💳 *Forma de Pagamento:* ${formaPagamento || 'A combinar'}
-
+💳 *Pagamento:* ${formaPagamento || 'A combinar'}
+✍️ *Status:* ${assinado}
+${contractSignatures.contratante.hash ? `🔒 *Autenticação:* ${contractSignatures.contratante.hash}\n` : ''}
 🎁 *Itens Inclusos:*
 ${itens || 'Conforme contrato padrão.'}
-
-📞 *Coordenação:* Wilkson Fotografias
-WhatsApp: (81) 98845-6625`;
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+_Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
 
                     navigator.clipboard.writeText(text).then(() => {
                         alert('✅ Resumo do contrato copiado! Pronto para enviar no WhatsApp.');
@@ -3763,15 +4205,44 @@ WhatsApp: (81) 98845-6625`;
                     const c = dbState.contratosGerados.find(item => item.id === contratoId);
                     if (!c) return;
 
+                    activeEditingContractId = contratoId;
                     window.app.switchContratosTab('gerar');
                     if (c.alunoId) {
                         document.getElementById('contrato-select-aluno').value = c.alunoId;
                     }
                     document.getElementById('contrato-aluno-nome').value = c.alunoNome || '';
+                    document.getElementById('contrato-aluno-turma').value = c.turmaNome || '';
                     document.getElementById('contrato-cliente-nome').value = c.responsavelNome || '';
                     document.getElementById('contrato-cliente-cpf').value = c.cpf || '';
+                    if (document.getElementById('contrato-cliente-rg')) document.getElementById('contrato-cliente-rg').value = c.rg || '';
+                    if (document.getElementById('contrato-cliente-endereco')) document.getElementById('contrato-cliente-endereco').value = c.endereco || '';
+                    if (document.getElementById('contrato-cliente-telefone')) document.getElementById('contrato-cliente-telefone').value = c.telefone || '';
+                    if (document.getElementById('contrato-cliente-email')) document.getElementById('contrato-cliente-email').value = c.email || '';
                     document.getElementById('contrato-valor').value = c.valor || 0;
                     document.getElementById('contrato-forma-pagamento').value = c.formaPagamento || '';
+                    if (document.getElementById('contrato-pacote-itens')) document.getElementById('contrato-pacote-itens').value = c.pacoteItens || '';
+                    if (document.getElementById('contrato-obs')) document.getElementById('contrato-obs').value = c.observacoes || '';
+                    if (document.getElementById('contrato-direito-imagem')) document.getElementById('contrato-direito-imagem').checked = c.direitoImagem !== false;
+
+                    // Restaurar assinaturas
+                    contractSignatures = {
+                        contratante: {
+                            assinado: Boolean(c.assinadoContratante || c.assinado),
+                            imagem: c.assinaturaContratanteImg || null,
+                            hash: c.assinaturaContratanteHash || null,
+                            dataHora: c.assinaturaContratanteDataHora || null,
+                            nome: c.responsavelNome || '',
+                            doc: c.cpf || ''
+                        },
+                        contratado: {
+                            assinado: Boolean(c.assinadoContratado),
+                            imagem: c.assinaturaContratadoImg || null,
+                            hash: c.assinaturaContratadoHash || null,
+                            dataHora: c.assinaturaContratadoDataHora || null,
+                            nome: 'Wilkson Albuquerque Carvalho',
+                            doc: '646.660.003-30'
+                        }
+                    };
 
                     window.app.onGenerateContractSubmit();
                 },

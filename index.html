@@ -1127,6 +1127,7 @@
                                 <thead class="bg-gray-50 border-b">
                                     <tr>
                                         <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Aluno</th>
+                                        <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Responsável</th>
                                         <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Turma</th>
                                         <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Valor Total</th>
                                         <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Valor Pago</th>
@@ -2027,7 +2028,7 @@
                 const financeiroFiltrado = dbState.financeiro.filter(f => alunosComContratoIds.includes(f.alunoId));
 
                 lista.innerHTML = financeiroFiltrado.length === 0 
-                    ? '<tr><td colspan="7" class="p-8 text-center text-gray-500">Nenhum lançamento financeiro para os alunos desta turma.</td></tr>'
+                    ? '<tr><td colspan="8" class="p-8 text-center text-gray-500">Nenhum lançamento financeiro para os alunos desta turma.</td></tr>'
                     : financeiroFiltrado.map(item => {
                         const aluno = dbState.alunos.find(a => a.id === item.alunoId);
                         if (!aluno) return ''; 
@@ -2060,6 +2061,7 @@
                         return `
                         <tr class="hover:bg-gray-50 transition border-b border-gray-100">
                             <td class="p-4 font-semibold text-gray-800">${aluno.nome}</td>
+                            <td class="p-4 text-sm text-gray-600">${aluno.pai || '<span class="text-gray-400 italic">Não informado</span>'}</td>
                             <td class="p-4 text-xs text-gray-500">${nomeTurma}</td>
                             <td class="p-4 font-medium text-gray-700">R$ ${total.toFixed(2).replace('.', ',')}</td>
                             <td class="p-4 font-medium text-emerald-600">R$ ${pago.toFixed(2).replace('.', ',')}</td>
@@ -2274,7 +2276,7 @@
                 if (financeiroAlunoSelect) {
                     const selVal = financeiroAlunoSelect.value;
                     financeiroAlunoSelect.innerHTML = '<option value="">Selecione o Aluno (Com Contrato)</option>' +
-                        alunosComContrato.map(a => `<option value="${a.id}">${a.nome} (${getNomeTurma(a.turmaId)})</option>`).join('');
+                        alunosComContrato.map(a => `<option value="${a.id}">${a.nome} (Resp: ${a.pai || '---'}) - ${getNomeTurma(a.turmaId)}</option>`).join('');
                     financeiroAlunoSelect.value = selVal;
                 }
 

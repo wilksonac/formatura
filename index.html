@@ -298,6 +298,90 @@
         </div>
     </div>
 
+    <!-- MODAL DE GALERIA DIGITAL / GOOGLE DRIVE -->
+    <div id="gallery-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-lg border border-gray-100">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                        <i data-lucide="cloud-lightning" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-800">Galeria Digital & Google Drive</h2>
+                        <p class="text-xs text-gray-500">Envio de link de fotos para os pais via WhatsApp</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.app.closeGalleryModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="gallery-form">
+                <input type="hidden" id="gallery-aluno-id">
+                
+                <div class="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl mb-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-xs text-blue-800 font-bold uppercase tracking-wider">Formando(a)</p>
+                            <h3 id="gallery-aluno-nome" class="font-bold text-gray-900 text-base">---</h3>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-blue-800 font-bold uppercase tracking-wider">Responsável</p>
+                            <span id="gallery-aluno-resp" class="text-xs font-semibold text-gray-700 block">---</span>
+                            <span id="gallery-aluno-contato" class="text-[11px] text-gray-500 block">---</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3.5 mb-5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+                            <i data-lucide="link" class="w-3.5 h-3.5 text-blue-600"></i> Link da Galeria Digital / Google Drive / OneDrive:
+                        </label>
+                        <input type="url" id="gallery-input-link" placeholder="https://drive.google.com/... ou https://..." class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+                                <i data-lucide="key" class="w-3.5 h-3.5 text-amber-600"></i> Senha / PIN (Opcional):
+                            </label>
+                            <input type="text" id="gallery-input-senha" placeholder="Ex: 1234 / formatura2026" class="w-full p-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+                                <i data-lucide="calendar" class="w-3.5 h-3.5 text-purple-600"></i> Validade (Opcional):
+                            </label>
+                            <input type="text" id="gallery-input-validade" placeholder="Ex: Disponível por 60 dias" class="w-full p-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="gallery-marcar-entregue" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4" checked>
+                            <span class="ml-2 text-xs font-semibold text-gray-700">Marcar "Mídia Digital" como Entregue nesta data</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-2 pt-3 border-t">
+                    <button type="button" onclick="window.app.openGalleryLinkDirect()" id="btn-gallery-test" class="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1">
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Abrir Link
+                    </button>
+                    <div class="flex gap-2 w-full sm:w-auto justify-end">
+                        <button type="button" onclick="window.app.closeGalleryModal()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-200 transition">Cancelar</button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow flex items-center gap-1.5">
+                            <i data-lucide="save" class="w-3.5 h-3.5"></i> Salvar Link
+                        </button>
+                        <button type="button" onclick="window.app.saveAndSendGalleryWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow flex items-center gap-1.5">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i> Enviar WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL GENÉRICO DE EDIÇÃO -->
     <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
         <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg">
@@ -697,6 +781,20 @@
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Turma</label>
                                     <select id="aluno-turma-select" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-3 border-t border-gray-100">
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1.5">
+                                        <i data-lucide="cloud-lightning" class="w-3.5 h-3.5 text-blue-600"></i> Link da Galeria Digital / Google Drive (Opcional):
+                                    </label>
+                                    <input type="url" id="aluno-link-galeria" placeholder="https://drive.google.com/... ou https://..." class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1.5">
+                                        <i data-lucide="key" class="w-3.5 h-3.5 text-amber-600"></i> Senha / PIN (Opcional):
+                                    </label>
+                                    <input type="text" id="aluno-senha-galeria" placeholder="Ex: 1234" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
                                 </div>
                             </div>
                             <div class="mt-4 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
@@ -1375,11 +1473,12 @@
                             <table class="w-full min-w-max">
                                 <thead class="bg-gray-50 border-b">
                                     <tr>
-                                        <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Aluno</th>
+                                        <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Aluno & Responsável</th>
                                         <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Turma</th>
+                                        <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Galeria Digital / Google Drive</th>
                                         <th class="p-4 text-center text-xs font-bold text-gray-600 uppercase">Mídia Digital</th>
                                         <th class="p-4 text-center text-xs font-bold text-gray-600 uppercase">Álbum Impresso</th>
-                                        <th class="p-4 text-left text-xs font-bold text-gray-600 uppercase">Histórico / Datas</th>
+                                        <th class="p-4 text-right text-xs font-bold text-gray-600 uppercase">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody id="lista-entregas" class="divide-y divide-gray-100"></tbody>
@@ -2161,6 +2260,14 @@
                             ? `<a href="https://wa.me/55${cleanPhone}" target="_blank" class="text-emerald-600 hover:text-emerald-800 font-medium inline-flex items-center gap-1 ml-1" title="Conversar no WhatsApp"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i></a>`
                             : '';
 
+                        const galeriaBtn = aluno.linkGaleria 
+                            ? `<button onclick="window.app.openGalleryModal('${aluno.id}')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Galeria de Fotos Vinculada - Abrir / Enviar no WhatsApp">
+                                <i data-lucide="cloud-lightning" class="w-4 h-4"></i>
+                               </button>`
+                            : `<button onclick="window.app.openGalleryModal('${aluno.id}')" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-gray-50 rounded" title="Vincular Link da Galeria Digital / Google Drive">
+                                <i data-lucide="cloud" class="w-4 h-4"></i>
+                               </button>`;
+
                         return `
                         <tr class="hover:bg-gray-50 transition border-b border-gray-100">
                             <td class="p-4 font-semibold text-gray-800">${aluno.nome}</td>
@@ -2172,6 +2279,7 @@
                             <td class="p-4 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${statusClass}">${statusText}</span></td>
                             <td class="p-4 text-right">
                                 <div class="inline-flex gap-1">
+                                    ${galeriaBtn}
                                     <button onclick="window.app.generateContractForAluno('${aluno.id}')" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded" title="Gerar Contrato de Formatura para este Aluno">
                                         <i data-lucide="file-signature" class="w-4 h-4"></i>
                                     </button>
@@ -2578,7 +2686,7 @@
                 if (btnClear) btnClear.classList.toggle('hidden', !filterState.entregasSearch);
 
                 if (alunosFiltrados.length === 0) {
-                    lista.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-gray-500">${filterState.entregasSearch ? `Nenhum aluno encontrado para "${filterState.entregasSearch}".` : 'Nenhum aluno para este filtro de entrega.'}</td></tr>`;
+                    lista.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-500">${filterState.entregasSearch ? `Nenhum aluno encontrado para "${filterState.entregasSearch}".` : 'Nenhum aluno para este filtro de entrega.'}</td></tr>`;
                     return;
                 }
 
@@ -2587,11 +2695,47 @@
                     const dataMidia = entrega.dataMidia ? new Date(entrega.dataMidia).toLocaleDateString('pt-BR') : '-';
                     const dataAlbum = entrega.dataAlbum ? new Date(entrega.dataAlbum).toLocaleDateString('pt-BR') : '-';
                     const nomeTurma = getNomeTurma(aluno.turmaId);
+                    const temGaleria = Boolean(aluno.linkGaleria && aluno.linkGaleria.trim());
+
+                    let galeriaHTML = '';
+                    if (temGaleria) {
+                        galeriaHTML = `
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-1.5">
+                                <a href="${aluno.linkGaleria}" target="_blank" class="text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1 max-w-[180px] truncate" title="${aluno.linkGaleria}">
+                                    <i data-lucide="cloud-lightning" class="w-3.5 h-3.5 text-blue-600 flex-shrink-0"></i> Acessar Galeria
+                                </a>
+                                ${aluno.senhaGaleria ? `<span class="px-1.5 py-0.5 bg-amber-50 text-amber-800 text-[10px] font-bold rounded border border-amber-200" title="Senha de Acesso">PIN: ${aluno.senhaGaleria}</span>` : ''}
+                            </div>
+                            <div class="flex items-center gap-1 pt-0.5">
+                                <button onclick="window.app.sendGalleryWhatsAppDirect('${aluno.id}')" class="px-2 py-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded flex items-center gap-1 transition shadow-sm" title="Disparar Fotos no WhatsApp do Responsável">
+                                    <i data-lucide="message-circle" class="w-3.5 h-3.5 text-emerald-600"></i> Enviar WhatsApp
+                                </button>
+                                <button onclick="window.app.copyGalleryLinkDirect('${aluno.linkGaleria}')" class="p-1 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded" title="Copiar Link da Galeria">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button onclick="window.app.openGalleryModal('${aluno.id}')" class="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded" title="Editar Link da Galeria">
+                                    <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>`;
+                    } else {
+                        galeriaHTML = `
+                        <div>
+                            <button onclick="window.app.openGalleryModal('${aluno.id}')" class="px-2.5 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg inline-flex items-center gap-1.5 transition shadow-sm" title="Cadastrar link do Google Drive ou Galeria">
+                                <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-blue-600"></i> Vincular Galeria
+                            </button>
+                        </div>`;
+                    }
 
                     return `
                     <tr class="hover:bg-gray-50 transition border-b border-gray-100">
-                        <td class="p-4 font-semibold text-gray-800">${aluno.nome}</td>
+                        <td class="p-4">
+                            <p class="font-bold text-gray-800 text-sm">${aluno.nome}</p>
+                            <p class="text-xs text-gray-500">Resp: <strong>${aluno.pai || 'Não informado'}</strong> ${aluno.contato ? `(${aluno.contato})` : ''}</p>
+                        </td>
                         <td class="p-4 text-xs text-gray-500">${nomeTurma}</td>
+                        <td class="p-4">${galeriaHTML}</td>
                         <td class="p-4 text-center">
                             <label class="inline-flex items-center cursor-pointer">
                                 <input type="checkbox" 
@@ -2602,6 +2746,7 @@
                                     ${entrega.entregueMidia ? 'Entregue' : 'Pendente'}
                                 </span>
                             </label>
+                            ${entrega.entregueMidia ? `<div class="text-[10px] text-gray-400 mt-1">${dataMidia}</div>` : ''}
                         </td>
                         <td class="p-4 text-center">
                             <label class="inline-flex items-center cursor-pointer">
@@ -2613,11 +2758,17 @@
                                     ${entrega.entregueAlbum ? 'Entregue' : 'Pendente'}
                                 </span>
                             </label>
+                            ${entrega.entregueAlbum ? `<div class="text-[10px] text-gray-400 mt-1">${dataAlbum}</div>` : ''}
                         </td>
-                        <td class="p-4 text-xs text-gray-500 space-y-1">
-                            ${entrega.entregueMidia ? `<div class="flex items-center gap-1 text-blue-700"><i data-lucide="disc" class="w-3.5 h-3.5"></i> Mídia: ${dataMidia}</div>` : ''}
-                            ${entrega.entregueAlbum ? `<div class="flex items-center gap-1 text-purple-700"><i data-lucide="book-open" class="w-3.5 h-3.5"></i> Álbum: ${dataAlbum}</div>` : ''}
-                            ${!entrega.entregueMidia && !entrega.entregueAlbum ? '<span class="text-gray-400">Aguardando entrega</span>' : ''}
+                        <td class="p-4 text-right">
+                            <div class="inline-flex items-center gap-1">
+                                <button onclick="window.app.openGalleryModal('${aluno.id}')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Gerenciar Galeria Digital / Google Drive">
+                                    <i data-lucide="cloud" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="window.app.openEditModal('alunos', '${aluno.id}')" class="p-1.5 text-slate-600 hover:bg-slate-100 rounded" title="Editar Dados do Aluno">
+                                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>`;
                 }).join('');
@@ -2900,8 +3051,43 @@
                     pai: this.elements['aluno-pai'].value.trim(), 
                     contato: this.elements['aluno-contato'].value.trim(),
                     turmaId: this.elements['aluno-turma-select'].value || (activeTurmaId !== 'ALL' ? activeTurmaId : DEFAULT_LEGACY_TURMA.id),
+                    linkGaleria: this.elements['aluno-link-galeria'] ? this.elements['aluno-link-galeria'].value.trim() : '',
+                    senhaGaleria: this.elements['aluno-senha-galeria'] ? this.elements['aluno-senha-galeria'].value.trim() : '',
                     temContrato: this.elements['aluno-tem-contrato'].checked 
                 }, this); 
+            });
+
+            // Submit do Modal de Galeria Digital
+            document.getElementById('gallery-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const alunoId = document.getElementById('gallery-aluno-id').value;
+                const link = document.getElementById('gallery-input-link').value.trim();
+                const senha = document.getElementById('gallery-input-senha').value.trim();
+                const validade = document.getElementById('gallery-input-validade').value.trim();
+                const marcarEntregue = document.getElementById('gallery-marcar-entregue').checked;
+
+                if (!userId || !alunoId) return;
+
+                try {
+                    await updateDoc(doc(db, `users/${userId}/alunos/${alunoId}`), {
+                        linkGaleria: link,
+                        senhaGaleria: senha,
+                        validadeGaleria: validade
+                    });
+
+                    if (marcarEntregue) {
+                        await setDoc(doc(db, `users/${userId}/entregas/${alunoId}`), {
+                            entregueMidia: true,
+                            dataMidia: new Date().toISOString()
+                        }, { merge: true });
+                    }
+
+                    window.app.closeGalleryModal();
+                    alert('✅ Link da Galeria Digital salvo com sucesso!');
+                } catch (error) {
+                    console.error("Erro ao salvar galeria:", error);
+                    alert("Erro ao salvar link da galeria.");
+                }
             });
 
             document.getElementById('form-fotografo').addEventListener('submit', function(e) { 
@@ -3066,6 +3252,8 @@
                     updatePayload.pai = document.getElementById('edit-field-pai').value.trim();
                     updatePayload.contato = document.getElementById('edit-field-contato').value.trim();
                     updatePayload.turmaId = document.getElementById('edit-field-turmaId').value;
+                    updatePayload.linkGaleria = document.getElementById('edit-field-linkGaleria') ? document.getElementById('edit-field-linkGaleria').value.trim() : '';
+                    updatePayload.senhaGaleria = document.getElementById('edit-field-senhaGaleria') ? document.getElementById('edit-field-senhaGaleria').value.trim() : '';
                     updatePayload.temContrato = document.getElementById('edit-field-temContrato').checked;
                 } else if (col === 'eventos') {
                     const dataInicio = document.getElementById('edit-field-data-inicio').value;
@@ -3954,6 +4142,125 @@ WhatsApp: (81) 98845-6625`;
                         await setDoc(doc(db, path), updateData, { merge: true });
                     } catch (error) { console.error("Erro entrega:", error); }
                 },
+                // --- GESTÃO E DISPARO DE GALERIA DIGITAL / GOOGLE DRIVE ---
+                openGalleryModal: (alunoId) => {
+                    const aluno = dbState.alunos.find(a => a.id === alunoId);
+                    if (!aluno) return;
+
+                    document.getElementById('gallery-aluno-id').value = alunoId;
+                    document.getElementById('gallery-aluno-nome').innerText = aluno.nome;
+                    document.getElementById('gallery-aluno-resp').innerText = aluno.pai || 'Não informado';
+                    document.getElementById('gallery-aluno-contato').innerText = aluno.contato || 'Sem telefone';
+                    document.getElementById('gallery-input-link').value = aluno.linkGaleria || '';
+                    document.getElementById('gallery-input-senha').value = aluno.senhaGaleria || '';
+                    document.getElementById('gallery-input-validade').value = aluno.validadeGaleria || '';
+
+                    const entrega = dbState.entregas.find(e => e.id === alunoId) || {};
+                    document.getElementById('gallery-marcar-entregue').checked = !entrega.entregueMidia;
+
+                    const modal = document.getElementById('gallery-modal');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    document.getElementById('gallery-input-link').focus();
+                    lucide.createIcons();
+                },
+                closeGalleryModal: () => {
+                    const modal = document.getElementById('gallery-modal');
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.getElementById('gallery-form').reset();
+                },
+                openGalleryLinkDirect: (url = null) => {
+                    const link = url || document.getElementById('gallery-input-link').value.trim();
+                    if (!link) {
+                        alert('Informe um link válido da galeria.');
+                        return;
+                    }
+                    window.open(link, '_blank');
+                },
+                copyGalleryLinkDirect: (link) => {
+                    if (!link) return;
+                    navigator.clipboard.writeText(link).then(() => {
+                        alert('✅ Link da galeria copiado para a área de transferência!');
+                    }).catch(() => {
+                        prompt('Copie o link abaixo:', link);
+                    });
+                },
+                saveAndSendGalleryWhatsApp: async () => {
+                    const alunoId = document.getElementById('gallery-aluno-id').value;
+                    const link = document.getElementById('gallery-input-link').value.trim();
+                    const senha = document.getElementById('gallery-input-senha').value.trim();
+                    const validade = document.getElementById('gallery-input-validade').value.trim();
+                    const marcarEntregue = document.getElementById('gallery-marcar-entregue').checked;
+
+                    if (!link) {
+                        alert('Informe o link da galeria antes de enviar.');
+                        return;
+                    }
+
+                    if (userId && alunoId) {
+                        try {
+                            await updateDoc(doc(db, `users/${userId}/alunos/${alunoId}`), {
+                                linkGaleria: link,
+                                senhaGaleria: senha,
+                                validadeGaleria: validade
+                            });
+                            if (marcarEntregue) {
+                                await setDoc(doc(db, `users/${userId}/entregas/${alunoId}`), {
+                                    entregueMidia: true,
+                                    dataMidia: new Date().toISOString()
+                                }, { merge: true });
+                            }
+                        } catch (err) {
+                            console.error("Erro ao salvar galeria antes de disparar:", err);
+                        }
+                    }
+
+                    window.app.closeGalleryModal();
+                    window.app.sendGalleryWhatsAppDirect(alunoId, link, senha, validade);
+                },
+                sendGalleryWhatsAppDirect: (alunoId, customLink = null, customSenha = null, customValidade = null) => {
+                    const aluno = dbState.alunos.find(a => a.id === alunoId);
+                    if (!aluno) return;
+
+                    const link = customLink || aluno.linkGaleria;
+                    if (!link) {
+                        window.app.openGalleryModal(alunoId);
+                        return;
+                    }
+
+                    const senha = customSenha !== null ? customSenha : (aluno.senhaGaleria || '');
+                    const validade = customValidade !== null ? customValidade : (aluno.validadeGaleria || '');
+                    const nomeTurma = getNomeTurma(aluno.turmaId);
+                    const cleanPhone = (aluno.contato || '').replace(/\D/g, '');
+
+                    let senhaTexto = senha ? `\n🔑 *PIN / Senha de Acesso:* ${senha}` : '';
+                    let validadeTexto = validade ? `\n⏳ *Validade:* ${validade}` : '';
+
+                    const text = 
+`🎓 *WILKSON FOTOGRAFIAS - SUAS FOTOS CHEGARAM!* 📸✨
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Olá *${aluno.pai || 'Família'}*! É com muita alegria que disponibilizamos as fotografias da formatura do(a) formando(a) *${aluno.nome}* (*${nomeTurma}*)!
+
+🔗 *Acesse a Galeria Digital no link abaixo:*
+${link}${senhaTexto}${validadeTexto}
+
+💡 *Dica:* Recomendamos fazer o download das fotos em alta resolução em um computador ou pen drive para guardar para sempre essa recordação inesquecível!
+
+Qualquer dúvida estamos à disposição.
+_Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
+
+                    navigator.clipboard.writeText(text).then(() => {
+                        if (cleanPhone.length >= 10) {
+                            const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(text)}`;
+                            window.open(url, '_blank');
+                        } else {
+                            alert('✅ Mensagem com link da galeria copiada! Cole no WhatsApp do responsável.');
+                        }
+                    }).catch(() => {
+                        prompt('Copie a mensagem abaixo para enviar no WhatsApp:', text);
+                    });
+                },
                 openPaymentModal: (docId) => {
                     const item = dbState.financeiro.find(f => f.id === docId);
                     if (!item) return;
@@ -4420,6 +4727,18 @@ WhatsApp: (81) 98845-6625`;
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">Turma</label>
                                 <select id="edit-field-turmaId" class="w-full p-2.5 border rounded-lg">${turmasOptions}</select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1.5">
+                                    <i data-lucide="cloud-lightning" class="w-3.5 h-3.5 text-blue-600"></i> Link da Galeria Digital / Google Drive:
+                                </label>
+                                <input type="url" id="edit-field-linkGaleria" value="${docItem.linkGaleria || ''}" placeholder="https://drive.google.com/... ou https://..." class="w-full p-2.5 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1.5">
+                                    <i data-lucide="key" class="w-3.5 h-3.5 text-amber-600"></i> Senha / PIN (Opcional):
+                                </label>
+                                <input type="text" id="edit-field-senhaGaleria" value="${docItem.senhaGaleria || ''}" placeholder="Ex: 1234" class="w-full p-2.5 border rounded-lg">
                             </div>
                             <div class="flex items-center mt-2">
                                 <input type="checkbox" id="edit-field-temContrato" class="rounded border-gray-300 text-blue-600" ${docItem.temContrato !== false ? 'checked' : ''}>

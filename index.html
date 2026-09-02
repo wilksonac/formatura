@@ -566,6 +566,78 @@
         </div>
     </div>
 
+    <!-- MODAL DE CERTIFICADO / DIPLOMA SIMBÓLICO INFANTIL -->
+    <div id="diploma-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-xs z-50 hidden items-center justify-center p-2 sm:p-4 md:p-6 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] flex flex-col overflow-hidden">
+            <!-- Modal Top Bar -->
+            <div class="p-4 bg-slate-900 text-white flex flex-wrap justify-between items-center gap-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="bg-amber-500/20 text-amber-400 p-2 rounded-xl border border-amber-500/30">
+                        <i data-lucide="award" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-base md:text-lg text-white leading-tight">Diploma / Certificado Simbólico de Formatura</h2>
+                        <p class="text-xs text-slate-400">Modelo paisagem A4 em alta qualidade para impressão ou brinde</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="window.app.downloadDiplomaPDF()" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition shadow">
+                        <i data-lucide="download" class="w-4 h-4"></i> Baixar PDF (A4)
+                    </button>
+                    <button type="button" onclick="window.app.printDiploma()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Imprimir
+                    </button>
+                    <button type="button" onclick="window.app.closeDiplomaModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Customization Bar -->
+            <div class="p-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-3 flex-wrap">
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-bold text-slate-600">Visualizar:</span>
+                        <select id="diploma-view-mode" onchange="window.app.onDiplomaFilterChange()" class="p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-amber-500">
+                            <option value="INDIVIDUAL">👤 Aluno Selecionado</option>
+                            <option value="TURMA_LOTE">👥 Todos da Turma (Impressão em Lote)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-bold text-slate-600">Tema da Moldura:</span>
+                        <select id="diploma-theme" onchange="window.app.onDiplomaFilterChange()" class="p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-amber-500">
+                            <option value="gold">🏆 Dourado Real & Azul Marinho</option>
+                            <option value="emerald">🌿 Verde Esmeralda Nobre</option>
+                            <option value="rose">🌸 Rosa Real & Dourado</option>
+                            <option value="royal">👑 Azul Real Monárquico</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="text-slate-500 italic" id="diploma-stats-info">1 certificado pronto</div>
+            </div>
+
+            <!-- Printable Certificate Document Area (Landscape A4 Preview) -->
+            <div class="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-200/70 flex justify-center">
+                <div id="diploma-document-container" class="w-full max-w-3xl space-y-6">
+                    <!-- Preenchido dinamicamente via JS -->
+                </div>
+            </div>
+
+            <!-- Modal Footer Actions -->
+            <div class="p-3.5 bg-white border-t border-slate-200 flex flex-wrap justify-between items-center gap-3">
+                <div class="text-xs text-slate-500 flex items-center gap-1.5">
+                    <i data-lucide="info" class="w-4 h-4 text-amber-600"></i>
+                    <span>Dica: Excelente para presentear dentro do estojo do álbum ou enviar aos pais em alta resolução!</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="window.app.closeDiplomaModal()" class="bg-slate-100 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl hover:bg-slate-200 transition">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DE RECIBO DE PAGAMENTO & QUITAÇÃO -->
     <div id="receipt-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center p-3 md:p-6 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden">
@@ -1160,6 +1232,9 @@
                             <p class="text-sm text-gray-500">Cadastre os formandos e seus responsáveis</p>
                         </div>
                         <div class="flex flex-wrap gap-2">
+                            <button onclick="window.app.openDiplomaModal(null, 'TURMA_LOTE')" class="bg-amber-600 hover:bg-amber-700 text-white text-sm px-4 py-2 rounded-xl font-bold transition shadow-xs flex items-center gap-2" title="Gerar Diplomas/Certificados Simbólicos da Turma em Lote">
+                                <i data-lucide="award" class="w-4 h-4"></i> Diplomas da Turma (PDF)
+                            </button>
                             <button onclick="window.app.openSchoolReportModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-xl font-bold transition shadow-xs flex items-center gap-2" title="Gerar Relatório Geral em PDF para a Direção da Escola">
                                 <i data-lucide="file-text" class="w-4 h-4"></i> Relatório da Escola (PDF)
                             </button>
@@ -2010,6 +2085,8 @@
             let currentZapAluno = null;
             let activeZapTemplateKey = 'cobranca';
             let currentSchoolReportTurmaId = 'ALL';
+            let currentDiplomaAlunoId = null;
+            let currentDiplomaTurmaId = 'ALL';
 
             // Estado de Assinaturas Digitais do Contrato
             let contractSignatures = {
@@ -2756,9 +2833,12 @@
                         </div>
 
                         <div class="mt-5 flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-gray-100">
-                            <div class="flex items-center gap-1.5">
+                            <div class="flex flex-wrap items-center gap-1.5">
                                 <button onclick="window.app.setActiveTurma('${t.id}')" class="text-xs bg-indigo-50 text-indigo-700 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition">
                                     ${isAtiva ? 'Selecionada' : 'Selecionar Turma'}
+                                </button>
+                                <button onclick="window.app.openDiplomaModal(null, 'TURMA_LOTE', '${t.id}')" class="text-xs bg-amber-50 text-amber-800 hover:bg-amber-100 font-bold px-2.5 py-1.5 rounded-lg transition border border-amber-200 flex items-center gap-1" title="Gerar Diplomas em Lote desta Turma">
+                                    <i data-lucide="award" class="w-3.5 h-3.5 text-amber-600"></i> Diplomas
                                 </button>
                                 <button onclick="window.app.openSchoolReportModal('${t.id}')" class="text-xs bg-slate-50 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 font-bold px-2.5 py-1.5 rounded-lg transition border border-slate-200 flex items-center gap-1" title="Relatório Oficial para a Direção da Escola">
                                     <i data-lucide="file-text" class="w-3.5 h-3.5 text-indigo-600"></i> Relatório PDF
@@ -2927,7 +3007,10 @@
                             <td class="p-4 text-right">
                                 <div class="inline-flex gap-1">
                                     ${galeriaBtn}
-                                    <button onclick="window.app.openExtraPhotosForAluno('${aluno.id}')" class="p-1.5 text-amber-600 hover:bg-amber-50 rounded" title="Vender Fotos Extras / Upsell">
+                                    <button onclick="window.app.openDiplomaModal('${aluno.id}', 'INDIVIDUAL')" class="p-1.5 text-amber-600 hover:bg-amber-50 rounded" title="Gerar Diploma / Certificado Simbólico">
+                                        <i data-lucide="award" class="w-4 h-4"></i>
+                                    </button>
+                                    <button onclick="window.app.openExtraPhotosForAluno('${aluno.id}')" class="p-1.5 text-orange-600 hover:bg-orange-50 rounded" title="Vender Fotos Extras / Upsell">
                                         <i data-lucide="image-plus" class="w-4 h-4"></i>
                                     </button>
                                     <button onclick="window.app.generateContractForAluno('${aluno.id}')" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded" title="Gerar Contrato de Formatura para este Aluno">
@@ -6519,6 +6602,255 @@ WhatsApp: (81) 98845-6625`;
                     }).catch(() => {
                         prompt('Copie o texto do resumo abaixo:', text);
                     });
+                },
+                // --- GERADOR DE DIPLOMA / CERTIFICADO SIMBÓLICO INFANTIL ---
+                openDiplomaModal: (alunoId = null, mode = 'INDIVIDUAL', turmaId = null) => {
+                    currentDiplomaAlunoId = alunoId;
+                    currentDiplomaTurmaId = turmaId || (alunoId ? (dbState.alunos.find(a => a.id === alunoId)?.turmaId || activeTurmaId) : activeTurmaId);
+
+                    const selectMode = document.getElementById('diploma-view-mode');
+                    if (selectMode) selectMode.value = mode;
+
+                    window.app.renderDiplomas();
+
+                    const modal = document.getElementById('diploma-modal');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    lucide.createIcons();
+                },
+                closeDiplomaModal: () => {
+                    const modal = document.getElementById('diploma-modal');
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                },
+                onDiplomaFilterChange: () => {
+                    window.app.renderDiplomas();
+                },
+                getDiplomaThemeStyles: (themeKey) => {
+                    switch (themeKey) {
+                        case 'emerald':
+                            return {
+                                outerBorder: 'border-emerald-800',
+                                innerBorder: 'border-emerald-500',
+                                ornamentColor: 'text-emerald-700',
+                                badgeBg: 'bg-emerald-800',
+                                badgeText: 'text-emerald-100',
+                                titleColor: 'text-emerald-950',
+                                nameColor: 'text-emerald-900',
+                                nameUnderline: 'border-emerald-600'
+                            };
+                        case 'rose':
+                            return {
+                                outerBorder: 'border-rose-700',
+                                innerBorder: 'border-amber-400',
+                                ornamentColor: 'text-rose-600',
+                                badgeBg: 'bg-rose-700',
+                                badgeText: 'text-amber-100',
+                                titleColor: 'text-rose-950',
+                                nameColor: 'text-rose-900',
+                                nameUnderline: 'border-rose-500'
+                            };
+                        case 'royal':
+                            return {
+                                outerBorder: 'border-blue-900',
+                                innerBorder: 'border-amber-500',
+                                ornamentColor: 'text-blue-700',
+                                badgeBg: 'bg-blue-900',
+                                badgeText: 'text-amber-300',
+                                titleColor: 'text-blue-950',
+                                nameColor: 'text-blue-900',
+                                nameUnderline: 'border-amber-500'
+                            };
+                        case 'gold':
+                        default:
+                            return {
+                                outerBorder: 'border-amber-800',
+                                innerBorder: 'border-amber-500',
+                                ornamentColor: 'text-amber-700',
+                                badgeBg: 'bg-amber-800',
+                                badgeText: 'text-amber-100',
+                                titleColor: 'text-slate-900',
+                                nameColor: 'text-amber-950',
+                                nameUnderline: 'border-amber-500'
+                            };
+                    }
+                },
+                renderDiplomas: () => {
+                    const mode = document.getElementById('diploma-view-mode')?.value || 'INDIVIDUAL';
+                    const themeKey = document.getElementById('diploma-theme')?.value || 'gold';
+                    const theme = window.app.getDiplomaThemeStyles(themeKey);
+                    const container = document.getElementById('diploma-document-container');
+                    const statsInfo = document.getElementById('diploma-stats-info');
+
+                    let alunosList = [];
+                    if (mode === 'INDIVIDUAL' && currentDiplomaAlunoId) {
+                        const single = dbState.alunos.find(a => a.id === currentDiplomaAlunoId);
+                        if (single) alunosList = [single];
+                    }
+
+                    if (alunosList.length === 0) {
+                        alunosList = dbState.alunos.filter(a => currentDiplomaTurmaId === 'ALL' || getTurmaDoItem(a) === currentDiplomaTurmaId);
+                    }
+
+                    if (alunosList.length === 0) {
+                        alunosList = dbState.alunos;
+                    }
+
+                    if (statsInfo) {
+                        statsInfo.innerText = `${alunosList.length} diploma(s) gerado(s)`;
+                    }
+
+                    if (!container) return;
+
+                    const dataHoje = new Date().toLocaleDateString('pt-BR');
+
+                    if (alunosList.length === 0) {
+                        container.innerHTML = `<div class="bg-white p-8 rounded-2xl shadow text-center text-slate-500">Nenhum aluno encontrado para gerar o diploma.</div>`;
+                        return;
+                    }
+
+                    container.innerHTML = alunosList.map((aluno, idx) => {
+                        const turma = dbState.turmas.find(t => t.id === aluno.turmaId);
+                        const nomeTurma = turma ? turma.nome : getNomeTurma(aluno.turmaId);
+                        const escola = turma?.escola || 'Educação Infantil';
+
+                        return `
+                        <div class="diploma-card bg-[#fefdfb] border-8 border-double ${theme.outerBorder} p-6 sm:p-10 rounded-2xl shadow-xl relative overflow-hidden text-center my-4 font-serif" style="aspect-ratio: 1.414/1; min-height: 480px; page-break-after: always;">
+                            <!-- Corner Ornaments (SVG) -->
+                            <div class="absolute top-2 left-2 w-10 h-10 ${theme.ornamentColor} opacity-70">
+                                <svg viewBox="0 0 100 100" fill="currentColor"><path d="M0,0 L100,0 C50,0 0,50 0,100 Z M15,15 L70,15 C40,15 15,40 15,70 Z"/></svg>
+                            </div>
+                            <div class="absolute top-2 right-2 w-10 h-10 ${theme.ornamentColor} opacity-70 rotate-90">
+                                <svg viewBox="0 0 100 100" fill="currentColor"><path d="M0,0 L100,0 C50,0 0,50 0,100 Z M15,15 L70,15 C40,15 15,40 15,70 Z"/></svg>
+                            </div>
+                            <div class="absolute bottom-2 left-2 w-10 h-10 ${theme.ornamentColor} opacity-70 -rotate-90">
+                                <svg viewBox="0 0 100 100" fill="currentColor"><path d="M0,0 L100,0 C50,0 0,50 0,100 Z M15,15 L70,15 C40,15 15,40 15,70 Z"/></svg>
+                            </div>
+                            <div class="absolute bottom-2 right-2 w-10 h-10 ${theme.ornamentColor} opacity-70 rotate-180">
+                                <svg viewBox="0 0 100 100" fill="currentColor"><path d="M0,0 L100,0 C50,0 0,50 0,100 Z M15,15 L70,15 C40,15 15,40 15,70 Z"/></svg>
+                            </div>
+
+                            <!-- Inner Decorative Border -->
+                            <div class="border-2 border-dashed ${theme.innerBorder} p-5 sm:p-7 h-full flex flex-col justify-between items-center relative">
+                                
+                                <!-- Header / Emblema -->
+                                <div class="w-full text-center">
+                                    <div class="inline-flex items-center justify-center gap-2 mb-1">
+                                        <span class="text-amber-500 text-sm sm:text-base">★ ★ ★</span>
+                                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full ${theme.badgeBg} ${theme.badgeText} flex items-center justify-center shadow">
+                                            <i data-lucide="award" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                                        </div>
+                                        <span class="text-amber-500 text-sm sm:text-base">★ ★ ★</span>
+                                    </div>
+                                    <h1 class="text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-widest ${theme.titleColor} mt-1 font-serif">
+                                        DIPLOMA DE FORMATURA
+                                    </h1>
+                                    <p class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-amber-700 font-sans">
+                                        EDUCAÇÃO INFANTIL • FORMATURA ABC
+                                    </p>
+                                </div>
+
+                                <!-- Body / Destinatário -->
+                                <div class="my-3 max-w-lg w-full text-center">
+                                    <p class="text-xs sm:text-sm text-slate-600 italic mb-1.5 font-serif">
+                                        Conferimos com todo orgulho e carinho o presente certificado ao(à) formando(a):
+                                    </p>
+                                    <div class="py-1.5 border-b-2 ${theme.nameUnderline} mb-2.5 mx-auto max-w-md">
+                                        <h2 class="text-xl sm:text-2xl md:text-3xl font-black ${theme.nameColor} tracking-wide font-serif">
+                                            ${aluno.nome}
+                                        </h2>
+                                    </div>
+                                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-serif">
+                                        Por ter concluído com brilho, amor e alegria a sua primeira grande jornada escolar na turma 
+                                        <strong class="font-bold text-slate-900">${nomeTurma}</strong> 
+                                        do <strong class="font-bold text-slate-900">${escola}</strong>, dando os primeiros passos de um futuro lindo e repleto de conquistas!
+                                    </p>
+                                </div>
+
+                                <!-- Rodapé e Assinaturas -->
+                                <div class="w-full pt-3 border-t border-slate-200/80">
+                                    <div class="flex justify-between items-end gap-3 text-center text-xs">
+                                        <div class="flex-1">
+                                            <div class="w-28 sm:w-44 border-b border-slate-400 mx-auto mb-1"></div>
+                                            <p class="font-bold text-slate-800 text-[10px] sm:text-xs font-sans">Direção / Coordenação</p>
+                                            <p class="text-[8px] sm:text-[10px] text-slate-500 font-sans">${escola}</p>
+                                        </div>
+                                        <div class="hidden sm:flex flex-col items-center">
+                                            <div class="w-12 h-12 rounded-full border-2 border-amber-400 bg-amber-50 flex items-center justify-center text-amber-700 shadow-inner">
+                                                <span class="text-[7px] font-black uppercase text-center leading-tight">HONRA<br>★ 2026 ★<br>MÉRITO</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="w-28 sm:w-44 border-b border-slate-400 mx-auto mb-1"></div>
+                                            <p class="font-bold text-slate-800 text-[10px] sm:text-xs font-sans">Wilkson Albuquerque Carvalho</p>
+                                            <p class="text-[8px] sm:text-[10px] text-slate-500 font-sans">Wilkson Fotografias</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-[8px] sm:text-[9px] text-slate-400 text-center mt-2 font-sans">Imperatriz - MA • ${dataHoje}</p>
+                                </div>
+
+                            </div>
+                        </div>`;
+                    }).join('');
+
+                    lucide.createIcons();
+                },
+                downloadDiplomaPDF: () => {
+                    const container = document.getElementById('diploma-document-container');
+                    if (!container) return;
+
+                    const mode = document.getElementById('diploma-view-mode')?.value || 'INDIVIDUAL';
+                    let fileName = 'Diplomas_Formatura_Infantil_WilksonFotografias.pdf';
+                    if (mode === 'INDIVIDUAL' && currentDiplomaAlunoId) {
+                        const aluno = dbState.alunos.find(a => a.id === currentDiplomaAlunoId);
+                        if (aluno) {
+                            fileName = `Diploma_Formatura_${aluno.nome.replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`;
+                        }
+                    }
+
+                    const opt = {
+                        margin: [5, 5, 5, 5],
+                        filename: fileName,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+                        pagebreak: { mode: ['css', 'legacy'], after: '.diploma-card' }
+                    };
+
+                    if (window.html2pdf) {
+                        window.html2pdf().set(opt).from(container).save();
+                    } else {
+                        window.app.printDiploma();
+                    }
+                },
+                printDiploma: () => {
+                    const container = document.getElementById('diploma-document-container');
+                    if (!container) return;
+
+                    const printWindow = window.open('', '_blank', 'width=1100,height=800');
+                    if (!printWindow) {
+                        alert('Permita popups no navegador para imprimir os diplomas.');
+                        return;
+                    }
+
+                    printWindow.document.open();
+                    printWindow.document.write(
+                        '<!DOCTYPE html><html><head><title>Diplomas de Formatura Infantil</title>' +
+                        '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">' +
+                        '<style>' +
+                        '@page { size: landscape; margin: 6mm; } ' +
+                        'body { font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; padding: 0; margin: 0; background: #fff; } ' +
+                        '.diploma-card { page-break-after: always; break-after: page; box-shadow: none !important; margin: 0 auto 20px auto !important; }' +
+                        '</style>' +
+                        '</head><body>' +
+                        container.innerHTML +
+                        '</body></html>'
+                    );
+                    printWindow.document.close();
+                    printWindow.focus();
+                    setTimeout(() => {
+                        printWindow.print();
+                    }, 500);
                 },
                 // Backup Completo do Banco de Dados
                 exportCompleteBackup: () => {

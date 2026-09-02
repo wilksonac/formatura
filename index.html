@@ -285,6 +285,112 @@
         </div>
     </div>
 
+    <!-- MODAL DE VENDA DE FOTOS EXTRAS (UPSELL) -->
+    <div id="extra-photos-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden items-center justify-center p-3 md:p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-lg border border-slate-200 overflow-hidden">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="bg-amber-100 text-amber-800 p-2 rounded-xl">
+                        <i data-lucide="image-plus" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base md:text-lg font-black text-slate-900 leading-tight">Venda de Fotos Extras</h2>
+                        <p class="text-xs text-slate-500">Adicionar fotos extras selecionadas pelos pais na galeria</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.app.closeExtraPhotosModal()" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Dados do Formando -->
+            <div class="bg-slate-50 p-3.5 rounded-xl mb-4 border border-slate-200/80">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 id="extra-aluno-nome" class="font-bold text-sm text-slate-900">Nome do Formando</h3>
+                        <p id="extra-aluno-info" class="text-xs text-slate-500">Responsável • Turma</p>
+                    </div>
+                    <span id="extra-pacote-badge" class="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg border border-blue-200">Pacote</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 mt-3 pt-2.5 border-t border-slate-200/60 text-center text-xs">
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Pacote Base</span>
+                        <strong id="extra-total-base" class="text-slate-700">R$ 0,00</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Total Já Pago</span>
+                        <strong id="extra-total-pago" class="text-emerald-700">R$ 0,00</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Saldo Atual</span>
+                        <strong id="extra-saldo-atual" class="text-rose-700">R$ 0,00</strong>
+                    </div>
+                </div>
+            </div>
+
+            <form id="extra-photos-form" onsubmit="window.app.onSaveExtraPhotos(event)">
+                <input type="hidden" id="extra-financeiro-id">
+                <input type="hidden" id="extra-aluno-id">
+
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Qtd de Fotos Extras</label>
+                        <input type="number" min="1" id="extra-qtd-fotos" value="10" oninput="window.app.calculateExtraPhotosTotal()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Valor por Foto (R$)</label>
+                        <input type="number" step="0.50" min="0" id="extra-valor-unitario" value="15.00" oninput="window.app.calculateExtraPhotosTotal()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-amber-500" required>
+                    </div>
+                </div>
+
+                <!-- Resumo do Cálculo em Destaque -->
+                <div class="bg-amber-50/80 border border-amber-200 p-3 rounded-xl mb-4 flex justify-between items-center">
+                    <div>
+                        <span class="text-[11px] font-bold text-amber-900 block uppercase tracking-wider">Total Adicional das Fotos Extras</span>
+                        <span id="extra-calculo-detalhe" class="text-xs text-amber-700">10 fotos × R$ 15,00</span>
+                    </div>
+                    <div class="text-right">
+                        <span id="extra-valor-total-display" class="text-xl font-black text-amber-900">R$ 150,00</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Forma de Pagamento</label>
+                        <select id="extra-metodo-pagamento" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white">
+                            <option value="PIX">PIX</option>
+                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            <option value="Cartão de Débito">Cartão de Débito</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="A Combinar">A Combinar / Na Entrega</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Status do Pagamento</label>
+                        <select id="extra-status-pagamento" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white">
+                            <option value="PAGO_AGORA">✅ Já foi Pago Agora</option>
+                            <option value="A_PAGAR">⏳ Adicionar ao Saldo Devedor</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">Observações / Detalhes das Fotos</label>
+                    <input type="text" id="extra-obs" placeholder="Ex: Fotos com padrinhos e beca selecionadas na galeria" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800">
+                </div>
+
+                <div class="flex justify-between items-center gap-3 pt-2">
+                    <button type="button" onclick="window.app.closeExtraPhotosModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-xs transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i> Confirmar Venda de Extras
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL DE BRIEFING / PDF DO EVENTO PARA FREELANCER -->
     <div id="briefing-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center p-3 md:p-6 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden">
@@ -2676,6 +2782,9 @@
                             <td class="p-4 text-right">
                                 <div class="inline-flex gap-1">
                                     ${galeriaBtn}
+                                    <button onclick="window.app.openExtraPhotosForAluno('${aluno.id}')" class="p-1.5 text-amber-600 hover:bg-amber-50 rounded" title="Vender Fotos Extras / Upsell">
+                                        <i data-lucide="image-plus" class="w-4 h-4"></i>
+                                    </button>
                                     <button onclick="window.app.generateContractForAluno('${aluno.id}')" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded" title="Gerar Contrato de Formatura para este Aluno">
                                         <i data-lucide="file-signature" class="w-4 h-4"></i>
                                     </button>
@@ -2923,9 +3032,16 @@
                                    </button>`
                                 : '');
 
+                        const extrasBadge = (item.extrasFotos && item.extrasFotos.qtd > 0)
+                            ? `<div class="mt-1"><span class="inline-flex items-center gap-1 text-[10px] bg-amber-50 text-amber-800 font-bold px-1.5 py-0.5 rounded border border-amber-200" title="${item.extrasFotos.qtd} fotos extras vendidas (${item.extrasFotos.obs || ''})"><i data-lucide="image-plus" class="w-3 h-3 text-amber-600"></i> +${item.extrasFotos.qtd} extras (R$ ${parseFloat(item.extrasFotos.totalExtras || 0).toFixed(2).replace('.', ',')})</span></div>`
+                            : '';
+
                         return `
                         <tr class="hover:bg-gray-50 transition border-b border-gray-100">
-                            <td class="p-4 font-semibold text-gray-800">${aluno.nome}</td>
+                            <td class="p-4 font-semibold text-gray-800">
+                                <div>${aluno.nome}</div>
+                                ${extrasBadge}
+                            </td>
                             <td class="p-4 text-sm text-gray-600">${aluno.pai || '<span class="text-gray-400 italic">Não informado</span>'}</td>
                             <td class="p-4 text-xs text-gray-500">${nomeTurma}</td>
                             <td class="p-4 font-medium text-gray-700">R$ ${total.toFixed(2).replace('.', ',')}</td>
@@ -2934,6 +3050,9 @@
                             <td class="p-4 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${statusClass}">${item.status}</span></td>
                             <td class="p-4 text-right">
                                 <div class="inline-flex items-center gap-1">
+                                    <button onclick="window.app.openExtraPhotosModal('${item.id}')" class="p-1.5 text-amber-600 hover:bg-amber-50 rounded" title="Vender / Gerenciar Fotos Extras deste Aluno">
+                                        <i data-lucide="image-plus" class="w-4 h-4"></i>
+                                    </button>
                                     <button onclick="window.app.openPaymentModal('${item.id}')" class="p-1.5 text-green-600 hover:bg-green-50 rounded font-medium" title="Adicionar Pagamento">
                                         <i data-lucide="plus-circle" class="w-4 h-4"></i>
                                     </button>
@@ -3140,11 +3259,17 @@
                         </div>`;
                     }
 
+                    const finItem = dbState.financeiro.find(f => f.alunoId === aluno.id);
+                    const extrasBadge = (finItem && finItem.extrasFotos && finItem.extrasFotos.qtd > 0)
+                        ? `<div class="mt-0.5"><span class="inline-flex items-center gap-1 text-[10px] bg-amber-50 text-amber-800 font-bold px-1.5 py-0.5 rounded border border-amber-200" title="${finItem.extrasFotos.qtd} fotos extras adicionadas (${finItem.extrasFotos.obs || ''})"><i data-lucide="image-plus" class="w-3 h-3 text-amber-600"></i> +${finItem.extrasFotos.qtd} fotos extras</span></div>`
+                        : '';
+
                     return `
                     <tr class="hover:bg-gray-50 transition border-b border-gray-100">
                         <td class="p-4">
                             <p class="font-bold text-gray-800 text-sm">${aluno.nome}</p>
-                            <p class="text-xs text-gray-500">Resp: <strong>${aluno.pai || 'Não informado'}</strong> ${aluno.contato ? `(${aluno.contato})` : ''}</p>
+                            ${extrasBadge}
+                            <p class="text-xs text-gray-500 mt-0.5">Resp: <strong>${aluno.pai || 'Não informado'}</strong> ${aluno.contato ? `(${aluno.contato})` : ''}</p>
                         </td>
                         <td class="p-4 text-xs text-gray-500">${nomeTurma}</td>
                         <td class="p-4">${galeriaHTML}</td>
@@ -5618,6 +5743,181 @@ _Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
                     document.getElementById('edit-form').reset();
+                },
+                // --- MÓDULO DE FOTOS EXTRAS (UPSELL) ---
+                openExtraPhotosModal: (financeiroId) => {
+                    const item = dbState.financeiro.find(f => f.id === financeiroId);
+                    if (!item) return;
+                    const aluno = dbState.alunos.find(a => a.id === item.alunoId);
+                    const pacote = dbState.pacotes.find(p => p.id === item.pacoteId);
+
+                    const totalBase = parseFloat(item.totalBase !== undefined ? item.totalBase : (item.total || 0));
+                    const totalPago = parseFloat(item.pago || 0);
+                    const saldoAtual = Math.max(0, parseFloat(item.total || 0) - totalPago);
+
+                    document.getElementById('extra-financeiro-id').value = financeiroId;
+                    document.getElementById('extra-aluno-id').value = aluno ? aluno.id : '';
+
+                    document.getElementById('extra-aluno-nome').innerText = aluno ? aluno.nome : 'Formando(a)';
+                    document.getElementById('extra-aluno-info').innerText = `${aluno ? (aluno.pai || 'Sem responsável cadastrado') : ''} • ${aluno ? getNomeTurma(aluno.turmaId) : 'Turma'}`;
+                    document.getElementById('extra-pacote-badge').innerText = pacote ? pacote.nome : 'Pacote';
+
+                    document.getElementById('extra-total-base').innerText = `R$ ${totalBase.toFixed(2).replace('.', ',')}`;
+                    document.getElementById('extra-total-pago').innerText = `R$ ${totalPago.toFixed(2).replace('.', ',')}`;
+                    document.getElementById('extra-saldo-atual').innerText = `R$ ${saldoAtual.toFixed(2).replace('.', ',')}`;
+
+                    // Se já tinha extras, carrega valores anteriores
+                    if (item.extrasFotos) {
+                        document.getElementById('extra-qtd-fotos').value = item.extrasFotos.qtd || 10;
+                        document.getElementById('extra-valor-unitario').value = parseFloat(item.extrasFotos.valorUnitario || 15).toFixed(2);
+                        document.getElementById('extra-metodo-pagamento').value = item.extrasFotos.metodo || 'PIX';
+                        document.getElementById('extra-status-pagamento').value = item.extrasFotos.status || 'PAGO_AGORA';
+                        document.getElementById('extra-obs').value = item.extrasFotos.obs || '';
+                    } else {
+                        document.getElementById('extra-qtd-fotos').value = 10;
+                        document.getElementById('extra-valor-unitario').value = '15.00';
+                        document.getElementById('extra-metodo-pagamento').value = 'PIX';
+                        document.getElementById('extra-status-pagamento').value = 'PAGO_AGORA';
+                        document.getElementById('extra-obs').value = '';
+                    }
+
+                    window.app.calculateExtraPhotosTotal();
+
+                    const modal = document.getElementById('extra-photos-modal');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    lucide.createIcons();
+                },
+                openExtraPhotosForAluno: (alunoId) => {
+                    const item = dbState.financeiro.find(f => f.alunoId === alunoId);
+                    if (item) {
+                        window.app.openExtraPhotosModal(item.id);
+                    } else {
+                        alert('⚠️ Este aluno ainda não possui lançamento financeiro ativo. Gere um contrato ou lance o pacote antes de vender fotos extras.');
+                    }
+                },
+                closeExtraPhotosModal: () => {
+                    const modal = document.getElementById('extra-photos-modal');
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.getElementById('extra-photos-form').reset();
+                },
+                calculateExtraPhotosTotal: () => {
+                    const qtd = parseInt(document.getElementById('extra-qtd-fotos').value) || 0;
+                    const unit = parseFloat(document.getElementById('extra-valor-unitario').value) || 0;
+                    const total = qtd * unit;
+
+                    const detalheEl = document.getElementById('extra-calculo-detalhe');
+                    if (detalheEl) detalheEl.innerText = `${qtd} foto(s) × R$ ${unit.toFixed(2).replace('.', ',')}`;
+
+                    const displayEl = document.getElementById('extra-valor-total-display');
+                    if (displayEl) displayEl.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+                },
+                onSaveExtraPhotos: async (e) => {
+                    if (e) e.preventDefault();
+                    if (!userId) return;
+
+                    const financeiroId = document.getElementById('extra-financeiro-id').value;
+                    const item = dbState.financeiro.find(f => f.id === financeiroId);
+                    if (!item) return;
+
+                    const alunoId = document.getElementById('extra-aluno-id').value;
+                    const aluno = dbState.alunos.find(a => a.id === alunoId);
+
+                    const qtd = parseInt(document.getElementById('extra-qtd-fotos').value) || 0;
+                    const unit = parseFloat(document.getElementById('extra-valor-unitario').value) || 0;
+                    const totalExtras = qtd * unit;
+                    const metodo = document.getElementById('extra-metodo-pagamento').value;
+                    const statusPagamento = document.getElementById('extra-status-pagamento').value;
+                    const obs = document.getElementById('extra-obs').value.trim();
+
+                    if (qtd <= 0 || unit <= 0) {
+                        alert('Informe uma quantidade e valor válidos para as fotos extras.');
+                        return;
+                    }
+
+                    const valorBase = item.totalBase !== undefined ? parseFloat(item.totalBase) : parseFloat(item.total || 0);
+                    const novoTotal = valorBase + totalExtras;
+                    let novoPago = parseFloat(item.pago || 0);
+                    let historico = Array.isArray(item.historico) ? [...item.historico] : [];
+
+                    if (statusPagamento === 'PAGO_AGORA') {
+                        // Se for pago agora, incrementa o valor pago e registra no histórico de pagamentos
+                        novoPago += totalExtras;
+                        historico.push({
+                            data: new Date().toISOString(),
+                            valor: totalExtras,
+                            metodo: metodo,
+                            obs: `Fotos Extras (${qtd} un × R$ ${unit.toFixed(2).replace('.', ',')}) ${obs ? '- ' + obs : ''}`
+                        });
+                    }
+
+                    const novoStatus = novoPago >= novoTotal ? 'Pago' : (novoPago > 0 ? 'Pago Parcialmente' : 'Pendente');
+
+                    const payload = {
+                        total: novoTotal,
+                        totalBase: valorBase,
+                        pago: novoPago,
+                        status: novoStatus,
+                        historico: historico,
+                        extrasFotos: {
+                            qtd: qtd,
+                            valorUnitario: unit,
+                            totalExtras: totalExtras,
+                            metodo: metodo,
+                            status: statusPagamento,
+                            obs: obs,
+                            data: new Date().toISOString()
+                        }
+                    };
+
+                    try {
+                        await setDoc(doc(db, `users/${userId}/financeiro/${financeiroId}`), payload, { merge: true });
+                        window.app.closeExtraPhotosModal();
+                        
+                        // Oferecer envio no WhatsApp
+                        const cleanPhone = (aluno?.contato || '').replace(/\D/g, '');
+                        if (cleanPhone.length >= 10) {
+                            const confirmZap = confirm(`✅ Venda de ${qtd} fotos extras (R$ ${totalExtras.toFixed(2).replace('.', ',')}) registrada com sucesso!\n\nDeseja abrir o WhatsApp para enviar a confirmação/comprovante para o responsável agora?`);
+                            if (confirmZap) {
+                                window.app.sendExtraPhotosWhatsApp(aluno, qtd, unit, totalExtras, metodo, statusPagamento, obs);
+                            }
+                        } else {
+                            alert(`✅ Venda de ${qtd} fotos extras (R$ ${totalExtras.toFixed(2).replace('.', ',')}) registrada com sucesso!`);
+                        }
+                    } catch (error) {
+                        console.error("Erro ao salvar fotos extras:", error);
+                        alert("Erro ao registrar venda de fotos extras.");
+                    }
+                },
+                sendExtraPhotosWhatsApp: (aluno, qtd, unit, totalExtras, metodo, statusPagamento, obs) => {
+                    if (!aluno) return;
+                    const cleanPhone = (aluno.contato || '').replace(/\D/g, '');
+                    if (cleanPhone.length < 10) return;
+
+                    const statusTexto = statusPagamento === 'PAGO_AGORA' ? '✅ Pagamento Confirmado' : '⏳ Adicionado ao saldo / A pagar';
+                    const msg = 
+`📸 *WILKSON FOTOGRAFIAS - CONFIRMAÇÃO DE FOTOS EXTRAS* ✨
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Olá *${aluno.pai || 'Responsável'}*! 
+Recebemos com muita alegria a seleção de fotos extras do(a) formando(a) *${aluno.nome}*!
+
+📌 *Detalhes da Seleção:*
+• Quantidade: *${qtd} fotos adicionais*
+• Valor unitário: R$ ${unit.toFixed(2).replace('.', ',')}
+• *Valor Total dos Extras:* R$ ${totalExtras.toFixed(2).replace('.', ',')}
+• Forma: ${metodo}
+• Status: *${statusTexto}*
+${obs ? `• Obs: ${obs}\n` : ''}
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ *Chave PIX:* 646.660.003-30 (Wilkson Albuquerque Carvalho)
+Suas fotos já foram encaminhadas para nossa equipe de edição e tratamento em alta resolução!
+
+Muito obrigado pela confiança e preferência!
+_Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
+
+                    const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(msg)}`;
+                    window.open(url, '_blank');
                 },
                 // Backup Completo do Banco de Dados
                 exportCompleteBackup: () => {

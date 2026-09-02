@@ -32,6 +32,96 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+
+        /* Estilos Tipográficos para o Documento de Contrato */
+        .contract-paper {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            color: #1a202c;
+            line-height: 1.7;
+            background-color: #ffffff;
+        }
+        .contract-paper h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+            line-height: 1.4;
+        }
+        .contract-paper h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 1.75rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1.5px solid #e2e8f0;
+            padding-bottom: 0.25rem;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .contract-paper p {
+            margin-bottom: 0.85rem;
+            text-align: justify;
+            font-size: 0.95rem;
+        }
+        .contract-paper strong {
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .contract-paper .package-items-box {
+            background-color: #f8fafc;
+            border-left: 3px solid #3b82f6;
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0;
+            font-size: 0.9rem;
+            white-space: pre-line;
+            border-radius: 0.25rem;
+        }
+        .contract-paper .date-location {
+            text-align: right;
+            margin-top: 2.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            font-style: italic;
+        }
+        .contract-paper .signatures-wrapper {
+            margin-top: 3.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            text-align: center;
+        }
+        .contract-paper .signature-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .contract-paper .signature-line {
+            border-bottom: 1.5px solid #334155;
+            width: 80%;
+            margin-bottom: 0.5rem;
+        }
+        .contract-paper .signature-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+        }
+        .contract-paper .signature-doc {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+        }
+
+        @media (max-width: 640px) {
+            .contract-paper .signatures-wrapper {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -258,6 +348,9 @@
                     <a href="#" onclick="window.app.showSection('alunos')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
                         <i data-lucide="users" class="w-5 h-5 mr-3 text-cyan-400"></i> Alunos & Pais
                     </a>
+                    <a href="#" onclick="window.app.showSection('contratos')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
+                        <i data-lucide="file-signature" class="w-5 h-5 mr-3 text-emerald-400"></i> Contratos
+                    </a>
                     <a href="#" onclick="window.app.showSection('fotos')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
                         <i data-lucide="image" class="w-5 h-5 mr-3 text-purple-400"></i> Fotos & Checklist
                     </a>
@@ -456,7 +549,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="lista-turmas"></div>
                 </div>
 
-                <!-- SECTION: EVENTOS (SUPORTE A MULTI-DIAS, FREELANCERS, HORA, LOCAL E BRIEFING PDF) -->
+                <!-- SECTION: EVENTOS -->
                 <div id="section-eventos" class="content-section hidden">
                     <div class="flex justify-between items-center mb-6">
                         <div>
@@ -596,7 +689,304 @@
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- SECTION: CONTRATOS (GERADOR + PACOTES + MODELO DE TEXTO) -->
+                <div id="section-contratos" class="content-section hidden">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                        <div>
+                            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Contratos de Formatura Infantil</h1>
+                            <p class="text-sm text-gray-500">Geração de contratos personalizados, pacotes editáveis e personalização do texto do contrato</p>
+                        </div>
+                    </div>
+
+                    <!-- Abas Internas de Contratos -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+                        <div class="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
+                            <button type="button" onclick="window.app.switchContratosTab('gerar')" id="tab-btn-contrato-gerar" class="py-3 px-5 font-bold text-sm text-emerald-600 border-b-2 border-emerald-600 bg-white flex items-center gap-2 whitespace-nowrap">
+                                <i data-lucide="file-plus-2" class="w-4 h-4"></i> Gerar Novo Contrato
+                            </button>
+                            <button type="button" onclick="window.app.switchContratosTab('pacotes')" id="tab-btn-contrato-pacotes" class="py-3 px-5 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent flex items-center gap-2 whitespace-nowrap">
+                                <i data-lucide="package" class="w-4 h-4"></i> Gerenciar Pacotes & Valores
+                            </button>
+                            <button type="button" onclick="window.app.switchContratosTab('modelo')" id="tab-btn-contrato-modelo" class="py-3 px-5 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent flex items-center gap-2 whitespace-nowrap">
+                                <i data-lucide="file-edit" class="w-4 h-4"></i> Editar Texto do Contrato & Cláusulas
+                            </button>
+                            <button type="button" onclick="window.app.switchContratosTab('historico')" id="tab-btn-contrato-historico" class="py-3 px-5 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent flex items-center gap-2 whitespace-nowrap">
+                                <i data-lucide="history" class="w-4 h-4"></i> Contratos Emitidos
+                            </button>
+                        </div>
+
+                        <!-- TAB CONTENT: GERAR CONTRATO -->
+                        <div id="tab-content-contrato-gerar" class="p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                                
+                                <!-- FORMULÁRIO DE GERAÇÃO -->
+                                <div class="lg:col-span-5 space-y-5">
+                                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                            <i data-lucide="user-check" class="w-4 h-4 text-blue-600"></i> Selecionar Aluno Cadastrado (Opcional):
+                                        </label>
+                                        <select id="contrato-select-aluno" onchange="window.app.onSelectAlunoParaContrato(this.value)" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500">
+                                            <option value="">-- Preenchimento Manual / Novo --</option>
+                                        </select>
+                                    </div>
+
+                                    <form id="form-gerar-contrato" onsubmit="window.app.onGenerateContractSubmit(event)" class="space-y-4">
+                                        
+                                        <!-- Dados do Responsável / Contratante -->
+                                        <div>
+                                            <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3 pb-1 border-b flex items-center gap-1">
+                                                <i data-lucide="user" class="w-3.5 h-3.5 text-emerald-600"></i> Dados do(a) Contratante (Pai / Mãe)
+                                            </h3>
+                                            <div class="space-y-3">
+                                                <div>
+                                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nome Completo do Responsável</label>
+                                                    <input type="text" id="contrato-cliente-nome" placeholder="Ex: Maria Silva Oliveira" class="w-full p-2.5 border rounded-lg text-sm" required>
+                                                </div>
+                                                <div class="grid grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label class="block text-xs font-semibold text-gray-600 mb-1">CPF</label>
+                                                        <input type="text" id="contrato-cliente-cpf" placeholder="000.000.000-00" class="w-full p-2.5 border rounded-lg text-sm" required>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-xs font-semibold text-gray-600 mb-1">RG</label>
+                                                        <input type="text" id="contrato-cliente-rg" placeholder="0000000 SSP/UF" class="w-full p-2.5 border rounded-lg text-sm">
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Endereço Completo com CEP</label>
+                                                    <input type="text" id="contrato-cliente-endereco" placeholder="Rua, Número, Bairro, Cidade - UF, CEP" class="w-full p-2.5 border rounded-lg text-sm" required>
+                                                </div>
+                                                <div class="grid grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label class="block text-xs font-semibold text-gray-600 mb-1">Telefone / WhatsApp</label>
+                                                        <input type="text" id="contrato-cliente-telefone" placeholder="(81) 99999-9999" class="w-full p-2.5 border rounded-lg text-sm" required>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail</label>
+                                                        <input type="email" id="contrato-cliente-email" placeholder="email@exemplo.com" class="w-full p-2.5 border rounded-lg text-sm">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Dados do Formando -->
+                                        <div class="pt-2">
+                                            <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3 pb-1 border-b flex items-center gap-1">
+                                                <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-blue-600"></i> Dados do Formando(a)
+                                            </h3>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div>
+                                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nome da Criança</label>
+                                                    <input type="text" id="contrato-aluno-nome" placeholder="Ex: Gabriel Silva" class="w-full p-2.5 border rounded-lg text-sm" required>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Turma / Escola</label>
+                                                    <input type="text" id="contrato-aluno-turma" placeholder="Ex: ABC 2026 - Colégio São José" class="w-full p-2.5 border rounded-lg text-sm" required>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Pacote & Pagamento -->
+                                        <div class="pt-2">
+                                            <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3 pb-1 border-b flex items-center gap-1">
+                                                <i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-yellow-600"></i> Pacote & Condições de Pagamento
+                                            </h3>
+                                            <div class="space-y-3">
+                                                <div>
+                                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Selecionar Pacote de Formatura</label>
+                                                    <select id="contrato-pacote-select" onchange="window.app.onContratoPacoteChange(this.value)" class="w-full p-2.5 border rounded-lg text-sm font-semibold bg-white" required>
+                                                        <!-- Preenchido dinamicamente via JS -->
+                                                    </select>
+                                                </div>
+                                                <div class="grid grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label class="block text-xs font-semibold text-gray-600 mb-1">Valor Total do Contrato (R$)</label>
+                                                        <input type="number" step="0.01" id="contrato-valor" class="w-full p-2.5 border rounded-lg text-sm font-bold text-emerald-700" required>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-xs font-semibold text-gray-600 mb-1">Forma de Pagamento</label>
+                                                        <input type="text" id="contrato-forma-pagamento" placeholder="Ex: 4x de R$ 649,00 via PIX/Cartão" class="w-full p-2.5 border rounded-lg text-sm" required>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Itens / Entregáveis do Pacote</label>
+                                                    <textarea id="contrato-pacote-itens" rows="3" class="w-full p-2 border rounded-lg text-xs font-mono bg-gray-50"></textarea>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Observações Adicionais (Opcional)</label>
+                                                    <input type="text" id="contrato-obs" placeholder="Ex: Fotos extras com os avós incluídas" class="w-full p-2.5 border rounded-lg text-sm">
+                                                </div>
+                                                <div class="pt-1">
+                                                    <label class="flex items-center cursor-pointer">
+                                                        <input type="checkbox" id="contrato-direito-imagem" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4" checked>
+                                                        <span class="ml-2 text-xs font-medium text-gray-700">Autoriza o uso de imagem para portfólio e redes sociais?</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="pt-3">
+                                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Atualizar Pré-Visualização do Contrato
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- PRÉ-VISUALIZAÇÃO DO CONTRATO GERADO -->
+                                <div class="lg:col-span-7 flex flex-col">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                                            <i data-lucide="file-text" class="w-4 h-4 text-emerald-600"></i> Prévia do Documento
+                                        </span>
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" onclick="window.app.downloadContractPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow">
+                                                <i data-lucide="download" class="w-4 h-4"></i> Baixar PDF
+                                            </button>
+                                            <button type="button" onclick="window.app.printContract()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+                                                <i data-lucide="printer" class="w-4 h-4"></i> Imprimir
+                                            </button>
+                                            <button type="button" onclick="window.app.copyContractWhatsAppText()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition border border-slate-300">
+                                                <i data-lucide="copy" class="w-4 h-4"></i> Copiar
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Papel do Contrato -->
+                                    <div class="border rounded-2xl bg-slate-100 p-4 overflow-y-auto max-h-[750px] shadow-inner">
+                                        <div id="contractOutput" class="contract-paper p-6 md:p-10 rounded-xl shadow border border-gray-200">
+                                            <p class="text-gray-400 text-center py-12 italic">Preencha os campos ao lado e clique em "Atualizar Pré-Visualização" para gerar o documento completo.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT: GERENCIAR PACOTES -->
+                        <div id="tab-content-contrato-pacotes" class="p-6 hidden">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                                <div>
+                                    <h2 class="text-lg font-bold text-gray-800">Pacotes de Formatura Infantil</h2>
+                                    <p class="text-xs text-gray-500">Crie, edite nomes, valores, opções de parcelamento e itens inclusos em cada pacote</p>
+                                </div>
+                                <button type="button" onclick="window.app.openAddPacoteModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow flex items-center gap-1.5">
+                                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Criar Novo Pacote
+                                </button>
+                            </div>
+
+                            <div id="lista-pacotes-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                                <!-- Preenchido dinamicamente via JS -->
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT: EDITAR MODELO DE TEXTO & CLÁUSULAS -->
+                        <div id="tab-content-contrato-modelo" class="p-6 hidden">
+                            <div class="max-w-4xl mx-auto space-y-6">
+                                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                                    <div>
+                                        <h2 class="text-lg font-bold text-gray-800">Personalização do Contrato & Cláusulas</h2>
+                                        <p class="text-xs text-gray-500">Altere os dados da Contratada (Fotógrafo) e o texto oficial do corpo do contrato</p>
+                                    </div>
+                                    <button type="button" onclick="window.app.restoreDefaultContractTemplate()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-lg border flex items-center gap-1.5 transition">
+                                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Restaurar Modelo Padrão
+                                    </button>
+                                </div>
+
+                                <!-- Dados da Contratada -->
+                                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                                        <i data-lucide="building" class="w-4 h-4 text-blue-600"></i> Dados da Contratada (Profissional / Empresa)
+                                    </h3>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nome Completo / Razão Social</label>
+                                            <input type="text" id="config-contratado-nome" class="w-full p-2.5 bg-white border rounded-lg text-sm" value="Wilkson Albuquerque Carvalho">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">CPF ou CNPJ</label>
+                                            <input type="text" id="config-contratado-cpf" class="w-full p-2.5 bg-white border rounded-lg text-sm" value="646.660.003-30">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Endereço Profissional</label>
+                                            <input type="text" id="config-contratado-endereco" class="w-full p-2.5 bg-white border rounded-lg text-sm" value="Rua das Araras, 11, Imperatriz - MA">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Telefone / WhatsApp</label>
+                                            <input type="text" id="config-contratado-telefone" class="w-full p-2.5 bg-white border rounded-lg text-sm" value="(81) 98845-6625">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail</label>
+                                            <input type="email" id="config-contratado-email" class="w-full p-2.5 bg-white border rounded-lg text-sm" value="wilkson@gmail.com">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Cidade / Foro Judicial</label>
+                                            <input type="text" id="config-cidade-foro" class="w-full p-2.5 bg-white border rounded-lg text-sm" value="Imperatriz/MA">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tags Dinâmicas de Ajuda -->
+                                <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-100 text-xs text-blue-900 space-y-2">
+                                    <p class="font-bold flex items-center gap-1.5"><i data-lucide="info" class="w-4 h-4 text-blue-600"></i> Tags Dinâmicas Disponíveis (O sistema substitui automaticamente):</p>
+                                    <div class="flex flex-wrap gap-1.5 font-mono text-[11px]">
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{NOME_CONTRATANTE}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{CPF_CONTRATANTE}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{RG_CONTRATANTE}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{ENDERECO_CONTRATANTE}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{TELEFONE_CONTRATANTE}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{NOME_FORMANDO}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{TURMA}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{NOME_PACOTE}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{ITENS_PACOTE}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{VALOR_TOTAL}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{FORMA_PAGAMENTO}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{DIREITO_IMAGEM}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded border border-blue-200">{DATA_EXTENSO}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Textarea do Template HTML/Texto -->
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Corpo do Modelo de Contrato (Cláusulas e Estrutura):</label>
+                                    <textarea id="config-template-texto" rows="18" class="w-full p-4 border rounded-xl font-mono text-xs leading-relaxed bg-white focus:ring-2 focus:ring-blue-500"></textarea>
+                                </div>
+
+                                <div class="flex justify-end">
+                                    <button type="button" onclick="window.app.saveContractTemplateConfig()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow transition flex items-center gap-2">
+                                        <i data-lucide="save" class="w-4 h-4"></i> Salvar Configurações do Contrato
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT: HISTÓRICO DE CONTRATOS -->
+                        <div id="tab-content-contrato-historico" class="p-6 hidden">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-bold text-gray-800">Contratos Emitidos</h2>
+                                <span class="text-xs text-gray-500">Histórico de contratos gerados para os alunos</span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full min-w-max">
+                                    <thead class="bg-gray-50 border-b">
+                                        <tr>
+                                            <th class="p-3 text-left text-xs font-bold text-gray-600 uppercase">Formando(a)</th>
+                                            <th class="p-3 text-left text-xs font-bold text-gray-600 uppercase">Responsável</th>
+                                            <th class="p-3 text-left text-xs font-bold text-gray-600 uppercase">Pacote</th>
+                                            <th class="p-3 text-left text-xs font-bold text-gray-600 uppercase">Valor</th>
+                                            <th class="p-3 text-left text-xs font-bold text-gray-600 uppercase">Data de Emissão</th>
+                                            <th class="p-3 text-right text-xs font-bold text-gray-600 uppercase">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lista-contratos-gerados" class="divide-y divide-gray-100"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
                 <!-- SECTION: FOTOS & CHECKLIST -->
                 <div id="section-fotos" class="content-section hidden">
                     <div class="flex justify-between items-center mb-6">
@@ -751,7 +1141,7 @@
                     </div>
                 </div>
                 
-                <!-- SECTION: CUSTOS & DESPESAS (DETALHADO: SERVIÇO, MATERIAL, FREELANCER) -->
+                <!-- SECTION: CUSTOS & DESPESAS -->
                 <div id="section-custos" class="content-section hidden">
                     <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
                         <div>
@@ -863,7 +1253,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, setDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         document.addEventListener('DOMContentLoaded', async function() {
             // Firebase Configuração Original
@@ -893,15 +1283,19 @@
                 custos: [], 
                 cenarios: [], 
                 checklist: {},
-                entregas: []
+                entregas: [],
+                pacotes: [],
+                contratosGerados: [],
+                configContrato: null
             };
 
             let unsubscribeListeners = [];
             let unsubscribeChecklistListeners = [];
             let selectedEventIdForFotos = null;
             let currentBriefingEvent = null;
+            let lastGeneratedContractData = null;
 
-            // Turma padrão de fallback para registros legados (garante 100% de retrocompatibilidade)
+            // Turma padrão de fallback para registros legados
             const DEFAULT_LEGACY_TURMA = {
                 id: 'turma_legado_2025',
                 nome: 'Turma 2025 (Inicial)',
@@ -909,7 +1303,90 @@
                 escola: 'Turma Principal'
             };
 
-            // Helper para formatar data de eventos (1 dia ou intervalo de múltiplos dias)
+            // Pacotes Padrão de Formatura Infantil
+            const DEFAULT_PACOTES_FORMATURA = [
+                {
+                    id: 'pacote_dei_bambini',
+                    nome: 'Dei Bambini',
+                    valor: 2596.00,
+                    condicoes: '4x de R$ 649,00',
+                    itens: 'a) Álbum 20x30 com 28 páginas e estojo em madeira personalizado.\nb) 80 (oitenta) fotos editadas.\nc) Pen drive personalizado.\nd) Vídeo geral do baile (brinde).'
+                },
+                {
+                    id: 'pacote_nana_coc',
+                    nome: 'Nana Coc',
+                    valor: 2396.00,
+                    condicoes: '4x de R$ 599,00',
+                    itens: 'a) Álbum 20x30 com 24 páginas e estojo tradicional.\nb) 70 (setenta) fotos editadas.\nc) Pen drive.\nd) Vídeo geral do baile (brinde).'
+                },
+                {
+                    id: 'pacote_lepetit',
+                    nome: 'Lepetit',
+                    valor: 1996.00,
+                    condicoes: '4x de R$ 499,00',
+                    itens: 'a) Álbum 20x30 com 20 páginas e estojo tradicional.\nb) 60 (sessenta) fotos editadas.\nc) Pen drive.\nd) Vídeo geral do baile (brinde).'
+                },
+                {
+                    id: 'pacote_abc',
+                    nome: 'ABC (Galeria Digital)',
+                    valor: 1196.00,
+                    condicoes: '4x de R$ 299,00',
+                    itens: 'a) 50 (cinquenta) fotos editadas em alta resolução.\nb) Fotos entregues via galeria online exclusiva.\nc) Vídeo geral do baile (brinde).'
+                }
+            ];
+
+            // Modelo Padrão de Contrato de Formatura Infantil
+            const DEFAULT_CONTRACT_TEMPLATE = 
+`<h1>CONTRATO DE PRESTAÇÃO DE SERVIÇOS FOTOGRÁFICOS – FORMATURA INFANTIL</h1>
+
+<h2>PARTES</h2>
+<p><strong>CONTRATANTE:</strong> {NOME_CONTRATANTE}, portador(a) do CPF nº {CPF_CONTRATANTE} e RG nº {RG_CONTRATANTE}, residente e domiciliado(a) em {ENDERECO_CONTRATANTE}, e-mail: {EMAIL_CONTRATANTE}, telefone: {TELEFONE_CONTRATANTE}, responsável legal pelo(a) formando(a) <strong>{NOME_FORMANDO}</strong>, doravante denominado(a) CONTRATANTE.</p>
+<p><strong>CONTRATADO:</strong> {NOME_CONTRATADO}, fotógrafo profissional, portador do CPF/CNPJ nº {CPF_CONTRATADO}, com endereço profissional em {ENDERECO_CONTRATADO}, e-mail: {EMAIL_CONTRATADO}, telefone: {TELEFONE_CONTRATADO}, doravante denominado CONTRATADO.</p>
+
+<h2>CLÁUSULA 1ª – DO OBJETO</h2>
+<p><strong>1.1.</strong> O presente contrato tem por objeto a prestação de serviços de cobertura fotográfica dos eventos relacionados à formatura infantil do(a) aluno(a) <strong>{NOME_FORMANDO}</strong>, da turma <strong>{TURMA}</strong> {ESCOLA}.</p>
+<p><strong>1.2.</strong> O serviço contratado compreende a cobertura das etapas e sessões fotográficas oficiais da formatura infantil (Fotos com Beca, Capelo, Canudo, Cenários Especiais, Aula da Saudade e Cerimônia/Baile de Formatura).</p>
+
+<h2>CLÁUSULA 2ª – DO PACOTE E ENTREGA DO MATERIAL</h2>
+<p><strong>2.1.</strong> O material a ser entregue pelo CONTRATADO ao(à) CONTRATANTE consiste no <strong>Pacote {NOME_PACOTE}</strong>, incluindo os seguintes itens:</p>
+<div class="package-items-box">{ITENS_PACOTE}</div>
+{OBSERVACOES}
+<p><strong>2.2.</strong> O prazo para entrega do material final é de até 60 (sessenta) dias úteis, contados a partir da data do último evento da formatura.</p>
+<p><strong>2.3.</strong> Fica expressamente acordado que os arquivos brutos (formato RAW) não serão entregues em nenhuma hipótese, garantindo o padrão artístico e profissional da edição.</p>
+
+<h2>CLÁUSULA 3ª – DAS OBRIGAÇÕES</h2>
+<p><strong>3.1.</strong> Compete ao CONTRATADO: prestar o serviço com zelo, pontualidade, utilizar equipamentos adequados e realizar o backup seguro dos arquivos digitais por um período mínimo de 12 (doze) meses.</p>
+<p><strong>3.2.</strong> Compete ao CONTRATANTE: realizar os pagamentos nas datas e valores acordados e conduzir o(a) formando(a) aos locais e horários programados para as sessões fotográficas.</p>
+
+<h2>CLÁUSULA 4ª – DO VALOR E FORMA DE PAGAMENTO</h2>
+<p><strong>4.1.</strong> O valor total do presente contrato é de <strong>R$ {VALOR_TOTAL}</strong>.</p>
+<p><strong>4.2.</strong> O pagamento será realizado da seguinte forma: <strong>{FORMA_PAGAMENTO}</strong>.</p>
+
+<h2>CLÁUSULA 5ª – DO CANCELAMENTO</h2>
+<p><strong>5.1.</strong> Em caso de rescisão imotivada por parte do(a) CONTRATANTE antes do início dos trabalhos, será retido o valor correspondente a 30% do total contratado a título de multa compensatória e custos administrativos. Valores pagos excedentes serão restituídos.</p>
+
+<h2>CLÁUSULA 6ª – DO DIREITO DE USO DE IMAGEM</h2>
+{DIREITO_IMAGEM}
+
+<h2>CLÁUSULA 7ª – DO FORO</h2>
+<p><strong>7.1.</strong> As partes elegem o foro da Comarca de {CIDADE_FORO} para dirimir quaisquer dúvidas ou litígios decorrentes do presente contrato, com renúncia expressa a qualquer outro.</p>
+
+<p class="date-location">{CIDADE_FORO}, {DATA_EXTENSO}.</p>
+
+<div class="signatures-wrapper">
+    <div class="signature-box">
+        <div class="signature-line"></div>
+        <div class="signature-name">{NOME_CONTRATANTE}</div>
+        <div class="signature-doc">CONTRATANTE (CPF: {CPF_CONTRATANTE})</div>
+    </div>
+    <div class="signature-box">
+        <div class="signature-line"></div>
+        <div class="signature-name">{NOME_CONTRATADO}</div>
+        <div class="signature-doc">CONTRATADO (CPF: {CPF_CONTRATADO})</div>
+    </div>
+</div>`;
+
+            // Helper para formatar data de eventos
             function formatarDataEvento(evento) {
                 const dataInicio = evento.dataInicio || evento.data;
                 const dataFim = evento.dataFim;
@@ -945,7 +1422,7 @@
                     appContainer.classList.add('flex');
                     document.getElementById('auth-status').innerText = user.email;
                     
-                    await ensureDefaultTurmaExists();
+                    await ensureDefaultDataExists();
                     setupRealtimeListeners();
                 } else {
                     userId = null;
@@ -960,17 +1437,42 @@
                 }
             });
 
-            // Garantir que exista ao menos uma turma (Turma 2025 Inicial) sem sobrescrever nada
-            async function ensureDefaultTurmaExists() {
+            // Garantir que existam registros padrões sem sobrescrever nada existente
+            async function ensureDefaultDataExists() {
                 if (!userId) return;
                 try {
+                    // Turma padrão
                     const turmasRef = collection(db, `users/${userId}/turmas`);
-                    const snapshot = await getDocs(turmasRef);
-                    if (snapshot.empty) {
+                    const snapTurmas = await getDocs(turmasRef);
+                    if (snapTurmas.empty) {
                         await setDoc(doc(db, `users/${userId}/turmas/turma_legado_2025`), DEFAULT_LEGACY_TURMA);
                     }
+
+                    // Pacotes de formatura padrão
+                    const pacotesRef = collection(db, `users/${userId}/pacotes_formatura`);
+                    const snapPacotes = await getDocs(pacotesRef);
+                    if (snapPacotes.empty) {
+                        for (const p of DEFAULT_PACOTES_FORMATURA) {
+                            await setDoc(doc(db, `users/${userId}/pacotes_formatura/${p.id}`), p);
+                        }
+                    }
+
+                    // Configurações do contrato
+                    const configRef = doc(db, `users/${userId}/config_contrato/modelo`);
+                    const configSnap = await getDoc(configRef);
+                    if (!configSnap.exists()) {
+                        await setDoc(configRef, {
+                            contratadoNome: "Wilkson Albuquerque Carvalho",
+                            contratadoCpf: "646.660.003-30",
+                            contratadoEndereco: "Rua das Araras, 11, Imperatriz - MA",
+                            contratadoEmail: "wilkson@gmail.com",
+                            contratadoTelefone: "(81) 98845-6625",
+                            cidadeForo: "Imperatriz/MA",
+                            templateTexto: DEFAULT_CONTRACT_TEMPLATE
+                        });
+                    }
                 } catch (e) {
-                    console.warn("Aviso ao verificar turma padrão:", e);
+                    console.warn("Aviso ao verificar dados padrão:", e);
                 }
             }
 
@@ -1020,11 +1522,12 @@
                 unsubscribeListeners.forEach(unsub => unsub());
                 unsubscribeListeners = [];
 
-                const collections = ['turmas', 'eventos', 'alunos', 'fotografos', 'financeiro', 'custos', 'entregas'];
+                const collections = ['turmas', 'eventos', 'alunos', 'fotografos', 'financeiro', 'custos', 'entregas', 'pacotes_formatura', 'contratos_gerados'];
                 collections.forEach(col => {
                     const collectionPath = `users/${userId}/${col}`;
                     const unsub = onSnapshot(collection(db, collectionPath), (querySnapshot) => {
-                        dbState[col] = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        const targetKey = col === 'pacotes_formatura' ? 'pacotes' : (col === 'contratos_gerados' ? 'contratosGerados' : col);
+                        dbState[targetKey] = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                         
                         if (col === 'turmas') {
                             if (dbState.turmas.length === 0) {
@@ -1041,10 +1544,39 @@
                         if (col === 'fotografos') {
                             dbState.fotografos.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
                         }
+                        if (col === 'pacotes_formatura') {
+                            if (dbState.pacotes.length === 0) {
+                                dbState.pacotes = [...DEFAULT_PACOTES_FORMATURA];
+                            }
+                            dbState.pacotes.sort((a, b) => (b.valor || 0) - (a.valor || 0));
+                        }
+                        if (col === 'contratos_gerados') {
+                            dbState.contratosGerados.sort((a, b) => new Date(b.dataGeracao || 0) - new Date(a.dataGeracao || 0));
+                        }
                         renderAll();
                     });
                     unsubscribeListeners.push(unsub);
                 });
+
+                // Listener para o Documento de Configuração de Contrato
+                const configDocRef = doc(db, `users/${userId}/config_contrato/modelo`);
+                const unsubConfig = onSnapshot(configDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        dbState.configContrato = docSnap.data();
+                    } else {
+                        dbState.configContrato = {
+                            contratadoNome: "Wilkson Albuquerque Carvalho",
+                            contratadoCpf: "646.660.003-30",
+                            contratadoEndereco: "Rua das Araras, 11, Imperatriz - MA",
+                            contratadoEmail: "wilkson@gmail.com",
+                            contratadoTelefone: "(81) 98845-6625",
+                            cidadeForo: "Imperatriz/MA",
+                            templateTexto: DEFAULT_CONTRACT_TEMPLATE
+                        };
+                    }
+                    populateContractConfigForm();
+                });
+                unsubscribeListeners.push(unsubConfig);
             }
 
             // Listeners para Checklist de Fotos
@@ -1074,7 +1606,8 @@
             function clearAllData() {
                 dbState = { 
                     turmas: [], eventos: [], alunos: [], fotografos: [], 
-                    financeiro: [], custos: [], cenarios: [], checklist: {}, entregas: []
+                    financeiro: [], custos: [], cenarios: [], checklist: {}, entregas: [],
+                    pacotes: [], contratosGerados: [], configContrato: null
                 };
                 selectedEventIdForFotos = null;
                 document.getElementById('fotos-management-area').classList.add('hidden');
@@ -1112,6 +1645,8 @@
                 renderFinanceiro();
                 renderCustos();
                 renderEntregas();
+                renderPacotesList();
+                renderContratosGeradosList();
                 populateDropdowns();
                 lucide.createIcons();
             }
@@ -1367,6 +1902,9 @@
                             <td class="p-4 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${statusClass}">${statusText}</span></td>
                             <td class="p-4 text-right">
                                 <div class="inline-flex gap-1">
+                                    <button onclick="window.app.generateContractForAluno('${aluno.id}')" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded" title="Gerar Contrato de Formatura para este Aluno">
+                                        <i data-lucide="file-signature" class="w-4 h-4"></i>
+                                    </button>
                                     <button onclick="window.app.openEditModal('alunos', '${aluno.id}')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Editar Aluno">
                                         <i data-lucide="edit-2" class="w-4 h-4"></i>
                                     </button>
@@ -1377,6 +1915,79 @@
                             </td>
                         </tr>`;
                     }).join('');
+            }
+
+            // --- SEÇÃO: CONTRATOS (PACOTES & HISTÓRICO) ---
+            function renderPacotesList() {
+                const container = document.getElementById('lista-pacotes-cards');
+                if (!container) return;
+
+                if (dbState.pacotes.length === 0) {
+                    container.innerHTML = '<div class="col-span-full p-6 text-center text-gray-400">Nenhum pacote cadastrado. Clique no botão acima para adicionar.</div>';
+                    return;
+                }
+
+                container.innerHTML = dbState.pacotes.map(p => `
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between hover:border-emerald-300 transition">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-base text-gray-800">${p.nome}</h3>
+                                <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">R$ ${parseFloat(p.valor || 0).toFixed(2).replace('.', ',')}</span>
+                            </div>
+                            <p class="text-xs text-blue-600 font-semibold mb-3">${p.condicoes || 'À vista ou parcelado'}</p>
+                            <div class="p-3 bg-gray-50 rounded-lg text-xs text-gray-600 whitespace-pre-line border leading-relaxed">
+                                ${p.itens || 'Sem itens descritos.'}
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t flex justify-end gap-2">
+                            <button onclick="window.app.openEditPacoteModal('${p.id}')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded text-xs font-semibold flex items-center gap-1">
+                                <i data-lucide="edit-2" class="w-3.5 h-3.5"></i> Editar
+                            </button>
+                            <button onclick="window.app.deleteItem('pacotes_formatura', '${p.id}')" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded text-xs font-semibold flex items-center gap-1">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Excluir
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function renderContratosGeradosList() {
+                const container = document.getElementById('lista-contratos-gerados');
+                if (!container) return;
+
+                if (dbState.contratosGerados.length === 0) {
+                    container.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-gray-500">Nenhum contrato gerado recentemente.</td></tr>';
+                    return;
+                }
+
+                container.innerHTML = dbState.contratosGerados.map(c => {
+                    const dataStr = c.dataGeracao ? new Date(c.dataGeracao).toLocaleString('pt-BR') : '-';
+                    return `
+                    <tr class="hover:bg-gray-50 transition border-b border-gray-100">
+                        <td class="p-3 font-semibold text-gray-800">${c.alunoNome || 'Formando'}</td>
+                        <td class="p-3 text-sm text-gray-600">${c.responsavelNome || '-'}</td>
+                        <td class="p-3 text-xs"><span class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded font-medium">${c.pacoteNome || '-'}</span></td>
+                        <td class="p-3 font-bold text-emerald-700 text-sm">R$ ${parseFloat(c.valor || 0).toFixed(2).replace('.', ',')}</td>
+                        <td class="p-3 text-xs text-gray-500">${dataStr}</td>
+                        <td class="p-3 text-right">
+                            <button onclick="window.app.reloadContractPreview('${c.id}')" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded text-xs font-semibold inline-flex items-center gap-1" title="Ver / Reemitir Contrato">
+                                <i data-lucide="eye" class="w-4 h-4"></i> Abrir
+                            </button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }
+
+            function populateContractConfigForm() {
+                if (!dbState.configContrato) return;
+                const cfg = dbState.configContrato;
+                if (document.getElementById('config-contratado-nome')) document.getElementById('config-contratado-nome').value = cfg.contratadoNome || '';
+                if (document.getElementById('config-contratado-cpf')) document.getElementById('config-contratado-cpf').value = cfg.contratadoCpf || '';
+                if (document.getElementById('config-contratado-endereco')) document.getElementById('config-contratado-endereco').value = cfg.contratadoEndereco || '';
+                if (document.getElementById('config-contratado-telefone')) document.getElementById('config-contratado-telefone').value = cfg.contratadoTelefone || '';
+                if (document.getElementById('config-contratado-email')) document.getElementById('config-contratado-email').value = cfg.contratadoEmail || '';
+                if (document.getElementById('config-cidade-foro')) document.getElementById('config-cidade-foro').value = cfg.cidadeForo || '';
+                if (document.getElementById('config-template-texto')) document.getElementById('config-template-texto').value = cfg.templateTexto || DEFAULT_CONTRACT_TEMPLATE;
             }
 
             // --- SEÇÃO: FOTÓGRAFOS ---
@@ -1674,6 +2285,31 @@
                     custoEventoSelect.innerHTML = '<option value="">Despesa Geral (Sem evento específico)</option>' +
                         eventosFiltrados.map(e => `<option value="${e.id}">${e.nome}</option>`).join('');
                     custoEventoSelect.value = selVal;
+                }
+
+                // Alunos Select na seção de Contratos
+                const contratoAlunoSelect = document.getElementById('contrato-select-aluno');
+                if (contratoAlunoSelect) {
+                    const currentAlunoVal = contratoAlunoSelect.value;
+                    let opts = '<option value="">-- Preenchimento Manual / Novo --</option>';
+                    const alunosParaContrato = dbState.alunos.filter(pertenceATurmaAtiva);
+                    alunosParaContrato.forEach(al => {
+                        opts += `<option value="${al.id}">${al.nome} (Resp: ${al.pai || '---'}) - ${getNomeTurma(al.turmaId)}</option>`;
+                    });
+                    contratoAlunoSelect.innerHTML = opts;
+                    contratoAlunoSelect.value = currentAlunoVal;
+                }
+
+                // Pacotes Select na seção de Contratos
+                const contratoPacoteSelect = document.getElementById('contrato-pacote-select');
+                if (contratoPacoteSelect) {
+                    const curPacoteVal = contratoPacoteSelect.value;
+                    let pOpts = '<option value="">Selecione o Pacote de Formatura...</option>';
+                    dbState.pacotes.forEach(p => {
+                        pOpts += `<option value="${p.id}">📦 ${p.nome} - R$ ${parseFloat(p.valor || 0).toFixed(2).replace('.', ',')} (${p.condicoes || 'À vista'})</option>`;
+                    });
+                    contratoPacoteSelect.innerHTML = pOpts;
+                    if (curPacoteVal) contratoPacoteSelect.value = curPacoteVal;
                 }
             }
 
@@ -2012,6 +2648,11 @@
                     updatePayload.total = parseFloat(document.getElementById('edit-field-total').value) || 0;
                     updatePayload.pago = parseFloat(document.getElementById('edit-field-pago').value) || 0;
                     updatePayload.status = document.getElementById('edit-field-status').value;
+                } else if (col === 'pacotes_formatura') {
+                    updatePayload.nome = document.getElementById('edit-field-pacote-nome').value.trim();
+                    updatePayload.valor = parseFloat(document.getElementById('edit-field-pacote-valor').value) || 0;
+                    updatePayload.condicoes = document.getElementById('edit-field-pacote-condicoes').value.trim();
+                    updatePayload.itens = document.getElementById('edit-field-pacote-itens').value.trim();
                 }
 
                 try {
@@ -2040,9 +2681,367 @@
                         link.classList.remove('bg-slate-800', 'text-white');
                         link.classList.add('text-slate-300');
                     });
-                    event.currentTarget.classList.add('bg-slate-800', 'text-white');
-                    event.currentTarget.classList.remove('text-slate-300');
+                    if (event && event.currentTarget && event.currentTarget.classList) {
+                        event.currentTarget.classList.add('bg-slate-800', 'text-white');
+                        event.currentTarget.classList.remove('text-slate-300');
+                    }
                     lucide.createIcons();
+                },
+                // --- NAVEGAÇÃO DE ABAS DE CONTRATOS ---
+                switchContratosTab: (tabId) => {
+                    const tabs = ['gerar', 'pacotes', 'modelo', 'historico'];
+                    tabs.forEach(t => {
+                        const content = document.getElementById(`tab-content-contrato-${t}`);
+                        const btn = document.getElementById(`tab-btn-contrato-${t}`);
+                        if (content) content.classList.toggle('hidden', t !== tabId);
+                        if (btn) {
+                            if (t === tabId) {
+                                btn.className = "py-3 px-5 font-bold text-sm text-emerald-600 border-b-2 border-emerald-600 bg-white flex items-center gap-2 whitespace-nowrap";
+                            } else {
+                                btn.className = "py-3 px-5 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent flex items-center gap-2 whitespace-nowrap";
+                            }
+                        }
+                    });
+                    lucide.createIcons();
+                },
+                // Preenchimento automático ao selecionar aluno
+                onSelectAlunoParaContrato: (alunoId) => {
+                    if (!alunoId) return;
+                    const aluno = dbState.alunos.find(a => a.id === alunoId);
+                    if (!aluno) return;
+
+                    const turma = dbState.turmas.find(t => t.id === aluno.turmaId);
+                    const nomeTurma = turma ? `${turma.nome} ${turma.escola ? `(${turma.escola})` : ''}` : 'Formatura Infantil';
+
+                    document.getElementById('contrato-aluno-nome').value = aluno.nome || '';
+                    document.getElementById('contrato-aluno-turma').value = nomeTurma;
+                    document.getElementById('contrato-cliente-nome').value = aluno.pai || '';
+                    document.getElementById('contrato-cliente-telefone').value = aluno.contato || '';
+
+                    // Se não tiver pacote selecionado, seleciona o primeiro
+                    const pacoteSelect = document.getElementById('contrato-pacote-select');
+                    if (pacoteSelect && !pacoteSelect.value && dbState.pacotes.length > 0) {
+                        pacoteSelect.value = dbState.pacotes[0].id;
+                        window.app.onContratoPacoteChange(dbState.pacotes[0].id);
+                    }
+                },
+                // Preenchimento ao selecionar pacote
+                onContratoPacoteChange: (pacoteId) => {
+                    if (!pacoteId) return;
+                    const pacote = dbState.pacotes.find(p => p.id === pacoteId);
+                    if (!pacote) return;
+
+                    document.getElementById('contrato-valor').value = parseFloat(pacote.valor || 0).toFixed(2);
+                    document.getElementById('contrato-forma-pagamento').value = pacote.condicoes || 'À vista ou parcelado';
+                    document.getElementById('contrato-pacote-itens').value = pacote.itens || '';
+                },
+                // Atalho a partir da tabela de alunos
+                generateContractForAluno: (alunoId) => {
+                    window.app.showSection('contratos');
+                    window.app.switchContratosTab('gerar');
+                    const select = document.getElementById('contrato-select-aluno');
+                    if (select) {
+                        select.value = alunoId;
+                        window.app.onSelectAlunoParaContrato(alunoId);
+                    }
+                },
+                // Gerar / Atualizar Contrato
+                onGenerateContractSubmit: async (e) => {
+                    if (e) e.preventDefault();
+                    
+                    const clienteNome = document.getElementById('contrato-cliente-nome').value.trim();
+                    const clienteCpf = document.getElementById('contrato-cliente-cpf').value.trim();
+                    const clienteRg = document.getElementById('contrato-cliente-rg').value.trim() || 'Não informado';
+                    const clienteEndereco = document.getElementById('contrato-cliente-endereco').value.trim();
+                    const clienteTelefone = document.getElementById('contrato-cliente-telefone').value.trim();
+                    const clienteEmail = document.getElementById('contrato-cliente-email').value.trim() || 'Não informado';
+
+                    const alunoNome = document.getElementById('contrato-aluno-nome').value.trim();
+                    const alunoTurma = document.getElementById('contrato-aluno-turma').value.trim();
+
+                    const pacoteId = document.getElementById('contrato-pacote-select').value;
+                    const pacoteObj = dbState.pacotes.find(p => p.id === pacoteId);
+                    const pacoteNome = pacoteObj ? pacoteObj.nome : 'Formatura Infantil';
+
+                    const valor = parseFloat(document.getElementById('contrato-valor').value) || 0;
+                    const formaPagamento = document.getElementById('contrato-forma-pagamento').value.trim();
+                    const pacoteItens = document.getElementById('contrato-pacote-itens').value.trim();
+                    const observacoes = document.getElementById('contrato-obs').value.trim();
+                    const direitoImagem = document.getElementById('contrato-direito-imagem').checked;
+
+                    const cfg = dbState.configContrato || {};
+                    const contratadoNome = cfg.contratadoNome || "Wilkson Albuquerque Carvalho";
+                    const contratadoCpf = cfg.contratadoCpf || "646.660.003-30";
+                    const contratadoEndereco = cfg.contratadoEndereco || "Rua das Araras, 11, Imperatriz - MA";
+                    const contratadoEmail = cfg.contratadoEmail || "wilkson@gmail.com";
+                    const contratadoTelefone = cfg.contratadoTelefone || "(81) 98845-6625";
+                    const cidadeForo = cfg.cidadeForo || "Imperatriz/MA";
+
+                    const dataExtenso = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+                    const direitoImagemHTML = direitoImagem 
+                        ? `<p><strong>6.1.</strong> O(A) CONTRATANTE <strong>AUTORIZA</strong> o CONTRATADO a utilizar as fotografias oriundas deste contrato em seu portfólio profissional (físico e digital), redes sociais, site e mostruários com a finalidade exclusiva de divulgação artística de seus trabalhos, sem qualquer ônus financeiro.</p>`
+                        : `<p><strong>6.1.</strong> O(A) CONTRATANTE <strong>NÃO AUTORIZA</strong> o uso das imagens para divulgação ou portfólio em redes sociais ou qualquer meio público.</p>`;
+
+                    const obsHTML = observacoes 
+                        ? `<p><strong>Observações Especiais Acordadas:</strong> ${observacoes}</p>`
+                        : '';
+
+                    // Montagem do texto a partir do modelo customizável
+                    let template = cfg.templateTexto || DEFAULT_CONTRACT_TEMPLATE;
+
+                    let rendered = template
+                        .replace(/{NOME_CONTRATANTE}/g, clienteNome || '[Nome do Responsável]')
+                        .replace(/{CPF_CONTRATANTE}/g, clienteCpf || '[CPF]')
+                        .replace(/{RG_CONTRATANTE}/g, clienteRg)
+                        .replace(/{ENDERECO_CONTRATANTE}/g, clienteEndereco || '[Endereço Completo]')
+                        .replace(/{EMAIL_CONTRATANTE}/g, clienteEmail)
+                        .replace(/{TELEFONE_CONTRATANTE}/g, clienteTelefone || '[Telefone]')
+                        .replace(/{NOME_FORMANDO}/g, alunoNome || '[Nome do Formando]')
+                        .replace(/{TURMA}/g, alunoTurma || '[Turma]')
+                        .replace(/{ESCOLA}/g, '')
+                        .replace(/{NOME_PACOTE}/g, pacoteNome)
+                        .replace(/{ITENS_PACOTE}/g, pacoteItens.replace(/\n/g, '<br>'))
+                        .replace(/{OBSERVACOES}/g, obsHTML)
+                        .replace(/{VALOR_TOTAL}/g, valor.toFixed(2).replace('.', ','))
+                        .replace(/{FORMA_PAGAMENTO}/g, formaPagamento)
+                        .replace(/{DIREITO_IMAGEM}/g, direitoImagemHTML)
+                        .replace(/{NOME_CONTRATADO}/g, contratadoNome)
+                        .replace(/{CPF_CONTRATADO}/g, contratadoCpf)
+                        .replace(/{ENDERECO_CONTRATADO}/g, contratadoEndereco)
+                        .replace(/{EMAIL_CONTRATADO}/g, contratadoEmail)
+                        .replace(/{TELEFONE_CONTRATADO}/g, contratadoTelefone)
+                        .replace(/{CIDADE_FORO}/g, cidadeForo)
+                        .replace(/{DATA_EXTENSO}/g, dataExtenso);
+
+                    // Atualiza a prévia visual
+                    const outputEl = document.getElementById('contractOutput');
+                    outputEl.innerHTML = rendered;
+
+                    // Guarda estado atual
+                    lastGeneratedContractData = {
+                        clienteNome, clienteCpf, clienteRg, clienteEndereco, clienteTelefone, clienteEmail,
+                        alunoNome, alunoTurma, pacoteNome, valor, formaPagamento, pacoteItens, observacoes, direitoImagem,
+                        dataGeracao: new Date().toISOString()
+                    };
+
+                    // Salva registro no histórico de contratos emitidos
+                    if (userId) {
+                        try {
+                            const alunoSelectedId = document.getElementById('contrato-select-aluno').value || null;
+                            await addDoc(collection(db, `users/${userId}/contratos_gerados`), {
+                                alunoId: alunoSelectedId,
+                                alunoNome: alunoNome,
+                                responsavelNome: clienteNome,
+                                cpf: clienteCpf,
+                                pacoteNome: pacoteNome,
+                                valor: valor,
+                                formaPagamento: formaPagamento,
+                                dataGeracao: new Date().toISOString()
+                            });
+                        } catch (err) {
+                            console.warn("Aviso ao salvar histórico de contrato:", err);
+                        }
+                    }
+
+                    lucide.createIcons();
+                },
+                // Baixar PDF do Contrato
+                downloadContractPDF: () => {
+                    const element = document.getElementById('contractOutput');
+                    if (!element || !element.innerHTML.includes('CONTRATO')) {
+                        alert('Gere o contrato primeiro preenchendo os dados ao lado.');
+                        return;
+                    }
+
+                    const alunoNome = document.getElementById('contrato-aluno-nome').value.trim() || 'Formando';
+                    const cleanName = alunoNome.replace(/[^a-zA-Z0-9_-]/g, '_');
+                    
+                    const opt = {
+                        margin: [12, 12, 12, 12],
+                        filename: `Contrato_Formatura_${cleanName}_WilksonFotografias.pdf`,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    if (window.html2pdf) {
+                        window.html2pdf().set(opt).from(element).save();
+                    } else {
+                        window.app.printContract();
+                    }
+                },
+                // Imprimir Contrato
+                printContract: () => {
+                    const content = document.getElementById('contractOutput');
+                    if (!content || !content.innerHTML.includes('CONTRATO')) {
+                        alert('Gere o contrato primeiro antes de imprimir.');
+                        return;
+                    }
+
+                    const printWindow = window.open('', '_blank', 'width=900,height=900');
+                    if (!printWindow) {
+                        alert('Permita popups no navegador para imprimir o contrato.');
+                        return;
+                    }
+
+                    printWindow.document.open();
+                    printWindow.document.write(
+                        '<!DOCTYPE html><html><head><title>Contrato de Formatura - Wilkson Fotografias</title>' +
+                        '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">' +
+                        '<style>' +
+                        'body { font-family: "Georgia", "Times New Roman", serif; padding: 24px; color: #1e293b; background: #fff; line-height: 1.7; }' +
+                        'h1 { font-family: sans-serif; font-size: 1.25rem; font-weight: 800; text-align: center; margin-bottom: 2rem; text-transform: uppercase; color: #0f172a; }' +
+                        'h2 { font-family: sans-serif; font-size: 0.95rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 0.25rem; text-transform: uppercase; }' +
+                        'p { margin-bottom: 0.8rem; text-align: justify; font-size: 0.95rem; }' +
+                        '.package-items-box { background: #f8fafc; border-left: 3px solid #3b82f6; padding: 0.75rem 1rem; margin: 0.75rem 0; font-size: 0.9rem; white-space: pre-line; }' +
+                        '.date-location { text-align: right; margin-top: 2rem; margin-bottom: 2rem; font-style: italic; }' +
+                        '.signatures-wrapper { margin-top: 3.5rem; display: flex; justify-content: space-around; text-align: center; }' +
+                        '.signature-box { display: flex; flex-direction: column; align-items: center; width: 45%; }' +
+                        '.signature-line { border-bottom: 1.5px solid #334155; width: 100%; margin-bottom: 0.5rem; }' +
+                        '.signature-name { font-size: 0.85rem; font-weight: 700; font-family: sans-serif; }' +
+                        '.signature-doc { font-size: 0.75rem; color: #64748b; font-family: sans-serif; }' +
+                        '@media print { body { padding: 0; } }' +
+                        '</style>' +
+                        '</head><body>' +
+                        '<div style="max-width: 800px; margin: 0 auto;">' +
+                        content.innerHTML +
+                        '</div>' +
+                        '</body></html>'
+                    );
+                    printWindow.document.close();
+                    printWindow.focus();
+                    setTimeout(() => {
+                        printWindow.print();
+                    }, 500);
+                },
+                // Copiar Texto para WhatsApp
+                copyContractWhatsAppText: () => {
+                    const alunoNome = document.getElementById('contrato-aluno-nome').value.trim();
+                    const clienteNome = document.getElementById('contrato-cliente-nome').value.trim();
+                    const pacoteSelect = document.getElementById('contrato-pacote-select');
+                    const pacoteNome = pacoteSelect.options[pacoteSelect.selectedIndex]?.text || 'Pacote de Formatura';
+                    const valor = document.getElementById('contrato-valor').value;
+                    const formaPagamento = document.getElementById('contrato-forma-pagamento').value;
+                    const itens = document.getElementById('contrato-pacote-itens').value;
+
+                    const text = 
+`📄 *WILKSON FOTOGRAFIAS - RESUMO DO CONTRATO DE FORMATURA*
+
+🎓 *Formando(a):* ${alunoNome || '---'}
+👤 *Responsável:* ${clienteNome || '---'}
+📦 *Pacote Escolhido:* ${pacoteNome}
+💰 *Valor Total:* R$ ${parseFloat(valor || 0).toFixed(2).replace('.', ',')}
+💳 *Forma de Pagamento:* ${formaPagamento || 'A combinar'}
+
+🎁 *Itens Inclusos:*
+${itens || 'Conforme contrato padrão.'}
+
+📞 *Coordenação:* Wilkson Fotografias
+WhatsApp: (81) 98845-6625`;
+
+                    navigator.clipboard.writeText(text).then(() => {
+                        alert('✅ Resumo do contrato copiado! Pronto para enviar no WhatsApp.');
+                    }).catch(() => {
+                        prompt('Copie o texto abaixo:', text);
+                    });
+                },
+                // Recarregar contrato emitido
+                reloadContractPreview: (contratoId) => {
+                    const c = dbState.contratosGerados.find(item => item.id === contratoId);
+                    if (!c) return;
+
+                    window.app.switchContratosTab('gerar');
+                    if (c.alunoId) {
+                        document.getElementById('contrato-select-aluno').value = c.alunoId;
+                    }
+                    document.getElementById('contrato-aluno-nome').value = c.alunoNome || '';
+                    document.getElementById('contrato-cliente-nome').value = c.responsavelNome || '';
+                    document.getElementById('contrato-cliente-cpf').value = c.cpf || '';
+                    document.getElementById('contrato-valor').value = c.valor || 0;
+                    document.getElementById('contrato-forma-pagamento').value = c.formaPagamento || '';
+
+                    window.app.onGenerateContractSubmit();
+                },
+                // Modal de Adicionar Novo Pacote
+                openAddPacoteModal: () => {
+                    const nome = prompt("Nome do Novo Pacote (ex: Pacote Ouro 2026):");
+                    if (!nome) return;
+                    const valor = parseFloat(prompt("Valor Total em R$ (ex: 2400.00):")) || 0;
+                    const condicoes = prompt("Condições / Parcelamento (ex: 4x de R$ 600,00):") || 'À vista ou parcelado';
+                    const itens = prompt("Itens Inclusos (separe por linha ou ponto):\nEx: Álbum 20x30 com 20 páginas, 60 fotos editadas, Pen drive") || 'Itens conforme pacote.';
+
+                    if (userId) {
+                        addDoc(collection(db, `users/${userId}/pacotes_formatura`), {
+                            nome: nome.trim(),
+                            valor: valor,
+                            condicoes: condicoes.trim(),
+                            itens: itens.trim()
+                        });
+                    }
+                },
+                // Modal de Editar Pacote
+                openEditPacoteModal: (pacoteId) => {
+                    const p = dbState.pacotes.find(item => item.id === pacoteId);
+                    if (!p) return;
+
+                    document.getElementById('edit-collection').value = 'pacotes_formatura';
+                    document.getElementById('edit-id').value = pacoteId;
+                    document.getElementById('edit-modal-title').innerText = 'Editar Pacote de Formatura';
+                    
+                    const fields = document.getElementById('edit-form-fields');
+                    fields.innerHTML = `
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Pacote</label>
+                            <input type="text" id="edit-field-pacote-nome" value="${p.nome || ''}" class="w-full p-2.5 border rounded-lg text-sm" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Valor Total (R$)</label>
+                                <input type="number" step="0.01" id="edit-field-pacote-valor" value="${p.valor || 0}" class="w-full p-2.5 border rounded-lg text-sm font-bold" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Condições de Pagamento</label>
+                                <input type="text" id="edit-field-pacote-condicoes" value="${p.condicoes || ''}" class="w-full p-2.5 border rounded-lg text-sm" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Itens / Entregáveis (Um por linha)</label>
+                            <textarea id="edit-field-pacote-itens" rows="4" class="w-full p-2.5 border rounded-lg text-xs font-mono">${p.itens || ''}</textarea>
+                        </div>
+                    `;
+
+                    const modal = document.getElementById('edit-modal');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    lucide.createIcons();
+                },
+                // Salvar Configuração do Modelo do Contrato
+                saveContractTemplateConfig: async () => {
+                    if (!userId) return;
+                    const payload = {
+                        contratadoNome: document.getElementById('config-contratado-nome').value.trim(),
+                        contratadoCpf: document.getElementById('config-contratado-cpf').value.trim(),
+                        contratadoEndereco: document.getElementById('config-contratado-endereco').value.trim(),
+                        contratadoTelefone: document.getElementById('config-contratado-telefone').value.trim(),
+                        contratadoEmail: document.getElementById('config-contratado-email').value.trim(),
+                        cidadeForo: document.getElementById('config-cidade-foro').value.trim(),
+                        templateTexto: document.getElementById('config-template-texto').value
+                    };
+
+                    try {
+                        await setDoc(doc(db, `users/${userId}/config_contrato/modelo`), payload);
+                        alert("✅ Configurações e modelo do contrato salvos com sucesso!");
+                    } catch (e) {
+                        console.error("Erro ao salvar config do contrato:", e);
+                        alert("Erro ao salvar configurações.");
+                    }
+                },
+                // Restaurar Modelo Padrão
+                restoreDefaultContractTemplate: () => {
+                    if (confirm("Deseja restaurar o texto padrão original do contrato de formatura infantil?")) {
+                        document.getElementById('config-template-texto').value = DEFAULT_CONTRACT_TEMPLATE;
+                    }
                 },
                 toggleCustoTipo: (tipo) => {
                     const wrapper = document.getElementById('custo-fotografo-wrapper');
@@ -2434,7 +3433,7 @@ WhatsApp: (81) 98845-6625`;
                     document.getElementById('batch-import-form').reset();
                 },
                 openEditModal: (collectionName, id) => {
-                    const docItem = dbState[collectionName]?.find(x => x.id === id);
+                    const docItem = dbState[collectionName === 'pacotes_formatura' ? 'pacotes' : collectionName]?.find(x => x.id === id);
                     if (!docItem) return;
 
                     document.getElementById('edit-collection').value = collectionName;

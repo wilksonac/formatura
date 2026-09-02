@@ -1514,6 +1514,7 @@
             
             let userId = null;
             let activeTurmaId = 'ALL'; // 'ALL' ou ID da turma ativa
+            let hasAutoSelectedTurma = false; // Flag para selecionar turma do ano atual automaticamente ao iniciar
 
             // Estado Local do Banco de Dados
             let dbState = { 
@@ -1862,6 +1863,15 @@
                                 dbState.turmas = [DEFAULT_LEGACY_TURMA];
                             }
                             dbState.turmas.sort((a, b) => (b.ano || 0) - (a.ano || 0));
+                            
+                            // Selecionar automaticamente a turma do ano atual como padrão ao carregar
+                            if (!hasAutoSelectedTurma && dbState.turmas.length > 0) {
+                                const defaultId = getDefaultTurmaId(dbState.turmas);
+                                if (defaultId && defaultId !== 'ALL') {
+                                    activeTurmaId = defaultId;
+                                }
+                                hasAutoSelectedTurma = true;
+                            }
                         }
                         if (col === 'alunos') {
                             dbState.alunos.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
@@ -1937,11 +1947,30 @@
                     financeiro: [], custos: [], cenarios: [], checklist: {}, entregas: [],
                     pacotes: [], contratosGerados: [], configContrato: null
                 };
+                activeTurmaId = 'ALL';
+                hasAutoSelectedTurma = false;
                 selectedEventIdForFotos = null;
                 document.getElementById('fotos-management-area').classList.add('hidden');
             }
 
-            // --- HELPER DE FILTRAGEM POR TURMA ---
+            // --- HELPER DE FILTRAGEM E SELEÇÃO DE TURMA ---
+            function getDefaultTurmaId(turmas) {
+                if (!turmas || turmas.length === 0) return 'ALL';
+                const currentYear = new Date().getFullYear();
+                
+                // 1. Procurar turma do ano atual exato (ex: 2026)
+                const turmaAnoAtual = turmas.find(t => parseInt(t.ano) === currentYear);
+                if (turmaAnoAtual) return turmaAnoAtual.id;
+                
+                // 2. Se não encontrar ano atual, pegar a turma com maior/mais recente ano
+                const turmasOrdenadas = [...turmas].sort((a, b) => (parseInt(b.ano) || 0) - (parseInt(a.ano) || 0));
+                if (turmasOrdenadas.length > 0 && turmasOrdenadas[0].id) {
+                    return turmasOrdenadas[0].id;
+                }
+                
+                return 'ALL';
+            }
+
             function getTurmaDoItem(item) {
                 if (item.turmaId) return item.turmaId;
                 return DEFAULT_LEGACY_TURMA.id;
@@ -3310,6 +3339,7 @@
             window.app = {
                 setActiveTurma: (turmaId) => {
                     activeTurmaId = turmaId;
+                    hasAutoSelectedTurma = true;
                     renderAll();
                 },
                 showSection: (sectionId) => {

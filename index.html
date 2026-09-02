@@ -670,6 +670,25 @@
                         </form>
                     </div>
 
+                    <!-- Barra de Busca Rápida e Filtros de Alunos -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                        <div class="relative flex-1 max-w-md">
+                            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-3"></i>
+                            <input type="text" id="search-alunos-input" oninput="window.app.filterAlunos(this.value)" placeholder="Buscar por aluno, responsável, telefone ou turma..." class="w-full pl-9 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500">
+                            <button type="button" id="btn-clear-search-alunos" onclick="window.app.clearSearchAlunos()" class="hidden absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2 overflow-x-auto">
+                            <div class="inline-flex rounded-lg p-1 bg-gray-100 border border-gray-200 text-xs font-medium">
+                                <button type="button" onclick="window.app.setAlunosContratoFilter('ALL')" id="filter-btn-alunos-all" class="px-3 py-1.5 rounded-md bg-white shadow-sm text-gray-900 font-bold transition">Todos (<span id="count-alunos-all">0</span>)</button>
+                                <button type="button" onclick="window.app.setAlunosContratoFilter('COM_CONTRATO')" id="filter-btn-alunos-com" class="px-3 py-1.5 rounded-md text-emerald-700 hover:text-emerald-900 transition">Com Contrato (<span id="count-alunos-com">0</span>)</button>
+                                <button type="button" onclick="window.app.setAlunosContratoFilter('SEM_CONTRATO')" id="filter-btn-alunos-sem" class="px-3 py-1.5 rounded-md text-amber-700 hover:text-amber-900 transition">Sem Contrato (<span id="count-alunos-sem">0</span>)</button>
+                            </div>
+                            <span id="info-alunos-count" class="text-xs text-gray-500 font-medium whitespace-nowrap ml-1"></span>
+                        </div>
+                    </div>
+
                     <!-- Tabela de Alunos -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div class="overflow-x-auto">
@@ -963,9 +982,18 @@
 
                         <!-- TAB CONTENT: HISTÓRICO DE CONTRATOS -->
                         <div id="tab-content-contrato-historico" class="p-6 hidden">
-                            <div class="flex justify-between items-center mb-4">
-                                <h2 class="text-lg font-bold text-gray-800">Contratos Emitidos</h2>
-                                <span class="text-xs text-gray-500">Histórico de contratos gerados para os alunos</span>
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-3">
+                                <div>
+                                    <h2 class="text-lg font-bold text-gray-800">Contratos Emitidos</h2>
+                                    <p class="text-xs text-gray-500">Histórico de contratos gerados prontos para reabrir e reimprimir</p>
+                                </div>
+                                <div class="relative w-full sm:w-80">
+                                    <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5"></i>
+                                    <input type="text" id="search-contratos-input" oninput="window.app.filterContratos(this.value)" placeholder="Buscar por formando, responsável ou pacote..." class="w-full pl-8 pr-7 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white">
+                                    <button type="button" id="btn-clear-search-contratos" onclick="window.app.clearSearchContratos()" class="hidden absolute right-2 top-2 text-gray-400 hover:text-gray-600">
+                                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full min-w-max">
@@ -1018,9 +1046,21 @@
 
                         <!-- Grid Checklist -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                            <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
-                                <h3 class="font-bold text-gray-700 text-sm">Checklist de Cobertura Fotográfica</h3>
-                                <span class="text-xs text-gray-500">Dica: Marque conforme as fotos forem tiradas</span>
+                            <div class="p-4 bg-gray-50 border-b flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                                <div>
+                                    <h3 class="font-bold text-gray-700 text-sm">Checklist de Cobertura Fotográfica</h3>
+                                    <span class="text-xs text-gray-500">Dica: Marque em tempo real conforme as fotos forem tiradas</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="relative w-full sm:w-64">
+                                        <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5"></i>
+                                        <input type="text" id="search-fotos-input" oninput="window.app.filterFotos(this.value)" placeholder="Localizar aluno na grade..." class="w-full pl-8 pr-7 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 bg-white">
+                                        <button type="button" id="btn-clear-search-fotos" onclick="window.app.clearSearchFotos()" class="hidden absolute right-2 top-2 text-gray-400 hover:text-gray-600">
+                                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
+                                    <span id="fotos-progress-stats" class="text-xs font-bold text-purple-700 bg-purple-100 px-2.5 py-1 rounded-md border border-purple-200 whitespace-nowrap">0% concluído</span>
+                                </div>
                             </div>
                             <div id="checklist-container" class="overflow-auto max-h-[65vh]"></div>
                         </div>
@@ -1120,6 +1160,28 @@
                         </form>
                     </div>
 
+                    <!-- Filtros e Busca Rápida no Financeiro -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                        <div class="relative flex-1 max-w-md">
+                            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-3"></i>
+                            <input type="text" id="search-financeiro-input" oninput="window.app.filterFinanceiro(this.value)" placeholder="Buscar por formando, responsável ou turma..." class="w-full pl-9 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                            <button type="button" id="btn-clear-search-financeiro" onclick="window.app.clearSearchFinanceiro()" class="hidden absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5 overflow-x-auto">
+                            <div class="inline-flex rounded-lg p-1 bg-gray-100 border border-gray-200 text-xs font-medium">
+                                <button type="button" onclick="window.app.setFinanceiroStatusFilter('ALL')" id="filter-btn-fin-all" class="px-3 py-1.5 rounded-md bg-white shadow-sm text-gray-900 font-bold transition">Todos (<span id="count-fin-all">0</span>)</button>
+                                <button type="button" onclick="window.app.setFinanceiroStatusFilter('Pendente')" id="filter-btn-fin-pendente" class="px-3 py-1.5 rounded-md text-rose-700 hover:text-rose-900 transition">Pendentes (<span id="count-fin-pendente">0</span>)</button>
+                                <button type="button" onclick="window.app.setFinanceiroStatusFilter('Pago Parcialmente')" id="filter-btn-fin-parcial" class="px-3 py-1.5 rounded-md text-amber-700 hover:text-amber-900 transition">Parciais (<span id="count-fin-parcial">0</span>)</button>
+                                <button type="button" onclick="window.app.setFinanceiroStatusFilter('Pago')" id="filter-btn-fin-pago" class="px-3 py-1.5 rounded-md text-emerald-700 hover:text-emerald-900 transition">Pagos (<span id="count-fin-pago">0</span>)</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Resumo Financeiro da Visualização Filtrada -->
+                    <div id="financeiro-filtered-summary" class="bg-amber-50/70 border border-amber-200 rounded-xl p-3.5 mb-4 flex flex-wrap items-center justify-between text-xs text-amber-950 gap-3"></div>
+
                     <!-- Tabela Financeira -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div class="overflow-x-auto">
@@ -1199,6 +1261,26 @@
                         </form>
                     </div>
 
+                    <!-- Filtros e Busca de Custos -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                        <div class="relative flex-1 max-w-md">
+                            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-3"></i>
+                            <input type="text" id="search-custos-input" oninput="window.app.filterCustos(this.value)" placeholder="Buscar por descrição, freelancer ou categoria..." class="w-full pl-9 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            <button type="button" id="btn-clear-search-custos" onclick="window.app.clearSearchCustos()" class="hidden absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5 overflow-x-auto">
+                            <div class="inline-flex rounded-lg p-1 bg-gray-100 border border-gray-200 text-xs font-medium">
+                                <button type="button" onclick="window.app.setCustosTipoFilter('ALL')" id="filter-btn-custo-all" class="px-3 py-1.5 rounded-md bg-white shadow-sm text-gray-900 font-bold transition">Todos (<span id="count-custo-all">0</span>)</button>
+                                <button type="button" onclick="window.app.setCustosTipoFilter('Freelancer')" id="filter-btn-custo-freela" class="px-3 py-1.5 rounded-md text-pink-700 hover:text-pink-900 transition">Freelancers</button>
+                                <button type="button" onclick="window.app.setCustosTipoFilter('Material')" id="filter-btn-custo-material" class="px-3 py-1.5 rounded-md text-purple-700 hover:text-purple-900 transition">Materiais</button>
+                                <button type="button" onclick="window.app.setCustosTipoFilter('Serviço')" id="filter-btn-custo-servico" class="px-3 py-1.5 rounded-md text-blue-700 hover:text-blue-900 transition">Serviços</button>
+                                <button type="button" onclick="window.app.setCustosTipoFilter('Outro')" id="filter-btn-custo-outro" class="px-3 py-1.5 rounded-md text-gray-700 hover:text-gray-900 transition">Outros</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Tabela de Custos -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div class="overflow-x-auto">
@@ -1228,7 +1310,26 @@
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <!-- Filtros e Busca de Entregas -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                        <div class="relative flex-1 max-w-md">
+                            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-3"></i>
+                            <input type="text" id="search-entregas-input" oninput="window.app.filterEntregas(this.value)" placeholder="Buscar por formando ou turma..." class="w-full pl-9 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                            <button type="button" id="btn-clear-search-entregas" onclick="window.app.clearSearchEntregas()" class="hidden absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5 overflow-x-auto">
+                            <div class="inline-flex rounded-lg p-1 bg-gray-100 border border-gray-200 text-xs font-medium">
+                                <button type="button" onclick="window.app.setEntregasStatusFilter('ALL')" id="filter-btn-ent-all" class="px-3 py-1.5 rounded-md bg-white shadow-sm text-gray-900 font-bold transition">Todos (<span id="count-ent-all">0</span>)</button>
+                                <button type="button" onclick="window.app.setEntregasStatusFilter('PENDENTE_MIDIA')" id="filter-btn-ent-midia" class="px-3 py-1.5 rounded-md text-blue-700 hover:text-blue-900 transition">Pendente Mídia (<span id="count-ent-midia">0</span>)</button>
+                                <button type="button" onclick="window.app.setEntregasStatusFilter('PENDENTE_ALBUM')" id="filter-btn-ent-album" class="px-3 py-1.5 rounded-md text-purple-700 hover:text-purple-900 transition">Pendente Álbum (<span id="count-ent-album">0</span>)</button>
+                                <button type="button" onclick="window.app.setEntregasStatusFilter('CONCLUIDO')" id="filter-btn-ent-concluido" class="px-3 py-1.5 rounded-md text-emerald-700 hover:text-emerald-900 transition">100% Entregue (<span id="count-ent-concluido">0</span>)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full min-w-max">
                                 <thead class="bg-gray-50 border-b">
@@ -1288,6 +1389,20 @@
                 pacotes: [],
                 contratosGerados: [],
                 configContrato: null
+            };
+
+            // Estado de Filtros e Busca em Tempo Real
+            const filterState = {
+                alunosSearch: '',
+                alunosContrato: 'ALL', // 'ALL', 'COM_CONTRATO', 'SEM_CONTRATO'
+                financeiroSearch: '',
+                financeiroStatus: 'ALL', // 'ALL', 'Pendente', 'Pago Parcialmente', 'Pago'
+                fotosSearch: '',
+                custosSearch: '',
+                custosTipo: 'ALL', // 'ALL', 'Freelancer', 'Material', 'Serviço', 'Outro'
+                entregasSearch: '',
+                entregasStatus: 'ALL', // 'ALL', 'PENDENTE_MIDIA', 'PENDENTE_ALBUM', 'CONCLUIDO'
+                contratosSearch: ''
             };
 
             let unsubscribeListeners = [];
@@ -1877,10 +1992,51 @@
             // --- SEÇÃO: ALUNOS ---
             function renderAlunos() {
                 const lista = document.getElementById('lista-alunos');
-                const filtrados = dbState.alunos.filter(pertenceATurmaAtiva);
+                const todosDaTurma = dbState.alunos.filter(pertenceATurmaAtiva);
+
+                // Atualizar contadores nos botões de filtro
+                const countAll = todosDaTurma.length;
+                const countCom = todosDaTurma.filter(hasContract).length;
+                const countSem = todosDaTurma.filter(a => !hasContract(a)).length;
+
+                if (document.getElementById('count-alunos-all')) document.getElementById('count-alunos-all').textContent = countAll;
+                if (document.getElementById('count-alunos-com')) document.getElementById('count-alunos-com').textContent = countCom;
+                if (document.getElementById('count-alunos-sem')) document.getElementById('count-alunos-sem').textContent = countSem;
+
+                // Aplicar filtros
+                let filtrados = todosDaTurma;
+                if (filterState.alunosContrato === 'COM_CONTRATO') {
+                    filtrados = filtrados.filter(hasContract);
+                } else if (filterState.alunosContrato === 'SEM_CONTRATO') {
+                    filtrados = filtrados.filter(a => !hasContract(a));
+                }
+
+                if (filterState.alunosSearch) {
+                    const q = filterState.alunosSearch.toLowerCase();
+                    filtrados = filtrados.filter(a => 
+                        (a.nome || '').toLowerCase().includes(q) ||
+                        (a.pai || '').toLowerCase().includes(q) ||
+                        (a.contato || '').toLowerCase().includes(q) ||
+                        getNomeTurma(a.turmaId).toLowerCase().includes(q)
+                    );
+                }
+
+                // Indicador de contagem
+                const infoEl = document.getElementById('info-alunos-count');
+                if (infoEl) {
+                    if (filterState.alunosSearch || filterState.alunosContrato !== 'ALL') {
+                        infoEl.textContent = `Exibindo ${filtrados.length} de ${countAll}`;
+                    } else {
+                        infoEl.textContent = `${countAll} aluno(s)`;
+                    }
+                }
+
+                // Botão limpar busca
+                const btnClear = document.getElementById('btn-clear-search-alunos');
+                if (btnClear) btnClear.classList.toggle('hidden', !filterState.alunosSearch);
 
                 lista.innerHTML = filtrados.length === 0 
-                    ? '<tr><td colspan="6" class="p-8 text-center text-gray-500">Nenhum aluno cadastrado para esta turma.</td></tr>'
+                    ? `<tr><td colspan="6" class="p-8 text-center text-gray-500">${filterState.alunosSearch ? `Nenhum aluno encontrado para "${filterState.alunosSearch}".` : 'Nenhum aluno cadastrado com este filtro.'}</td></tr>`
                     : filtrados.map(aluno => {
                         const temContrato = hasContract(aluno);
                         const statusClass = temContrato ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800';
@@ -1956,12 +2112,26 @@
                 const container = document.getElementById('lista-contratos-gerados');
                 if (!container) return;
 
-                if (dbState.contratosGerados.length === 0) {
-                    container.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-gray-500">Nenhum contrato gerado recentemente.</td></tr>';
+                let filtrados = dbState.contratosGerados;
+                if (filterState.contratosSearch) {
+                    const q = filterState.contratosSearch.toLowerCase();
+                    filtrados = filtrados.filter(c => 
+                        (c.alunoNome || '').toLowerCase().includes(q) ||
+                        (c.responsavelNome || '').toLowerCase().includes(q) ||
+                        (c.pacoteNome || '').toLowerCase().includes(q)
+                    );
+                }
+
+                // Botão limpar busca no histórico de contratos
+                const btnClear = document.getElementById('btn-clear-search-contratos');
+                if (btnClear) btnClear.classList.toggle('hidden', !filterState.contratosSearch);
+
+                if (filtrados.length === 0) {
+                    container.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-500">${filterState.contratosSearch ? `Nenhum contrato encontrado para "${filterState.contratosSearch}".` : 'Nenhum contrato gerado recentemente.'}</td></tr>`;
                     return;
                 }
 
-                container.innerHTML = dbState.contratosGerados.map(c => {
+                container.innerHTML = filtrados.map(c => {
                     const dataStr = c.dataGeracao ? new Date(c.dataGeracao).toLocaleString('pt-BR') : '-';
                     return `
                     <tr class="hover:bg-gray-50 transition border-b border-gray-100">
@@ -2025,10 +2195,62 @@
                 const alunosFiltrados = dbState.alunos.filter(pertenceATurmaAtiva);
                 const alunosComContratoIds = alunosFiltrados.filter(hasContract).map(a => a.id);
                 
-                const financeiroFiltrado = dbState.financeiro.filter(f => alunosComContratoIds.includes(f.alunoId));
+                const todosFinanceiro = dbState.financeiro.filter(f => alunosComContratoIds.includes(f.alunoId));
+
+                // Atualizar contadores nos botões de status
+                const countAll = todosFinanceiro.length;
+                const countPendente = todosFinanceiro.filter(f => f.status === 'Pendente').length;
+                const countParcial = todosFinanceiro.filter(f => f.status === 'Pago Parcialmente').length;
+                const countPago = todosFinanceiro.filter(f => f.status === 'Pago').length;
+
+                if (document.getElementById('count-fin-all')) document.getElementById('count-fin-all').textContent = countAll;
+                if (document.getElementById('count-fin-pendente')) document.getElementById('count-fin-pendente').textContent = countPendente;
+                if (document.getElementById('count-fin-parcial')) document.getElementById('count-fin-parcial').textContent = countParcial;
+                if (document.getElementById('count-fin-pago')) document.getElementById('count-fin-pago').textContent = countPago;
+
+                // Aplicar filtros
+                let financeiroFiltrado = todosFinanceiro;
+                if (filterState.financeiroStatus !== 'ALL') {
+                    financeiroFiltrado = financeiroFiltrado.filter(f => f.status === filterState.financeiroStatus);
+                }
+
+                if (filterState.financeiroSearch) {
+                    const q = filterState.financeiroSearch.toLowerCase();
+                    financeiroFiltrado = financeiroFiltrado.filter(f => {
+                        const aluno = dbState.alunos.find(a => a.id === f.alunoId);
+                        if (!aluno) return false;
+                        return (aluno.nome || '').toLowerCase().includes(q) ||
+                               (aluno.pai || '').toLowerCase().includes(q) ||
+                               (aluno.contato || '').toLowerCase().includes(q) ||
+                               getNomeTurma(aluno.turmaId).toLowerCase().includes(q);
+                    });
+                }
+
+                // Resumo da visualização filtrada
+                const totalFiltrado = financeiroFiltrado.reduce((acc, f) => acc + (parseFloat(f.total) || 0), 0);
+                const pagoFiltrado = financeiroFiltrado.reduce((acc, f) => acc + (parseFloat(f.pago) || 0), 0);
+                const restanteFiltrado = Math.max(0, totalFiltrado - pagoFiltrado);
+
+                const summaryEl = document.getElementById('financeiro-filtered-summary');
+                if (summaryEl) {
+                    summaryEl.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-amber-900 flex items-center gap-1.5"><i data-lucide="bar-chart-3" class="w-4 h-4 text-amber-700"></i> Resumo da Visualização (${financeiroFiltrado.length} registros):</span>
+                        </div>
+                        <div class="flex flex-wrap gap-4 font-medium">
+                            <span>Pacotes: <strong class="text-gray-900">R$ ${totalFiltrado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
+                            <span>Recebido: <strong class="text-emerald-700">R$ ${pagoFiltrado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
+                            <span>A Receber: <strong class="text-rose-700 font-bold">R$ ${restanteFiltrado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
+                        </div>
+                    `;
+                }
+
+                // Botão limpar busca
+                const btnClear = document.getElementById('btn-clear-search-financeiro');
+                if (btnClear) btnClear.classList.toggle('hidden', !filterState.financeiroSearch);
 
                 lista.innerHTML = financeiroFiltrado.length === 0 
-                    ? '<tr><td colspan="8" class="p-8 text-center text-gray-500">Nenhum lançamento financeiro para os alunos desta turma.</td></tr>'
+                    ? `<tr><td colspan="8" class="p-8 text-center text-gray-500">${filterState.financeiroSearch ? `Nenhum lançamento encontrado para "${filterState.financeiroSearch}".` : 'Nenhum lançamento financeiro para este filtro.'}</td></tr>`
                     : financeiroFiltrado.map(item => {
                         const aluno = dbState.alunos.find(a => a.id === item.alunoId);
                         if (!aluno) return ''; 
@@ -2091,13 +2313,15 @@
             // --- SEÇÃO: CUSTOS DETALHADOS ---
             function renderCustos() {
                 const lista = document.getElementById('lista-custos');
-                const filtrados = dbState.custos.filter(pertenceATurmaAtiva);
+                const todosCustos = dbState.custos.filter(pertenceATurmaAtiva);
+
+                if (document.getElementById('count-custo-all')) document.getElementById('count-custo-all').textContent = todosCustos.length;
 
                 // Cálculo dos subtotais para os cards de resumo
-                const totalGeral = filtrados.reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0);
-                const totalFreela = filtrados.filter(c => (c.tipo || '').toLowerCase() === 'freelancer').reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0);
-                const totalServico = filtrados.filter(c => (c.tipo || '').toLowerCase() === 'serviço' || (c.tipo || '').toLowerCase() === 'servico' || !c.tipo).reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0);
-                const totalMaterial = filtrados.filter(c => (c.tipo || '').toLowerCase() === 'material').reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0);
+                const totalGeral = todosCustos.reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0);
+                const totalFreela = todosCustos.filter(c => (c.tipo || '').toLowerCase() === 'freelancer').reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0);
+                const totalServico = todosCustos.filter(c => (c.tipo || '').toLowerCase() === 'serviço' || (c.tipo || '').toLowerCase() === 'servico' || !c.tipo).reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0);
+                const totalMaterial = todosCustos.filter(c => (c.tipo || '').toLowerCase() === 'material').reduce((acc, c) => acc + (parseFloat(c.valor) || 0), 0);
 
                 const resumoEl = document.getElementById('custos-resumo-cards');
                 if (resumoEl) {
@@ -2121,8 +2345,28 @@
                     `;
                 }
 
+                // Aplicar filtros
+                let filtrados = todosCustos;
+                if (filterState.custosTipo !== 'ALL') {
+                    filtrados = filtrados.filter(c => (c.tipo || 'Serviço') === filterState.custosTipo);
+                }
+
+                if (filterState.custosSearch) {
+                    const q = filterState.custosSearch.toLowerCase();
+                    filtrados = filtrados.filter(c => 
+                        (c.descricao || '').toLowerCase().includes(q) ||
+                        (c.fotografoNome || '').toLowerCase().includes(q) ||
+                        (c.tipo || '').toLowerCase().includes(q) ||
+                        getNomeTurma(c.turmaId).toLowerCase().includes(q)
+                    );
+                }
+
+                // Botão limpar busca
+                const btnClear = document.getElementById('btn-clear-search-custos');
+                if (btnClear) btnClear.classList.toggle('hidden', !filterState.custosSearch);
+
                 lista.innerHTML = filtrados.length === 0
-                    ? '<tr><td colspan="6" class="p-6 text-center text-gray-500">Nenhum custo cadastrado para esta turma.</td></tr>'
+                    ? `<tr><td colspan="6" class="p-6 text-center text-gray-500">${filterState.custosSearch ? `Nenhum custo encontrado para "${filterState.custosSearch}".` : 'Nenhum custo cadastrado com este filtro.'}</td></tr>`
                     : filtrados.map(item => {
                         const evento = dbState.eventos.find(e => e.id === item.eventoId);
                         const valor = parseFloat(item.valor) || 0;
@@ -2167,10 +2411,50 @@
             // --- SEÇÃO: ENTREGAS ---
             function renderEntregas() {
                 const lista = document.getElementById('lista-entregas');
-                const alunosFiltrados = dbState.alunos.filter(pertenceATurmaAtiva);
+                const todosAlunos = dbState.alunos.filter(pertenceATurmaAtiva);
+
+                // Contadores nos botões de filtro de entregas
+                const countAll = todosAlunos.length;
+                const countPendenteMidia = todosAlunos.filter(a => !(dbState.entregas.find(e => e.id === a.id) || {}).entregueMidia).length;
+                const countPendenteAlbum = todosAlunos.filter(a => !(dbState.entregas.find(e => e.id === a.id) || {}).entregueAlbum).length;
+                const countConcluido = todosAlunos.filter(a => {
+                    const ent = dbState.entregas.find(e => e.id === a.id) || {};
+                    return ent.entregueMidia && ent.entregueAlbum;
+                }).length;
+
+                if (document.getElementById('count-ent-all')) document.getElementById('count-ent-all').textContent = countAll;
+                if (document.getElementById('count-ent-midia')) document.getElementById('count-ent-midia').textContent = countPendenteMidia;
+                if (document.getElementById('count-ent-album')) document.getElementById('count-ent-album').textContent = countPendenteAlbum;
+                if (document.getElementById('count-ent-concluido')) document.getElementById('count-ent-concluido').textContent = countConcluido;
+
+                // Aplicar filtros
+                let alunosFiltrados = todosAlunos;
+                if (filterState.entregasStatus === 'PENDENTE_MIDIA') {
+                    alunosFiltrados = alunosFiltrados.filter(a => !(dbState.entregas.find(e => e.id === a.id) || {}).entregueMidia);
+                } else if (filterState.entregasStatus === 'PENDENTE_ALBUM') {
+                    alunosFiltrados = alunosFiltrados.filter(a => !(dbState.entregas.find(e => e.id === a.id) || {}).entregueAlbum);
+                } else if (filterState.entregasStatus === 'CONCLUIDO') {
+                    alunosFiltrados = alunosFiltrados.filter(a => {
+                        const ent = dbState.entregas.find(e => e.id === a.id) || {};
+                        return ent.entregueMidia && ent.entregueAlbum;
+                    });
+                }
+
+                if (filterState.entregasSearch) {
+                    const q = filterState.entregasSearch.toLowerCase();
+                    alunosFiltrados = alunosFiltrados.filter(a => 
+                        (a.nome || '').toLowerCase().includes(q) ||
+                        (a.pai || '').toLowerCase().includes(q) ||
+                        getNomeTurma(a.turmaId).toLowerCase().includes(q)
+                    );
+                }
+
+                // Botão limpar busca
+                const btnClear = document.getElementById('btn-clear-search-entregas');
+                if (btnClear) btnClear.classList.toggle('hidden', !filterState.entregasSearch);
 
                 if (alunosFiltrados.length === 0) {
-                    lista.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-gray-500">Nenhum aluno cadastrado nesta turma.</td></tr>';
+                    lista.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-gray-500">${filterState.entregasSearch ? `Nenhum aluno encontrado para "${filterState.entregasSearch}".` : 'Nenhum aluno para este filtro de entrega.'}</td></tr>`;
                     return;
                 }
 
@@ -2351,8 +2635,47 @@
                     alunosDoEvento = dbState.alunos.filter(a => getTurmaDoItem(a) === turmaDoEvento);
                 }
 
+                // Calcular progresso geral de fotos da turma no evento
+                let totalFotosPossiveis = 0;
+                let totalFotosConcluidas = 0;
+                if (dbState.cenarios.length > 0 && alunosDoEvento.length > 0) {
+                    totalFotosPossiveis = alunosDoEvento.length * dbState.cenarios.length;
+                    alunosDoEvento.forEach(a => {
+                        dbState.cenarios.forEach(c => {
+                            if (dbState.checklist[a.id] && dbState.checklist[a.id][c.id]) {
+                                totalFotosConcluidas++;
+                            }
+                        });
+                    });
+                }
+
+                const percent = totalFotosPossiveis > 0 ? Math.round((totalFotosConcluidas / totalFotosPossiveis) * 100) : 0;
+                const progressStatsEl = document.getElementById('fotos-progress-stats');
+                if (progressStatsEl) {
+                    progressStatsEl.textContent = `${totalFotosConcluidas}/${totalFotosPossiveis} fotos (${percent}%)`;
+                    progressStatsEl.className = percent === 100 
+                        ? "text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-md border border-emerald-200 whitespace-nowrap"
+                        : "text-xs font-bold text-purple-700 bg-purple-100 px-2.5 py-1 rounded-md border border-purple-200 whitespace-nowrap";
+                }
+
+                // Filtrar por busca de aluno
+                let alunosExibidos = alunosDoEvento;
+                if (filterState.fotosSearch) {
+                    const q = filterState.fotosSearch.toLowerCase();
+                    alunosExibidos = alunosExibidos.filter(a => (a.nome || '').toLowerCase().includes(q));
+                }
+
+                // Botão limpar busca
+                const btnClear = document.getElementById('btn-clear-search-fotos');
+                if (btnClear) btnClear.classList.toggle('hidden', !filterState.fotosSearch);
+
                 if (alunosDoEvento.length === 0 || dbState.cenarios.length === 0) {
                     container.innerHTML = '<p class="p-6 text-center text-gray-500 text-sm">Adicione alunos e cenários para montar a grade de checklist.</p>';
+                    return;
+                }
+
+                if (alunosExibidos.length === 0) {
+                    container.innerHTML = `<p class="p-6 text-center text-gray-500 text-sm">Nenhum aluno encontrado no checklist para "${filterState.fotosSearch}".</p>`;
                     return;
                 }
 
@@ -2362,7 +2685,7 @@
                 });
                 headHTML += '</tr>';
 
-                let bodyHTML = alunosDoEvento.map(aluno => {
+                let bodyHTML = alunosExibidos.map(aluno => {
                     const temContrato = hasContract(aluno);
                     const badge = !temContrato
                         ? ' <span class="ml-1 px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded">Sem Contrato</span>' 
@@ -2687,6 +3010,146 @@
                         event.currentTarget.classList.add('bg-slate-800', 'text-white');
                         event.currentTarget.classList.remove('text-slate-300');
                     }
+                    lucide.createIcons();
+                },
+                // --- FILTROS E BUSCA EM TEMPO REAL ---
+                filterAlunos: (query) => {
+                    filterState.alunosSearch = query.trim();
+                    renderAlunos();
+                    lucide.createIcons();
+                },
+                clearSearchAlunos: () => {
+                    filterState.alunosSearch = '';
+                    const inp = document.getElementById('search-alunos-input');
+                    if (inp) inp.value = '';
+                    renderAlunos();
+                    lucide.createIcons();
+                },
+                setAlunosContratoFilter: (val) => {
+                    filterState.alunosContrato = val;
+                    const btnAll = document.getElementById('filter-btn-alunos-all');
+                    const btnCom = document.getElementById('filter-btn-alunos-com');
+                    const btnSem = document.getElementById('filter-btn-alunos-sem');
+                    if (btnAll) btnAll.className = val === 'ALL' ? 'px-3 py-1.5 rounded-md bg-white shadow-sm text-gray-900 font-bold transition' : 'px-3 py-1.5 rounded-md text-gray-600 hover:text-gray-900 transition';
+                    if (btnCom) btnCom.className = val === 'COM_CONTRATO' ? 'px-3 py-1.5 rounded-md bg-white shadow-sm text-emerald-800 font-bold transition' : 'px-3 py-1.5 rounded-md text-emerald-700 hover:text-emerald-900 transition';
+                    if (btnSem) btnSem.className = val === 'SEM_CONTRATO' ? 'px-3 py-1.5 rounded-md bg-white shadow-sm text-amber-800 font-bold transition' : 'px-3 py-1.5 rounded-md text-amber-700 hover:text-amber-900 transition';
+                    renderAlunos();
+                    lucide.createIcons();
+                },
+                filterFinanceiro: (query) => {
+                    filterState.financeiroSearch = query.trim();
+                    renderFinanceiro();
+                    lucide.createIcons();
+                },
+                clearSearchFinanceiro: () => {
+                    filterState.financeiroSearch = '';
+                    const inp = document.getElementById('search-financeiro-input');
+                    if (inp) inp.value = '';
+                    renderFinanceiro();
+                    lucide.createIcons();
+                },
+                setFinanceiroStatusFilter: (status) => {
+                    filterState.financeiroStatus = status;
+                    const btnAll = document.getElementById('filter-btn-fin-all');
+                    const btnPendente = document.getElementById('filter-btn-fin-pendente');
+                    const btnParcial = document.getElementById('filter-btn-fin-parcial');
+                    const btnPago = document.getElementById('filter-btn-fin-pago');
+                    if (btnAll) btnAll.className = status === 'ALL' ? 'px-3 py-1.5 rounded-md bg-white shadow-sm text-gray-900 font-bold transition' : 'px-3 py-1.5 rounded-md text-gray-600 hover:text-gray-900 transition';
+                    if (btnPendente) btnPendente.className = status === 'Pendente' ? 'px-3 py-1.5 rounded-md bg-white shadow-sm text-rose-800 font-bold transition' : 'px-3 py-1.5 rounded-md text-rose-700 hover:text-rose-900 transition';
+                    if (btnParcial) btnParcial.className = status === 'Pago Parcialmente' ? 'px-3 py-1.5 rounded-md bg-white shadow-sm text-amber-800 font-bold transition' : 'px-3 py-1.5 rounded-md text-amber-700 hover:text-amber-900 transition';
+                    if (btnPago) btnPago.className = status === 'Pago' ? 'px-3 py-1.5 rounded-md bg-white shadow-sm text-emerald-800 font-bold transition' : 'px-3 py-1.5 rounded-md text-emerald-700 hover:text-emerald-900 transition';
+                    renderFinanceiro();
+                    lucide.createIcons();
+                },
+                filterFotos: (query) => {
+                    filterState.fotosSearch = query.trim();
+                    renderChecklist();
+                    lucide.createIcons();
+                },
+                clearSearchFotos: () => {
+                    filterState.fotosSearch = '';
+                    const inp = document.getElementById('search-fotos-input');
+                    if (inp) inp.value = '';
+                    renderChecklist();
+                    lucide.createIcons();
+                },
+                filterCustos: (query) => {
+                    filterState.custosSearch = query.trim();
+                    renderCustos();
+                    lucide.createIcons();
+                },
+                clearSearchCustos: () => {
+                    filterState.custosSearch = '';
+                    const inp = document.getElementById('search-custos-input');
+                    if (inp) inp.value = '';
+                    renderCustos();
+                    lucide.createIcons();
+                },
+                setCustosTipoFilter: (tipo) => {
+                    filterState.custosTipo = tipo;
+                    const mapBtn = {
+                        'ALL': 'filter-btn-custo-all',
+                        'Freelancer': 'filter-btn-custo-freela',
+                        'Material': 'filter-btn-custo-material',
+                        'Serviço': 'filter-btn-custo-servico',
+                        'Outro': 'filter-btn-custo-outro'
+                    };
+                    Object.keys(mapBtn).forEach(k => {
+                        const btn = document.getElementById(mapBtn[k]);
+                        if (btn) {
+                            if (k === tipo) {
+                                btn.className = 'px-3 py-1.5 rounded-md bg-white shadow-sm text-gray-900 font-bold transition';
+                            } else {
+                                btn.className = 'px-3 py-1.5 rounded-md text-gray-600 hover:text-gray-900 transition';
+                            }
+                        }
+                    });
+                    renderCustos();
+                    lucide.createIcons();
+                },
+                filterEntregas: (query) => {
+                    filterState.entregasSearch = query.trim();
+                    renderEntregas();
+                    lucide.createIcons();
+                },
+                clearSearchEntregas: () => {
+                    filterState.entregasSearch = '';
+                    const inp = document.getElementById('search-entregas-input');
+                    if (inp) inp.value = '';
+                    renderEntregas();
+                    lucide.createIcons();
+                },
+                setEntregasStatusFilter: (status) => {
+                    filterState.entregasStatus = status;
+                    const mapBtn = {
+                        'ALL': 'filter-btn-ent-all',
+                        'PENDENTE_MIDIA': 'filter-btn-ent-midia',
+                        'PENDENTE_ALBUM': 'filter-btn-ent-album',
+                        'CONCLUIDO': 'filter-btn-ent-concluido'
+                    };
+                    Object.keys(mapBtn).forEach(k => {
+                        const btn = document.getElementById(mapBtn[k]);
+                        if (btn) {
+                            if (k === status) {
+                                btn.className = 'px-3 py-1.5 rounded-md bg-white shadow-sm text-gray-900 font-bold transition';
+                            } else {
+                                btn.className = 'px-3 py-1.5 rounded-md text-gray-600 hover:text-gray-900 transition';
+                            }
+                        }
+                    });
+                    renderEntregas();
+                    lucide.createIcons();
+                },
+                filterContratos: (query) => {
+                    filterState.contratosSearch = query.trim();
+                    renderContratosGeradosList();
+                    lucide.createIcons();
+                },
+                clearSearchContratos: () => {
+                    filterState.contratosSearch = '';
+                    const inp = document.getElementById('search-contratos-input');
+                    if (inp) inp.value = '';
+                    renderContratosGeradosList();
                     lucide.createIcons();
                 },
                 // --- NAVEGAÇÃO DE ABAS DE CONTRATOS ---

@@ -3163,9 +3163,9 @@
             function renderFinanceiro() {
                 const lista = document.getElementById('lista-financeiro');
                 const alunosFiltrados = dbState.alunos.filter(pertenceATurmaAtiva);
-                const alunosComContratoIds = alunosFiltrados.filter(hasContract).map(a => a.id);
+                const alunosFiltradosIds = alunosFiltrados.map(a => a.id);
                 
-                const todosFinanceiro = dbState.financeiro.filter(f => alunosComContratoIds.includes(f.alunoId));
+                const todosFinanceiro = dbState.financeiro.filter(f => alunosFiltradosIds.includes(f.alunoId));
 
                 // Atualizar contadores nos botões de status
                 const countAll = todosFinanceiro.length;
@@ -4414,10 +4414,89 @@
                         dataGeracao: new Date().toISOString()
                     };
 
-                    // Salva registro no histórico de contratos emitidos
+                    // Salva registro no histórico de contratos emitidos e sincroniza no Financeiro
                     if (userId) {
                         try {
-                            const alunoSelectedId = document.getElementById('contrato-select-aluno').value || null;
+                            let alunoSelectedId = document.getElementById('contrato-select-aluno').value || null;
+                            let targetAluno = null;
+
+                            if (alunoSelectedId) {
+                                targetAluno = dbState.alunos.find(a => a.id === alunoSelectedId);
+                            }
+
+                            if (!targetAluno && alunoNome) {
+                                targetAluno = dbState.alunos.find(a => (a.nome || '').trim().toLowerCase() === alunoNome.trim().toLowerCase());
+                                if (targetAluno) {
+                                    alunoSelectedId = targetAluno.id;
+                                }
+                            }
+
+                            // Se o aluno ainda não existir no cadastro, cria-o automaticamente
+                            if (!targetAluno && alunoNome) {
+                                let targetTurmaId = activeTurmaId !== 'ALL' ? activeTurmaId : null;
+                                if (!targetTurmaId && alunoTurma) {
+                                    const tFound = dbState.turmas.find(t => alunoTurma.toLowerCase().includes((t.nome || '').toLowerCase()));
+                                    if (tFound) targetTurmaId = tFound.id;
+                                }
+                                if (!targetTurmaId) {
+                                    targetTurmaId = dbState.turmas.length > 0 ? dbState.turmas[0].id : DEFAULT_LEGACY_TURMA.id;
+                                }
+
+                                const novoAlunoRef = await addDoc(collection(db, `users/${userId}/alunos`), {
+                                    nome: alunoNome,
+                                    pai: clienteNome || '',
+                                    contato: clienteTelefone || '',
+                                    turmaId: targetTurmaId,
+                                    temContrato: true,
+                                    linkGaleria: '',
+                                    senhaGaleria: ''
+                                });
+                                alunoSelectedId = novoAlunoRef.id;
+                                targetAluno = {
+                                    id: novoAlunoRef.id,
+                                    nome: alunoNome,
+                                    pai: clienteNome,
+                                    contato: clienteTelefone,
+                                    turmaId: targetTurmaId,
+                                    temContrato: true
+                                };
+                            } else if (targetAluno) {
+                                // Garante que o aluno existente esteja com temContrato = true e dados complementados
+                                const updateAlunoPayload = { temContrato: true };
+                                if (!targetAluno.pai && clienteNome) updateAlunoPayload.pai = clienteNome;
+                                if (!targetAluno.contato && clienteTelefone) updateAlunoPayload.contato = clienteTelefone;
+                                await updateDoc(doc(db, `users/${userId}/alunos/${targetAluno.id}`), updateAlunoPayload);
+                            }
+
+                            // --- SINCRONIZAÇÃO AUTOMÁTICA COM O FINANCEIRO COM O VALOR DO CONTRATO ---
+                            if (alunoSelectedId) {
+                                const finExistente = dbState.financeiro.find(f => f.alunoId === alunoSelectedId);
+                                if (finExistente) {
+                                    // Se já existe lançamento, atualiza o valor total com o valor contratado (mantendo eventuais fotos extras e pagamentos já realizados)
+                                    const totalExtras = finExistente.extrasFotos?.totalExtras || 0;
+                                    const novoTotal = valor + totalExtras;
+                                    const pagoAtual = parseFloat(finExistente.pago || 0);
+                                    const novoStatus = pagoAtual >= novoTotal ? 'Pago' : (pagoAtual > 0 ? 'Pago Parcialmente' : 'Pendente');
+
+                                    await updateDoc(doc(db, `users/${userId}/financeiro/${finExistente.id}`), {
+                                        total: novoTotal,
+                                        totalBase: valor,
+                                        status: novoStatus
+                                    });
+                                } else {
+                                    // Cria novo lançamento financeiro com o valor exato do contrato
+                                    await addDoc(collection(db, `users/${userId}/financeiro`), {
+                                        alunoId: alunoSelectedId,
+                                        total: valor,
+                                        totalBase: valor,
+                                        pago: 0,
+                                        status: 'Pendente',
+                                        historico: [],
+                                        turmaId: targetAluno?.turmaId || (activeTurmaId !== 'ALL' ? activeTurmaId : DEFAULT_LEGACY_TURMA.id)
+                                    });
+                                }
+                            }
+
                             const contractPayload = {
                                 alunoId: alunoSelectedId,
                                 alunoNome: alunoNome,
@@ -4453,7 +4532,7 @@
                                 activeEditingContractId = newDocRef.id;
                             }
                         } catch (err) {
-                            console.warn("Aviso ao salvar histórico de contrato:", err);
+                            console.warn("Aviso ao salvar histórico de contrato e sincronizar financeiro:", err);
                         }
                     }
 

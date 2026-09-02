@@ -257,6 +257,47 @@
         </div>
     </div>
 
+    <!-- MODAL DE RECIBO DE PAGAMENTO & QUITAÇÃO -->
+    <div id="receipt-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center p-3 md:p-6 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden">
+            <!-- Modal Top Bar -->
+            <div class="p-4 bg-slate-900 text-white flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="receipt" class="text-amber-400 w-5 h-5"></i>
+                    <h2 id="receipt-modal-title" class="font-bold text-base md:text-lg">Recibo Oficial de Pagamento</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="window.app.downloadReceiptPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow">
+                        <i data-lucide="download" class="w-4 h-4"></i> Baixar PDF
+                    </button>
+                    <button type="button" onclick="window.app.printReceipt()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Imprimir
+                    </button>
+                    <button type="button" onclick="window.app.closeReceiptModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Printable Document Area -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-100">
+                <div id="receipt-document-content" class="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-200 text-gray-800 space-y-6">
+                    <!-- Preenchido dinamicamente via JS -->
+                </div>
+            </div>
+
+            <!-- Modal Footer Actions -->
+            <div class="p-4 bg-gray-50 border-t flex flex-wrap justify-between items-center gap-3">
+                <button type="button" onclick="window.app.copyReceiptWhatsAppText()" class="text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-300 font-bold px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition shadow-sm">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i> Copiar Comprovante para WhatsApp
+                </button>
+                <button type="button" onclick="window.app.closeReceiptModal()" class="bg-gray-200 text-gray-700 text-xs font-bold px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL GENÉRICO DE EDIÇÃO -->
     <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
         <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg">
@@ -1410,6 +1451,7 @@
             let selectedEventIdForFotos = null;
             let currentBriefingEvent = null;
             let lastGeneratedContractData = null;
+            let currentReceiptData = null;
 
             // Turma padrão de fallback para registros legados
             const DEFAULT_LEGACY_TURMA = {
@@ -1524,6 +1566,77 @@
 
                 if (diffDays <= 1) return strInicio;
                 return `${strInicio} a ${strFim} (${diffDays} dias)`;
+            }
+
+            // Helper para converter valores monetários em Reais por extenso
+            function valorPorExtenso(valor) {
+                if (!valor || isNaN(valor) || valor <= 0) return 'Zero reais';
+                const num = Math.round(parseFloat(valor) * 100) / 100;
+                const inteiros = Math.floor(num);
+                const centavos = Math.round((num - inteiros) * 100);
+
+                const unidades = ['', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove'];
+                const especiais = ['dez', 'onze', 'doze', 'treze', 'quatorze', 'quinze', 'dezesseis', 'dezessete', 'dezoito', 'dezenove'];
+                const dezenas = ['', '', 'vinte', 'trinta', 'quarenta', 'cinquenta', 'sessenta', 'setenta', 'oitenta', 'noventa'];
+                const centenas = ['', 'cento', 'duzentos', 'trezentos', 'quatrocentos', 'quinhentos', 'seiscentos', 'setecentos', 'oitocentos', 'novecentos'];
+
+                function converterBloco(n) {
+                    if (n === 0) return '';
+                    if (n === 100) return 'cem';
+                    let str = '';
+                    const c = Math.floor(n / 100);
+                    const resto = n % 100;
+                    if (c > 0) str += centenas[c];
+                    if (resto > 0) {
+                        if (c > 0) str += ' e ';
+                        if (resto < 10) {
+                            str += unidades[resto];
+                        } else if (resto >= 10 && resto < 20) {
+                            str += especiais[resto - 10];
+                        } else {
+                            const d = Math.floor(resto / 10);
+                            const u = resto % 10;
+                            str += dezenas[d];
+                            if (u > 0) str += ' e ' + unidades[u];
+                        }
+                    }
+                    return str;
+                }
+
+                let resultado = '';
+                if (inteiros === 1) {
+                    resultado = 'um real';
+                } else if (inteiros > 1 && inteiros < 1000) {
+                    resultado = converterBloco(inteiros) + ' reais';
+                } else if (inteiros >= 1000 && inteiros < 1000000) {
+                    const milhares = Math.floor(inteiros / 1000);
+                    const restoMil = inteiros % 1000;
+                    resultado = (milhares === 1 ? 'mil' : converterBloco(milhares) + ' mil');
+                    if (restoMil > 0) {
+                        resultado += (restoMil < 100 || restoMil % 100 === 0 ? ' e ' : ', ') + converterBloco(restoMil);
+                    }
+                    resultado += ' reais';
+                } else if (inteiros >= 1000000) {
+                    resultado = `R$ ${valor.toFixed(2).replace('.', ',')}`;
+                }
+
+                if (centavos > 0) {
+                    let centavosStr = '';
+                    if (centavos < 10) {
+                        centavosStr = unidades[centavos];
+                    } else if (centavos < 20) {
+                        centavosStr = especiais[centavos - 10];
+                    } else {
+                        const d = Math.floor(centavos / 10);
+                        const u = centavos % 10;
+                        centavosStr = dezenas[d] + (u > 0 ? ' e ' + unidades[u] : '');
+                    }
+                    centavosStr += (centavos === 1 ? ' centavo' : ' centavos');
+                    resultado = resultado ? resultado + ' e ' + centavosStr : centavosStr;
+                }
+
+                if (!resultado) resultado = 'zero reais';
+                return resultado.charAt(0).toUpperCase() + resultado.slice(1);
             }
 
             // --- AUTENTICAÇÃO ---
@@ -2280,6 +2393,16 @@
                             </a>`;
                         }
 
+                        const quitacaoOrReceiptButton = restante === 0
+                            ? `<button onclick="window.app.openQuitacaoModal('${item.id}')" class="p-1.5 text-emerald-700 hover:bg-emerald-100 rounded bg-emerald-50 border border-emerald-300 transition" title="Emitir Termo de Quitação Total (Pacote 100% Quitado)">
+                                <i data-lucide="award" class="w-4 h-4"></i>
+                               </button>`
+                            : (pago > 0 
+                                ? `<button onclick="window.app.openLatestReceiptModal('${item.id}')" class="p-1.5 text-amber-700 hover:bg-amber-100 rounded bg-amber-50 border border-amber-300 transition" title="Emitir Recibo do Último Pagamento">
+                                    <i data-lucide="receipt" class="w-4 h-4"></i>
+                                   </button>`
+                                : '');
+
                         return `
                         <tr class="hover:bg-gray-50 transition border-b border-gray-100">
                             <td class="p-4 font-semibold text-gray-800">${aluno.nome}</td>
@@ -2294,8 +2417,9 @@
                                     <button onclick="window.app.openPaymentModal('${item.id}')" class="p-1.5 text-green-600 hover:bg-green-50 rounded font-medium" title="Adicionar Pagamento">
                                         <i data-lucide="plus-circle" class="w-4 h-4"></i>
                                     </button>
-                                    <button onclick="window.app.openPaymentHistoryModal('${item.id}')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Ver Histórico de Pagamentos">
-                                        <i data-lucide="receipt" class="w-4 h-4"></i>
+                                    ${quitacaoOrReceiptButton}
+                                    <button onclick="window.app.openPaymentHistoryModal('${item.id}')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Histórico e Recibos Detalhados">
+                                        <i data-lucide="history" class="w-4 h-4"></i>
                                     </button>
                                     ${whatsAppButton}
                                     <button onclick="window.app.openEditModal('financeiro', '${item.id}')" class="p-1.5 text-slate-600 hover:bg-slate-100 rounded" title="Editar Lançamento">
@@ -2875,6 +2999,11 @@
                     const docRef = doc(db, `users/${userId}/financeiro/${docId}`);
                     await updateDoc(docRef, { pago: newPaid, status: newStatus, historico: historico });
                     window.app.closePaymentModal();
+                    
+                    // Abrir automaticamente o recibo do pagamento recém-registrado
+                    setTimeout(() => {
+                        window.app.openReceiptModal(docId, historico.length - 1);
+                    }, 250);
                 } catch (error) { 
                     console.error("Erro ao atualizar pagamento:", error); 
                     alert("Erro ao salvar pagamento.");
@@ -3857,20 +3986,62 @@ WhatsApp: (81) 98845-6625`;
                     const aluno = dbState.alunos.find(a => a.id === item.alunoId);
                     const container = document.getElementById('payment-history-content');
                     
+                    const total = parseFloat(item.total) || 0;
+                    const pago = parseFloat(item.pago) || 0;
+                    const restante = Math.max(0, total - pago);
+                    const statusClass = item.status === 'Pago' 
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
+                        : (item.status === 'Pendente' ? 'bg-rose-100 text-rose-800 border-rose-200' : 'bg-amber-100 text-amber-800 border-amber-200');
+
                     const historico = Array.isArray(item.historico) ? item.historico : [];
+
+                    let headerCard = `
+                        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl mb-3 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                            <div>
+                                <h4 class="font-bold text-gray-900 text-sm">${aluno ? aluno.nome : 'Formando'}</h4>
+                                <p class="text-xs text-gray-500">Resp: <strong>${aluno ? (aluno.pai || '---') : '---'}</strong> • ${aluno ? getNomeTurma(aluno.turmaId) : ''}</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-1 text-xs font-bold rounded-full border ${statusClass}">${item.status}</span>
+                                <button onclick="window.app.openQuitacaoModal('${item.id}')" class="px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 rounded-lg flex items-center gap-1 transition shadow-sm" title="Emitir Termo de Quitação Total">
+                                    <i data-lucide="award" class="w-3.5 h-3.5"></i> Termo de Quitação
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mb-3 text-center text-xs">
+                            <div class="bg-gray-50 p-2 rounded-lg border">
+                                <span class="text-gray-500 block">Total Pacote</span>
+                                <strong class="text-gray-800">R$ ${total.toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                            <div class="bg-emerald-50 p-2 rounded-lg border border-emerald-100">
+                                <span class="text-emerald-700 block">Total Pago</span>
+                                <strong class="text-emerald-800">R$ ${pago.toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                            <div class="bg-amber-50 p-2 rounded-lg border border-amber-100">
+                                <span class="text-amber-800 block">Saldo Restante</span>
+                                <strong class="${restante > 0 ? 'text-rose-700' : 'text-emerald-700'}">R$ ${restante.toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                        </div>
+                    `;
+
                     if (historico.length === 0) {
-                        container.innerHTML = `<div class="p-4 text-center text-gray-500 bg-gray-50 rounded-lg">Nenhum pagamento registrado no histórico ainda para ${aluno ? aluno.nome : 'este aluno'}. (Valor pago atual acumulado: R$ ${parseFloat(item.pago || 0).toFixed(2)})</div>`;
+                        container.innerHTML = headerCard + `<div class="p-4 text-center text-gray-500 bg-gray-50 rounded-lg">Nenhum pagamento registrado no histórico ainda para ${aluno ? aluno.nome : 'este aluno'}. (Valor pago acumulado: R$ ${pago.toFixed(2)})</div>`;
                     } else {
-                        container.innerHTML = historico.map((h, idx) => {
+                        container.innerHTML = headerCard + historico.map((h, idx) => {
                             const dataFormatada = h.data ? new Date(h.data).toLocaleString('pt-BR') : 'Data não registrada';
                             return `
-                            <div class="p-3 bg-gray-50 border rounded-lg flex justify-between items-center">
+                            <div class="p-3 bg-white border border-gray-200 rounded-xl flex justify-between items-center shadow-sm mb-2 hover:border-amber-300 transition">
                                 <div>
-                                    <p class="font-bold text-gray-800 text-sm">R$ ${parseFloat(h.valor || 0).toFixed(2).replace('.', ',')}</p>
-                                    <p class="text-xs text-gray-500">${h.metodo || 'PIX'} • ${dataFormatada}</p>
+                                    <div class="flex items-center gap-2">
+                                        <p class="font-bold text-gray-900 text-sm">R$ ${parseFloat(h.valor || 0).toFixed(2).replace('.', ',')}</p>
+                                        <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-bold rounded">${h.metodo || 'PIX'}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-0.5">${dataFormatada}</p>
                                     ${h.obs ? `<p class="text-xs text-gray-600 mt-0.5 italic">"${h.obs}"</p>` : ''}
                                 </div>
-                                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded">Pago</span>
+                                <button onclick="window.app.openReceiptModal('${item.id}', ${idx})" class="p-2 text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg flex items-center gap-1.5 transition shadow-sm" title="Emitir Recibo desta Parcela">
+                                    <i data-lucide="receipt" class="w-3.5 h-3.5 text-amber-600"></i> Recibo
+                                </button>
                             </div>`;
                         }).join('');
                     }
@@ -3884,6 +4055,313 @@ WhatsApp: (81) 98845-6625`;
                     const modal = document.getElementById('payment-history-modal');
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
+                },
+                // --- EMISSÃO DE RECIBOS E TERMO DE QUITAÇÃO ---
+                openReceiptModal: (financeiroId, historyIndex = null) => {
+                    const item = dbState.financeiro.find(f => f.id === financeiroId);
+                    if (!item) return;
+                    const aluno = dbState.alunos.find(a => a.id === item.alunoId);
+                    const historico = Array.isArray(item.historico) ? item.historico : [];
+                    
+                    let parcela = null;
+                    let idx = historyIndex;
+                    if (idx !== null && historico[idx]) {
+                        parcela = historico[idx];
+                    } else if (historico.length > 0) {
+                        idx = historico.length - 1;
+                        parcela = historico[idx];
+                    } else {
+                        // Fallback se não houver histórico separado
+                        parcela = {
+                            valor: parseFloat(item.pago) || 0,
+                            metodo: 'PIX / Pagamento',
+                            data: new Date().toISOString(),
+                            obs: 'Pagamento de Pacote de Formatura'
+                        };
+                        idx = 0;
+                    }
+
+                    const valorParcela = parseFloat(parcela.valor) || 0;
+                    const totalPacote = parseFloat(item.total) || 0;
+                    const totalPago = parseFloat(item.pago) || 0;
+                    const restante = Math.max(0, totalPacote - totalPago);
+                    const turmaNome = aluno ? getNomeTurma(aluno.turmaId) : 'Turma Geral';
+                    const dataPagamentoFormatada = parcela.data ? new Date(parcela.data).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
+
+                    currentReceiptData = {
+                        tipo: 'RECIBO_PARCELA',
+                        numeroRecibo: `REC-${new Date().getFullYear()}-${(item.id || '').slice(-4).toUpperCase()}-${idx + 1}`,
+                        alunoNome: aluno ? aluno.nome : 'Formando(a)',
+                        responsavelNome: aluno ? (aluno.pai || 'Responsável') : 'Responsável',
+                        turmaNome: turmaNome,
+                        valor: valorParcela,
+                        valorExtenso: valorPorExtenso(valorParcela),
+                        metodo: parcela.metodo || 'PIX',
+                        dataPagamento: dataPagamentoFormatada,
+                        obs: parcela.obs || '',
+                        totalPacote: totalPacote,
+                        totalPago: totalPago,
+                        restante: restante,
+                        status: item.status,
+                        contatoWhatsApp: aluno ? (aluno.contato || '') : ''
+                    };
+
+                    window.app.renderReceiptDocument(currentReceiptData);
+
+                    const titleEl = document.getElementById('receipt-modal-title');
+                    if (titleEl) titleEl.innerText = `Recibo de Pagamento - ${currentReceiptData.alunoNome}`;
+
+                    const modal = document.getElementById('receipt-modal');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    lucide.createIcons();
+                },
+                openQuitacaoModal: (financeiroId) => {
+                    const item = dbState.financeiro.find(f => f.id === financeiroId);
+                    if (!item) return;
+                    const aluno = dbState.alunos.find(a => a.id === item.alunoId);
+                    
+                    const totalPacote = parseFloat(item.total) || 0;
+                    const totalPago = parseFloat(item.pago) || totalPacote;
+                    const turmaNome = aluno ? getNomeTurma(aluno.turmaId) : 'Turma Geral';
+                    const dataHojeFormatada = new Date().toLocaleDateString('pt-BR');
+
+                    currentReceiptData = {
+                        tipo: 'TERMO_QUITACAO',
+                        numeroRecibo: `QUIT-${new Date().getFullYear()}-${(item.id || '').slice(-4).toUpperCase()}`,
+                        alunoNome: aluno ? aluno.nome : 'Formando(a)',
+                        responsavelNome: aluno ? (aluno.pai || 'Responsável') : 'Responsável',
+                        turmaNome: turmaNome,
+                        valor: totalPago,
+                        valorExtenso: valorPorExtenso(totalPago),
+                        metodo: 'Quitação Plena e Integral',
+                        dataPagamento: dataHojeFormatada,
+                        obs: 'Quitação integral de todas as parcelas e serviços contratados',
+                        totalPacote: totalPacote,
+                        totalPago: totalPago,
+                        restante: 0,
+                        status: 'Pago',
+                        contatoWhatsApp: aluno ? (aluno.contato || '') : ''
+                    };
+
+                    window.app.renderReceiptDocument(currentReceiptData);
+
+                    const titleEl = document.getElementById('receipt-modal-title');
+                    if (titleEl) titleEl.innerText = `Termo de Quitação Total - ${currentReceiptData.alunoNome}`;
+
+                    const modal = document.getElementById('receipt-modal');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    lucide.createIcons();
+                },
+                openLatestReceiptModal: (financeiroId) => {
+                    const item = dbState.financeiro.find(f => f.id === financeiroId);
+                    if (!item) return;
+                    const historico = Array.isArray(item.historico) ? item.historico : [];
+                    window.app.openReceiptModal(financeiroId, historico.length > 0 ? historico.length - 1 : 0);
+                },
+                renderReceiptDocument: (data) => {
+                    const container = document.getElementById('receipt-document-content');
+                    if (!container || !data) return;
+
+                    const isQuitacao = data.tipo === 'TERMO_QUITACAO';
+                    const dataHoje = new Date().toLocaleDateString('pt-BR');
+                    const tipoDocumento = isQuitacao ? 'Termo de Quitação Plena' : 'Recibo de Pagamento';
+                    const labelValor = isQuitacao ? 'Valor Total Quitado:' : 'Valor Recebido:';
+
+                    let quitacaoDestaqueHTML = isQuitacao ? `
+                        <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-300 text-xs text-emerald-950 space-y-1.5">
+                            <p class="font-bold flex items-center gap-1.5 text-emerald-900 text-sm"><i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i> Declaração de Quitação Plena e Irrevogável:</p>
+                            <p class="leading-relaxed">
+                                Declaramos para os devidos fins de direito que o(a) CONTRATANTE acima qualificado(a) efetuou a <strong>quitação integral de todas as obrigações financeiras</strong> relativas ao pacote de formatura infantil do(a) formando(a) <strong>${data.alunoNome}</strong>, nada mais havendo a reclamar a título de parcelas, serviços ou taxas desta cobertura fotográfica.
+                            </p>
+                        </div>
+                    ` : '';
+
+                    container.innerHTML = `
+                        <!-- CABEÇALHO TIMBRADO WILKSON FOTOGRAFIAS -->
+                        <div class="border-b-2 border-slate-900 pb-4 flex flex-col sm:flex-row justify-between items-start gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-slate-900 text-white p-3 rounded-xl shadow">
+                                    <i data-lucide="camera" class="w-7 h-7"></i>
+                                </div>
+                                <div>
+                                    <h1 class="text-2xl font-black text-slate-900 tracking-wider uppercase">WILKSON FOTOGRAFIAS</h1>
+                                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Fotografia Profissional & Formaturas Infantis</p>
+                                    <p class="text-[11px] text-gray-500 mt-0.5">CNPJ/CPF: 646.660.003-30 • Imperatriz - MA</p>
+                                </div>
+                            </div>
+                            <div class="text-left sm:text-right">
+                                <span class="px-3 py-1 ${isQuitacao ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-slate-950'} text-xs font-black rounded uppercase tracking-wider inline-block">${tipoDocumento}</span>
+                                <p class="text-[11px] text-gray-600 mt-1 font-bold">Nº ${data.numeroRecibo}</p>
+                                <p class="text-[11px] text-gray-400">Emissão: ${dataHoje}</p>
+                            </div>
+                        </div>
+
+                        <!-- VALOR EM DESTAQUE -->
+                        <div class="bg-slate-900 text-white p-4 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-2">
+                            <div>
+                                <span class="text-xs text-slate-400 uppercase tracking-wider font-semibold block">${labelValor}</span>
+                                <span class="text-2xl font-black ${isQuitacao ? 'text-emerald-400' : 'text-amber-400'} tracking-wide">R$ ${data.valor.toFixed(2).replace('.', ',')}</span>
+                            </div>
+                            <div class="text-left sm:text-right">
+                                <span class="text-xs text-slate-300 italic block font-medium">(${data.valorExtenso})</span>
+                            </div>
+                        </div>
+
+                        <!-- TEXTO FORMAL DO RECIBO -->
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 text-sm leading-relaxed text-gray-700 space-y-2">
+                            <p>
+                                Recebemos de <strong>${data.responsavelNome}</strong> a quantia de <strong>R$ ${data.valor.toFixed(2).replace('.', ',')}</strong> (<em>${data.valorExtenso}</em>), referente a ${isQuitacao ? '<strong>quitação total</strong>' : '<strong>pagamento de parcela/serviço</strong>'} da cobertura fotográfica de formatura do(a) formando(a) <strong>${data.alunoNome}</strong> (${data.turmaNome}).
+                            </p>
+                            <div class="pt-2.5 flex flex-wrap gap-4 text-xs text-gray-600 border-t border-gray-200">
+                                <div><strong>Forma de Pagamento:</strong> <span class="text-gray-800">${data.metodo}</span></div>
+                                <div><strong>Data do Pagamento:</strong> <span class="text-gray-800">${data.dataPagamento}</span></div>
+                                ${data.obs ? `<div><strong>Observação:</strong> <span class="text-gray-800 italic">${data.obs}</span></div>` : ''}
+                            </div>
+                        </div>
+
+                        <!-- QUADRO FINANCEIRO RESUMO -->
+                        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                            <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <span class="text-gray-500 block">Total do Pacote</span>
+                                <strong class="text-gray-900 text-sm">R$ ${data.totalPacote.toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                            <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                                <span class="text-emerald-700 block">Total Já Pago</span>
+                                <strong class="text-emerald-800 text-sm">R$ ${data.totalPago.toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                            <div class="p-3 ${data.restante === 0 ? 'bg-emerald-100 border-emerald-300' : 'bg-rose-50 border-rose-200'} rounded-lg border">
+                                <span class="${data.restante === 0 ? 'text-emerald-800' : 'text-rose-700'} block">${data.restante === 0 ? 'Situação' : 'Saldo Restante'}</span>
+                                <strong class="${data.restante === 0 ? 'text-emerald-900 font-black' : 'text-rose-800'} text-sm">${data.restante === 0 ? 'QUITADO ✅' : 'R$ ' + data.restante.toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                        </div>
+
+                        ${quitacaoDestaqueHTML}
+
+                        <!-- ASSINATURAS -->
+                        <div class="pt-6 grid grid-cols-1 sm:grid-cols-2 gap-8 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-48 border-t border-gray-400 mb-1"></div>
+                                <p class="font-bold text-xs text-gray-800">WILKSON FOTOGRAFIAS</p>
+                                <p class="text-[10px] text-gray-500">Wilkson Albuquerque Carvalho (CPF: 646.660.003-30)</p>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-48 border-t border-gray-400 mb-1"></div>
+                                <p class="font-bold text-xs text-gray-800">${data.responsavelNome}</p>
+                                <p class="text-[10px] text-gray-500">Contratante / Pagador(a)</p>
+                            </div>
+                        </div>
+
+                        <!-- RODAPÉ CONTATO -->
+                        <div class="pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center text-[11px] text-gray-500 gap-1">
+                            <span>Wilkson Fotografias • Imperatriz - MA</span>
+                            <span>WhatsApp Oficial: <strong>(81) 98845-6625</strong></span>
+                        </div>
+                    `;
+                },
+                closeReceiptModal: () => {
+                    const modal = document.getElementById('receipt-modal');
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                },
+                downloadReceiptPDF: () => {
+                    const element = document.getElementById('receipt-document-content');
+                    if (!element || !currentReceiptData) return;
+
+                    const cleanName = (currentReceiptData.alunoNome || 'Formando').replace(/[^a-zA-Z0-9_-]/g, '_');
+                    const prefix = currentReceiptData.tipo === 'TERMO_QUITACAO' ? 'Termo_Quitacao' : 'Recibo_Pagamento';
+                    const opt = {
+                        margin: [8, 8, 8, 8],
+                        filename: `${prefix}_${cleanName}_WilksonFotografias.pdf`,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    if (window.html2pdf) {
+                        window.html2pdf().set(opt).from(element).save();
+                    } else {
+                        window.app.printReceipt();
+                    }
+                },
+                printReceipt: () => {
+                    const content = document.getElementById('receipt-document-content');
+                    if (!content) return;
+
+                    const printWindow = window.open('', '_blank', 'width=850,height=900');
+                    if (!printWindow) {
+                        alert('Permita popups no seu navegador para imprimir o recibo.');
+                        return;
+                    }
+
+                    printWindow.document.open();
+                    printWindow.document.write(
+                        '<!DOCTYPE html><html><head><title>Recibo - Wilkson Fotografias</title>' +
+                        '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">' +
+                        '<style>body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px; color: #1e293b; background: #fff; } @media print { body { padding: 0; } }</style>' +
+                        '</head><body>' +
+                        '<div style="max-width: 800px; margin: 0 auto;">' +
+                        content.innerHTML +
+                        '</div>' +
+                        '</body></html>'
+                    );
+                    printWindow.document.close();
+                    printWindow.focus();
+                    setTimeout(() => {
+                        printWindow.print();
+                    }, 500);
+                },
+                copyReceiptWhatsAppText: () => {
+                    if (!currentReceiptData) return;
+                    const d = currentReceiptData;
+                    const isQuitacao = d.tipo === 'TERMO_QUITACAO';
+
+                    let text = '';
+                    if (isQuitacao) {
+                        text = `🎓 *WILKSON FOTOGRAFIAS - TERMO DE QUITAÇÃO TOTAL*\n` +
+                               `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                               `📜 *Comprovante:* ${d.numeroRecibo}\n` +
+                               `👦👧 *Formando(a):* ${d.alunoNome}\n` +
+                               `👨‍👩‍👧 *Responsável:* ${d.responsavelNome}\n` +
+                               `🏫 *Turma:* ${d.turmaNome}\n` +
+                               `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                               `💰 *Valor Total do Pacote:* R$ ${d.totalPacote.toFixed(2).replace('.', ',')}\n` +
+                               `✅ *Status:* 100% QUITADO / PAGO INTEGRALMENTE\n` +
+                               `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                               `Declaramos para os devidos fins que o pacote de formatura encontra-se integralmente quitado, sem nenhuma pendência financeira.\n\n` +
+                               `_Wilkson Albuquerque Carvalho - (81) 98845-6625_`;
+                    } else {
+                        text = `🎓 *WILKSON FOTOGRAFIAS - COMPROVANTE DE PAGAMENTO*\n` +
+                               `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                               `🧾 *Recibo:* ${d.numeroRecibo}\n` +
+                               `👦👧 *Formando(a):* ${d.alunoNome}\n` +
+                               `👨‍👩‍👧 *Responsável:* ${d.responsavelNome}\n` +
+                               `🏫 *Turma:* ${d.turmaNome}\n` +
+                               `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                               `💵 *Valor Pago:* R$ ${d.valor.toFixed(2).replace('.', ',')} (${d.valorExtenso})\n` +
+                               `💳 *Forma de Pagamento:* ${d.metodo}\n` +
+                               `📅 *Data:* ${d.dataPagamento}\n` +
+                               (d.obs ? `📝 *Obs:* ${d.obs}\n` : '') +
+                               `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                               `📦 *Total do Pacote:* R$ ${d.totalPacote.toFixed(2).replace('.', ',')}\n` +
+                               `🟢 *Total Pago até o momento:* R$ ${d.totalPago.toFixed(2).replace('.', ',')}\n` +
+                               (d.restante > 0 ? `⏳ *Saldo Restante:* R$ ${d.restante.toFixed(2).replace('.', ',')}\n` : `✅ *Status:* QUITADO\n`) +
+                               `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                               `_Agradecemos a confiança! Wilkson Fotografias - (81) 98845-6625_`;
+                    }
+
+                    navigator.clipboard.writeText(text).then(() => {
+                        const cleanPhone = (d.contatoWhatsApp || '').replace(/\D/g, '');
+                        if (cleanPhone.length >= 10) {
+                            const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(text)}`;
+                            window.open(url, '_blank');
+                        } else {
+                            alert('✅ Comprovante copiado com sucesso! Agora basta colar no WhatsApp do Responsável.');
+                        }
+                    }).catch(() => {
+                        prompt('Copie o comprovante abaixo:', text);
+                    });
                 },
                 openBatchImportModal: () => {
                     const modal = document.getElementById('batch-import-modal');

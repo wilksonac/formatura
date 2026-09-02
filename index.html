@@ -192,30 +192,31 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-800">
 
     <!-- LOGIN / REGISTER OVERLAY -->
-    <div id="login-overlay" class="fixed inset-0 bg-gray-200 z-50 flex items-center justify-center">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100">
-            <div class="flex items-center justify-center mb-6">
-                <div class="bg-blue-600 p-3 rounded-full text-white shadow-md">
-                    <i data-lucide="camera" class="h-8 w-8"></i>
+    <div id="login-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm border border-slate-200/80">
+            <div class="flex flex-col items-center justify-center mb-6 text-center">
+                <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-xs mb-3">
+                    <i data-lucide="camera" class="h-7 w-7"></i>
                 </div>
-                <h1 class="text-2xl font-bold ml-3 text-gray-800">Gestor de Formaturas</h1>
+                <h1 class="text-xl font-black text-slate-900 tracking-tight">Formatura Pro</h1>
+                <p class="text-xs text-slate-500 font-medium mt-0.5">Wilkson Fotografias</p>
             </div>
             <form id="login-form">
                 <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="email" class="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <label for="email" class="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">Email</label>
+                    <input type="email" id="email" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="seu@email.com" required>
                 </div>
-                <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                    <input type="password" id="password" class="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <div class="mb-5">
+                    <label for="password" class="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">Senha</label>
+                    <input type="password" id="password" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="••••••••" required>
                 </div>
-                <div id="login-error" class="text-red-500 text-sm mb-4 text-center hidden"></div>
+                <div id="login-error" class="text-rose-600 text-xs font-semibold mb-4 text-center hidden p-2 bg-rose-50 rounded-lg border border-rose-200"></div>
                 <div class="flex flex-col gap-2">
-                    <button type="submit" id="login-button" class="w-full bg-blue-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-blue-700 transition shadow">Entrar</button>
-                    <button type="button" id="register-button" class="w-full bg-gray-100 text-gray-700 py-2.5 px-4 rounded-lg font-medium hover:bg-gray-200 transition">Criar Conta</button>
+                    <button type="submit" id="login-button" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-2.5 px-4 rounded-xl font-bold text-sm transition shadow-xs">Entrar no Sistema</button>
+                    <button type="button" id="register-button" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 px-4 rounded-xl font-semibold text-xs transition">Criar Nova Conta</button>
                 </div>
             </form>
         </div>
@@ -592,106 +593,106 @@
         <div id="sidebar-backdrop" onclick="window.app.toggleMobileMenu(false)" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden transition-opacity"></div>
 
         <!-- SIDEBAR -->
-        <aside id="sidebar" class="sidebar bg-slate-900 text-white w-72 md:w-64 flex flex-col justify-between py-5 px-3 fixed md:relative inset-y-0 left-0 z-50 transform -translate-x-full md:translate-x-0 shadow-2xl transition-transform duration-300 ease-in-out">
+        <aside id="sidebar" class="sidebar bg-white border-r border-slate-200 text-slate-700 w-72 md:w-64 flex flex-col justify-between py-5 px-3.5 fixed md:relative inset-y-0 left-0 z-50 transform -translate-x-full md:translate-x-0 shadow-xl md:shadow-none transition-transform duration-300 ease-in-out">
             <div>
                 <!-- Botão Fechar no Celular -->
-                <div class="flex justify-between items-center px-2 mb-3 md:hidden border-b border-slate-800 pb-3">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                        <i data-lucide="layers" class="w-4 h-4 text-blue-400"></i> Menu Completo
+                <div class="flex justify-between items-center px-1 mb-4 md:hidden border-b border-slate-100 pb-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                        <i data-lucide="layers" class="w-4 h-4 text-slate-700"></i> Menu de Opções
                     </span>
-                    <button type="button" onclick="window.app.toggleMobileMenu(false)" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800">
+                    <button type="button" onclick="window.app.toggleMobileMenu(false)" class="text-slate-500 hover:text-slate-900 p-1.5 rounded-lg bg-slate-100 transition">
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
 
                 <!-- Brand Header -->
-                <a href="#" class="text-white flex items-center space-x-3 px-3 mb-6">
-                    <div class="bg-blue-600 p-2 rounded-lg">
-                        <i data-lucide="camera" class="h-6 w-6"></i>
+                <a href="#" class="text-slate-900 flex items-center space-x-3 px-1 mb-5 group">
+                    <div class="bg-slate-900 group-hover:bg-blue-600 text-white p-2.5 rounded-xl shadow-xs transition duration-200">
+                        <i data-lucide="camera" class="h-5 w-5"></i>
                     </div>
                     <div>
-                        <span class="text-xl font-extrabold tracking-tight">Formatura Pro</span>
-                        <p class="text-xs text-slate-400">Wilkson Fotografias</p>
+                        <span class="text-lg font-black tracking-tight text-slate-900 block leading-tight">Formatura Pro</span>
+                        <p class="text-[11px] font-medium text-slate-500">Wilkson Fotografias</p>
                     </div>
                 </a>
 
                 <!-- Turma Selector Box inside Sidebar -->
-                <div class="bg-slate-800 p-3 rounded-xl mb-6 border border-slate-700">
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1">
-                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-blue-400"></i> Turma Ativa:
+                <div class="bg-slate-50 p-2.5 rounded-xl mb-4 border border-slate-200/80">
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 flex items-center gap-1.5">
+                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-blue-600"></i> Turma Ativa:
                     </label>
-                    <select id="global-turma-select" onchange="window.app.setActiveTurma(this.value)" class="w-full bg-slate-900 text-white text-sm p-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium cursor-pointer">
+                    <select id="global-turma-select" onchange="window.app.setActiveTurma(this.value)" class="w-full bg-white text-slate-800 text-xs p-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold cursor-pointer shadow-2xs">
                         <option value="ALL">🌐 Todas as Turmas</option>
                     </select>
                 </div>
 
                 <!-- Navigation Links -->
                 <nav class="space-y-1">
-                    <a href="#" onclick="window.app.showSection('dashboard')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link bg-slate-800 text-white">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3 text-blue-400"></i> Dashboard
+                    <a href="#" onclick="window.app.showSection('dashboard')" class="flex items-center py-2.5 px-3 rounded-xl transition duration-150 nav-link bg-blue-50 text-blue-700 font-bold shadow-2xs">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4 mr-3 text-blue-600"></i> Dashboard
                     </a>
-                    <a href="#" onclick="window.app.showSection('turmas')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
-                        <i data-lucide="graduation-cap" class="w-5 h-5 mr-3 text-indigo-400"></i> Turmas & Anos
+                    <a href="#" onclick="window.app.showSection('turmas')" class="flex items-center py-2.5 px-3 rounded-xl transition duration-150 hover:bg-slate-100/80 nav-link text-slate-600 font-medium hover:text-slate-900">
+                        <i data-lucide="graduation-cap" class="w-4 h-4 mr-3 text-indigo-500"></i> Turmas & Anos
                     </a>
-                    <a href="#" onclick="window.app.showSection('eventos')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
-                        <i data-lucide="calendar-days" class="w-5 h-5 mr-3 text-emerald-400"></i> Eventos & Briefings
+                    <a href="#" onclick="window.app.showSection('eventos')" class="flex items-center py-2.5 px-3 rounded-xl transition duration-150 hover:bg-slate-100/80 nav-link text-slate-600 font-medium hover:text-slate-900">
+                        <i data-lucide="calendar-days" class="w-4 h-4 mr-3 text-emerald-500"></i> Eventos & Briefings
                     </a>
-                    <a href="#" onclick="window.app.showSection('alunos')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
-                        <i data-lucide="users" class="w-5 h-5 mr-3 text-cyan-400"></i> Alunos & Pais
+                    <a href="#" onclick="window.app.showSection('alunos')" class="flex items-center py-2.5 px-3 rounded-xl transition duration-150 hover:bg-slate-100/80 nav-link text-slate-600 font-medium hover:text-slate-900">
+                        <i data-lucide="users" class="w-4 h-4 mr-3 text-cyan-600"></i> Alunos & Pais
                     </a>
-                    <a href="#" onclick="window.app.showSection('contratos')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
-                        <i data-lucide="file-signature" class="w-5 h-5 mr-3 text-emerald-400"></i> Contratos
+                    <a href="#" onclick="window.app.showSection('contratos')" class="flex items-center py-2.5 px-3 rounded-xl transition duration-150 hover:bg-slate-100/80 nav-link text-slate-600 font-medium hover:text-slate-900">
+                        <i data-lucide="file-signature" class="w-4 h-4 mr-3 text-emerald-600"></i> Contratos
                     </a>
-                    <a href="#" onclick="window.app.showSection('fotos')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
-                        <i data-lucide="image" class="w-5 h-5 mr-3 text-purple-400"></i> Fotos & Checklist
+                    <a href="#" onclick="window.app.showSection('fotos')" class="flex items-center py-2.5 px-3 rounded-xl transition duration-150 hover:bg-slate-100/80 nav-link text-slate-600 font-medium hover:text-slate-900">
+                        <i data-lucide="image" class="w-4 h-4 mr-3 text-purple-500"></i> Fotos & Checklist
                     </a>
-                    <a href="#" onclick="window.app.showSection('fotografos')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
-                        <i data-lucide="user-square" class="w-5 h-5 mr-3 text-pink-400"></i> Fotógrafos & Freelas
+                    <a href="#" onclick="window.app.showSection('fotografos')" class="flex items-center py-2.5 px-3 rounded-xl transition duration-150 hover:bg-slate-100/80 nav-link text-slate-600 font-medium hover:text-slate-900">
+                        <i data-lucide="user-square" class="w-4 h-4 mr-3 text-pink-500"></i> Fotógrafos & Freelas
                     </a>
-                    <a href="#" onclick="window.app.showSection('financeiro')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
-                        <i data-lucide="dollar-sign" class="w-5 h-5 mr-3 text-yellow-400"></i> Financeiro
+                    <a href="#" onclick="window.app.showSection('financeiro')" class="flex items-center py-2.5 px-3 rounded-xl transition duration-150 hover:bg-slate-100/80 nav-link text-slate-600 font-medium hover:text-slate-900">
+                        <i data-lucide="dollar-sign" class="w-4 h-4 mr-3 text-amber-500"></i> Financeiro
                     </a>
-                    <a href="#" onclick="window.app.showSection('custos')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
-                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-3 text-orange-400"></i> Custos & Despesas
+                    <a href="#" onclick="window.app.showSection('custos')" class="flex items-center py-2.5 px-3 rounded-xl transition duration-150 hover:bg-slate-100/80 nav-link text-slate-600 font-medium hover:text-slate-900">
+                        <i data-lucide="shopping-cart" class="w-4 h-4 mr-3 text-orange-500"></i> Custos & Despesas
                     </a>
-                    <a href="#" onclick="window.app.showSection('entregas')" class="flex items-center py-2.5 px-3 rounded-lg transition duration-150 hover:bg-slate-800 nav-link text-slate-300">
-                        <i data-lucide="package-check" class="w-5 h-5 mr-3 text-teal-400"></i> Entrega de Material
+                    <a href="#" onclick="window.app.showSection('entregas')" class="flex items-center py-2.5 px-3 rounded-xl transition duration-150 hover:bg-slate-100/80 nav-link text-slate-600 font-medium hover:text-slate-900">
+                        <i data-lucide="package-check" class="w-4 h-4 mr-3 text-teal-600"></i> Entrega de Material
                     </a>
                 </nav>
             </div>
 
             <!-- Backup & Export in Sidebar Bottom -->
-            <div class="pt-4 border-t border-slate-800">
-                <button onclick="window.app.exportCompleteBackup()" class="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 hover:text-white py-2.5 px-3 rounded-lg transition border border-slate-700 font-medium">
-                    <i data-lucide="download-cloud" class="w-4 h-4 text-emerald-400"></i> Backup Completo (JSON)
+            <div class="pt-3 border-t border-slate-200">
+                <button onclick="window.app.exportCompleteBackup()" class="w-full flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-xs text-slate-700 py-2.5 px-3 rounded-xl transition border border-slate-200 font-semibold shadow-2xs">
+                    <i data-lucide="download-cloud" class="w-4 h-4 text-emerald-600"></i> Backup Completo (JSON)
                 </button>
             </div>
         </aside>
 
         <!-- MAIN CONTENT WRAPPER -->
-        <div class="flex-1 flex flex-col overflow-hidden bg-gray-100">
+        <div class="flex-1 flex flex-col overflow-hidden bg-slate-100/70">
             
             <!-- HEADER -->
-            <header class="flex justify-between items-center py-3.5 px-6 bg-white border-b shadow-sm z-30">
+            <header class="flex justify-between items-center py-3.5 px-6 bg-white border-b border-slate-200/80 shadow-2xs z-30">
                 <div class="flex items-center gap-4">
-                    <button id="mobile-menu-button" class="text-gray-600 focus:outline-none md:hidden p-1.5 rounded-lg hover:bg-gray-100">
+                    <button id="mobile-menu-button" class="text-slate-600 focus:outline-none md:hidden p-1.5 rounded-lg hover:bg-slate-100 transition">
                         <i data-lucide="menu" class="h-6 w-6"></i>
                     </button>
                     <!-- Visual Active Turma Indicator -->
                     <div class="flex items-center gap-2">
-                        <span class="text-xs font-semibold text-gray-500 uppercase">Visualizando:</span>
-                        <span id="header-turma-badge" class="px-2.5 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full flex items-center gap-1">
-                            <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i> Todas as Turmas
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Turma:</span>
+                        <span id="header-turma-badge" class="px-2.5 py-1 bg-slate-100 text-slate-800 text-xs font-bold rounded-lg flex items-center gap-1 border border-slate-200">
+                            <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-blue-600"></i> Todas as Turmas
                         </span>
                     </div>
                 </div>
                 
                 <div class="flex items-center gap-3">
-                    <button onclick="window.app.exportCompleteBackup()" title="Baixar cópia de segurança completa do banco de dados" class="hidden sm:flex items-center gap-1.5 text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition font-medium">
+                    <button onclick="window.app.exportCompleteBackup()" title="Baixar cópia de segurança completa do banco de dados" class="hidden sm:flex items-center gap-1.5 text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition font-semibold">
                         <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i> Backup Seguro
                     </button>
-                    <div id="auth-status" class="text-gray-600 text-xs font-medium bg-gray-100 px-3 py-1.5 rounded-lg border"></div>
-                    <button id="logout-button" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-red-600 transition shadow-sm flex items-center gap-1">
+                    <div id="auth-status" class="text-slate-600 text-xs font-medium bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200"></div>
+                    <button id="logout-button" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-2xs flex items-center gap-1.5">
                         <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sair
                     </button>
                 </div>
@@ -3751,13 +3752,14 @@
                     
                     // Highlight na Sidebar (Desktop e Drawer)
                     document.querySelectorAll('.nav-link').forEach(link => {
-                        link.classList.remove('bg-slate-800', 'text-white');
-                        link.classList.add('text-slate-300');
+                        link.classList.remove('bg-blue-50', 'text-blue-700', 'font-bold', 'shadow-2xs');
+                        link.classList.add('text-slate-600', 'font-medium');
+                        const onclickAttr = link.getAttribute('onclick') || '';
+                        if (onclickAttr.includes(`'${sectionId}'`)) {
+                            link.classList.add('bg-blue-50', 'text-blue-700', 'font-bold', 'shadow-2xs');
+                            link.classList.remove('text-slate-600', 'font-medium');
+                        }
                     });
-                    if (event && event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.contains('nav-link')) {
-                        event.currentTarget.classList.add('bg-slate-800', 'text-white');
-                        event.currentTarget.classList.remove('text-slate-300');
-                    }
 
                     // Highlight na Barra Inferior do Celular
                     const bottomNavIds = ['dashboard', 'alunos', 'contratos', 'financeiro'];

@@ -391,6 +391,99 @@
         </div>
     </div>
 
+    <!-- MODAL DA CENTRAL DE MENSAGENS WHATSAPP INTELIGENTES -->
+    <div id="whatsapp-messages-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden items-center justify-center p-3 md:p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl border border-slate-200 overflow-hidden my-auto">
+            <!-- Modal Header -->
+            <div class="p-4 bg-emerald-600 text-white flex justify-between items-center">
+                <div class="flex items-center gap-2.5">
+                    <div class="bg-white/20 p-2 rounded-xl backdrop-blur-xs">
+                        <i data-lucide="message-square" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-black text-base md:text-lg leading-tight">Central de Mensagens WhatsApp</h2>
+                        <p class="text-xs text-emerald-100">Comunicação rápida, acolhedora e profissional com os pais</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.app.closeWhatsAppMessagesModal()" class="text-white/80 hover:text-white p-1 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-5 space-y-4 max-h-[82vh] overflow-y-auto bg-slate-50">
+                <!-- Info do Aluno e Destinatário -->
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Destinatário / Formando</span>
+                        <h3 id="zap-aluno-nome" class="font-bold text-sm text-slate-900">Nome do Aluno</h3>
+                        <p id="zap-aluno-info" class="text-xs text-slate-500">Resp: Maria • Turma 2026</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 px-3 py-1.5 rounded-xl border border-emerald-200 text-xs font-bold">
+                        <i data-lucide="phone" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <span id="zap-aluno-telefone">(81) 98845-6625</span>
+                    </div>
+                </div>
+
+                <!-- Seletor de Modelo de Mensagem -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-600"></i> Escolha o Modelo de Mensagem:
+                    </label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="zap-template-buttons">
+                        <button type="button" onclick="window.app.selectZapTemplate('cobranca')" class="zap-tpl-btn p-2.5 rounded-xl text-left border border-emerald-500 bg-emerald-50/70 transition flex flex-col justify-between text-xs group" data-tpl="cobranca">
+                            <span class="font-bold text-emerald-900 flex items-center gap-1"><i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-amber-500"></i> Cobrança / PIX</span>
+                            <span class="text-[10px] text-emerald-700 mt-1">Lembrete de saldo</span>
+                        </button>
+                        <button type="button" onclick="window.app.selectZapTemplate('sessao_fotos')" class="zap-tpl-btn p-2.5 rounded-xl text-left border border-slate-200 bg-white hover:border-emerald-500 hover:bg-emerald-50/50 transition flex flex-col justify-between text-xs group" data-tpl="sessao_fotos">
+                            <span class="font-bold text-slate-800 group-hover:text-emerald-700 flex items-center gap-1"><i data-lucide="camera" class="w-3.5 h-3.5 text-blue-500"></i> Sessão de Fotos</span>
+                            <span class="text-[10px] text-slate-400 mt-1">Dicas e roupas</span>
+                        </button>
+                        <button type="button" onclick="window.app.selectZapTemplate('baile_evento')" class="zap-tpl-btn p-2.5 rounded-xl text-left border border-slate-200 bg-white hover:border-emerald-500 hover:bg-emerald-50/50 transition flex flex-col justify-between text-xs group" data-tpl="baile_evento">
+                            <span class="font-bold text-slate-800 group-hover:text-emerald-700 flex items-center gap-1"><i data-lucide="award" class="w-3.5 h-3.5 text-purple-500"></i> Baile / Colação</span>
+                            <span class="text-[10px] text-slate-400 mt-1">Cerimonial e festa</span>
+                        </button>
+                        <button type="button" onclick="window.app.selectZapTemplate('galeria_fotos')" class="zap-tpl-btn p-2.5 rounded-xl text-left border border-slate-200 bg-white hover:border-emerald-500 hover:bg-emerald-50/50 transition flex flex-col justify-between text-xs group" data-tpl="galeria_fotos">
+                            <span class="font-bold text-slate-800 group-hover:text-emerald-700 flex items-center gap-1"><i data-lucide="cloud-lightning" class="w-3.5 h-3.5 text-cyan-600"></i> Galeria Online</span>
+                            <span class="text-[10px] text-slate-400 mt-1">Link e seleção</span>
+                        </button>
+                        <button type="button" onclick="window.app.selectZapTemplate('material_pronto')" class="zap-tpl-btn p-2.5 rounded-xl text-left border border-slate-200 bg-white hover:border-emerald-500 hover:bg-emerald-50/50 transition flex flex-col justify-between text-xs group" data-tpl="material_pronto">
+                            <span class="font-bold text-slate-800 group-hover:text-emerald-700 flex items-center gap-1"><i data-lucide="package-check" class="w-3.5 h-3.5 text-teal-600"></i> Álbum Pronto</span>
+                            <span class="text-[10px] text-slate-400 mt-1">Aviso de entrega</span>
+                        </button>
+                        <button type="button" onclick="window.app.selectZapTemplate('quitacao')" class="zap-tpl-btn p-2.5 rounded-xl text-left border border-slate-200 bg-white hover:border-emerald-500 hover:bg-emerald-50/50 transition flex flex-col justify-between text-xs group" data-tpl="quitacao">
+                            <span class="font-bold text-slate-800 group-hover:text-emerald-700 flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i> Agradecimento</span>
+                            <span class="text-[10px] text-slate-400 mt-1">Quitação total</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Caixa de Edição da Mensagem -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Texto da Mensagem (Editável)</label>
+                        <span class="text-[10px] text-slate-400">Você pode personalizar qualquer palavra</span>
+                    </div>
+                    <textarea id="zap-message-textarea" rows="9" class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs font-mono leading-relaxed text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs"></textarea>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 bg-white border-t border-slate-200 flex flex-wrap justify-between items-center gap-2">
+                <button type="button" onclick="window.app.copyZapMessageText()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3.5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-2xs">
+                    <i data-lucide="copy" class="w-4 h-4 text-slate-500"></i> Copiar Mensagem
+                </button>
+                <div class="flex gap-2">
+                    <button type="button" onclick="window.app.closeWhatsAppMessagesModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium px-4 py-2.5 rounded-xl transition">
+                        Fechar
+                    </button>
+                    <button type="button" onclick="window.app.sendZapMessageDirect()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl transition shadow-md flex items-center gap-1.5">
+                        <i data-lucide="send" class="w-4 h-4"></i> Abrir no WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DE BRIEFING / PDF DO EVENTO PARA FREELANCER -->
     <div id="briefing-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center p-3 md:p-6 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden">
@@ -1870,6 +1963,8 @@
             let currentBriefingEvent = null;
             let currentReceiptData = null;
             let activeEditingContractId = null;
+            let currentZapAluno = null;
+            let activeZapTemplateKey = 'cobranca';
 
             // Estado de Assinaturas Digitais do Contrato
             let contractSignatures = {
@@ -2759,7 +2854,7 @@
                         
                         const cleanPhone = (aluno.contato || '').replace(/\D/g, '');
                         const whatsAppLink = cleanPhone.length >= 10 
-                            ? `<a href="https://wa.me/55${cleanPhone}" target="_blank" class="text-emerald-600 hover:text-emerald-800 font-medium inline-flex items-center gap-1 ml-1" title="Conversar no WhatsApp"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i></a>`
+                            ? `<button onclick="window.app.openWhatsAppMessagesModal('${aluno.id}', 'sessao_fotos')" class="text-emerald-600 hover:text-emerald-800 font-medium inline-flex items-center gap-1 ml-1.5 p-1 hover:bg-emerald-50 rounded-lg transition" title="Central de Mensagens WhatsApp"><i data-lucide="message-circle" class="w-4 h-4"></i></button>`
                             : '';
 
                         const galeriaBtn = aluno.linkGaleria 
@@ -3009,17 +3104,10 @@
                         const cleanPhone = (aluno.contato || '').replace(/\D/g, '');
                         let whatsAppButton = '';
                         if (cleanPhone.length >= 10) {
-                            const msg = encodeURIComponent(
-                                `Olá ${aluno.pai || ''}! Passando para atualizar o status do pacote de formatura do(a) formando(a) ${aluno.nome}.\n` +
-                                `• Valor Total: R$ ${total.toFixed(2).replace('.', ',')}\n` +
-                                `• Valor Pago: R$ ${pago.toFixed(2).replace('.', ',')}\n` +
-                                `• Saldo Restante: R$ ${restante.toFixed(2).replace('.', ',')}\n` +
-                                `Qualquer dúvida estamos à disposição!`
-                            );
                             whatsAppButton = `
-                            <a href="https://wa.me/55${cleanPhone}?text=${msg}" target="_blank" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded" title="Enviar Cobrança / Extrato no WhatsApp">
+                            <button onclick="window.app.openWhatsAppMessagesModal('${aluno.id}', 'cobranca')" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded" title="Central de Mensagens & Cobrança no WhatsApp">
                                 <i data-lucide="message-circle" class="w-4 h-4"></i>
-                            </a>`;
+                            </button>`;
                         }
 
                         const quitacaoOrReceiptButton = restante === 0
@@ -5917,6 +6005,174 @@ Muito obrigado pela confiança e preferência!
 _Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
 
                     const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(msg)}`;
+                    window.open(url, '_blank');
+                },
+                // --- CENTRAL DE MENSAGENS WHATSAPP INTELIGENTES ---
+                openWhatsAppMessagesModal: (alunoId, defaultTemplate = 'cobranca') => {
+                    const aluno = dbState.alunos.find(a => a.id === alunoId);
+                    if (!aluno) return;
+
+                    currentZapAluno = aluno;
+                    const cleanPhone = (aluno.contato || '').replace(/\D/g, '');
+                    
+                    document.getElementById('zap-aluno-nome').innerText = aluno.nome;
+                    document.getElementById('zap-aluno-info').innerText = `Resp: ${aluno.pai || 'Não informado'} • ${getNomeTurma(aluno.turmaId)}`;
+                    document.getElementById('zap-aluno-telefone').innerText = aluno.contato || 'Sem telefone';
+
+                    window.app.selectZapTemplate(defaultTemplate);
+
+                    const modal = document.getElementById('whatsapp-messages-modal');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    lucide.createIcons();
+                },
+                closeWhatsAppMessagesModal: () => {
+                    const modal = document.getElementById('whatsapp-messages-modal');
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                },
+                selectZapTemplate: (tplKey) => {
+                    activeZapTemplateKey = tplKey;
+
+                    // Atualiza botões
+                    document.querySelectorAll('.zap-tpl-btn').forEach(btn => {
+                        const isSelected = btn.getAttribute('data-tpl') === tplKey;
+                        if (isSelected) {
+                            btn.className = "zap-tpl-btn p-2.5 rounded-xl text-left border border-emerald-500 bg-emerald-50/80 transition flex flex-col justify-between text-xs group shadow-xs";
+                            const titleSpan = btn.querySelector('span.font-bold');
+                            if (titleSpan) titleSpan.className = "font-bold text-emerald-900 flex items-center gap-1";
+                        } else {
+                            btn.className = "zap-tpl-btn p-2.5 rounded-xl text-left border border-slate-200 bg-white hover:border-emerald-400 hover:bg-emerald-50/40 transition flex flex-col justify-between text-xs group";
+                            const titleSpan = btn.querySelector('span.font-bold');
+                            if (titleSpan) titleSpan.className = "font-bold text-slate-800 group-hover:text-emerald-700 flex items-center gap-1";
+                        }
+                    });
+
+                    if (currentZapAluno) {
+                        const msg = window.app.generateZapMessageContent(tplKey, currentZapAluno);
+                        document.getElementById('zap-message-textarea').value = msg;
+                    }
+                },
+                generateZapMessageContent: (tplKey, aluno) => {
+                    if (!aluno) return '';
+                    const finItem = dbState.financeiro.find(f => f.alunoId === aluno.id) || {};
+                    const total = parseFloat(finItem.total || 0);
+                    const pago = parseFloat(finItem.pago || 0);
+                    const restante = Math.max(0, total - pago);
+                    const nomeTurma = getNomeTurma(aluno.turmaId);
+                    const responsavel = aluno.pai || 'Responsável';
+
+                    switch (tplKey) {
+                        case 'cobranca':
+                            return `🎓 *WILKSON FOTOGRAFIAS - LEMBRETE DE PARCELA / EXTRATO* 📸
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Olá, *${responsavel}*! Tudo bem?
+Passando com muito carinho para compartilhar o resumo financeiro da formatura do(a) formando(a) *${aluno.nome}* (${nomeTurma}):
+
+📌 *Resumo do Pacote:*
+• Valor Total: *R$ ${total.toFixed(2).replace('.', ',')}*
+• Total Pago: *R$ ${pago.toFixed(2).replace('.', ',')}*
+• Saldo Restante: *R$ ${restante.toFixed(2).replace('.', ',')}*
+
+💳 *Pagamento via PIX:*
+• Chave: *646.660.003-30* (Wilkson Albuquerque Carvalho)
+
+Ficamos à disposição para qualquer dúvida ou para o envio do comprovante!
+_Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
+
+                        case 'sessao_fotos':
+                            return `📸 *WILKSON FOTOGRAFIAS - ORIENTAÇÕES PARA A SESSÃO DE FOTOS* 🎓✨
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Olá, *${responsavel}*! 
+Está chegando o dia da tão esperada sessão de fotos do(a) nosso(a) formando(a) *${aluno.nome}* (${nomeTurma})!
+
+✨ *Dicas Importantes para o Ensaio:*
+• *Roupas:* Recomendamos roupa leve e confortável por baixo da beca (preferencialmente blusa/camisa branca ou preta lisa, sem estampas).
+• *Cabelo & Penteado:* Como haverá colocação do capelo (chapéu de formando), penteados baixos ou soltos facilitam o ajuste.
+• *Pontualidade:* Chegar com 15 minutos de antecedência para a troca de beca com tranquilidade.
+• *Fotos com a Família:* Papais, mamães e irmãos são muito bem-vindos para os registros familiares!
+
+Qualquer dúvida estamos por aqui!
+_Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
+
+                        case 'baile_evento':
+                            return `🎓 *WILKSON FOTOGRAFIAS - INFORMAÇÕES DA SOLENIDADE / BAILE* 🎉
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Olá, *${responsavel}*! 
+A solenidade e baile de formatura do(a) *${aluno.nome}* (${nomeTurma}) estão chegando e nossa equipe fotográfica está pronta para eternizar cada segundo!
+
+📌 *Lembretes Importantes:*
+• Nossa equipe estará posicionada para capturar a entrada triunfal, canudo, juramento e a valsa em família.
+• Chegue com antecedência para fazermos fotos exclusivas no painel decorativo antes do início da cerimônia.
+• Prepare o coração para momentos emocionantes e inesquecíveis!
+
+Nos vemos lá!
+_Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
+
+                        case 'galeria_fotos':
+                            const linkGaleria = aluno.linkGaleria ? aluno.linkGaleria : '[Cadastre o link da galeria no sistema]';
+                            const senhaGaleria = aluno.senhaGaleria ? `• PIN / Senha: *${aluno.senhaGaleria}*\n` : '';
+                            return `📸 *WILKSON FOTOGRAFIAS - GALERIA DIGITAL LIBERADA!* 🌟
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Olá, *${responsavel}*! 
+As fotos da formatura do(a) *${aluno.nome}* já estão disponíveis em nossa galeria digital em alta resolução!
+
+🔗 *Link de Acesso:*
+${linkGaleria}
+${senhaGaleria}
+📌 *Próximos Passos:*
+1. Acesse o link acima para visualizar todas as fotos do evento.
+2. Selecione suas fotos favoritas para a confecção do álbum/material.
+3. Se desejar fotos adicionais além do pacote, temos condições especiais para fotos extras!
+
+Aproveitem para reviver esse momento tão especial!
+_Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
+
+                        case 'material_pronto':
+                            return `📦 *WILKSON FOTOGRAFIAS - SEU MATERIAL ESTÁ PRONTO!* 🎓✨
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Olá, *${responsavel}*! 
+Temos uma notícia maravilhosa: o álbum impresso / material de formatura do(a) *${aluno.nome}* ficou pronto com acabamento impecável!
+
+📌 *Entrega / Retirada:*
+O material já passou pela nossa conferência de qualidade e está pronto para entrega.
+
+Por favor, nos confirme o melhor dia e horário para combinarmos!
+_Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
+
+                        case 'quitacao':
+                            return `🎓 *WILKSON FOTOGRAFIAS - CONFIRMAÇÃO DE QUITAÇÃO TOTAL* ✨
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Olá, *${responsavel}*! 
+Confirmamos com sucesso a quitação integral de todas as parcelas do pacote de formatura do(a) formando(a) *${aluno.nome}*!
+
+Gostaríamos de agradecer imensamente pela confiança depositada em nosso trabalho para registrar essa etapa tão linda e marcante da sua família.
+
+Muito obrigado e contem sempre conosco!
+_Wilkson Fotografias • WhatsApp: (81) 98845-6625_`;
+
+                        default:
+                            return '';
+                    }
+                },
+                copyZapMessageText: () => {
+                    const text = document.getElementById('zap-message-textarea').value;
+                    if (!text) return;
+                    navigator.clipboard.writeText(text).then(() => {
+                        alert('✅ Mensagem copiada com sucesso! Agora basta colar no WhatsApp.');
+                    }).catch(() => {
+                        prompt('Copie o texto da mensagem abaixo:', text);
+                    });
+                },
+                sendZapMessageDirect: () => {
+                    if (!currentZapAluno) return;
+                    const cleanPhone = (currentZapAluno.contato || '').replace(/\D/g, '');
+                    if (cleanPhone.length < 10) {
+                        alert('⚠️ Este aluno não possui um número de telefone com DDD cadastrado.');
+                        return;
+                    }
+                    const text = document.getElementById('zap-message-textarea').value;
+                    const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(text)}`;
                     window.open(url, '_blank');
                 },
                 // Backup Completo do Banco de Dados
